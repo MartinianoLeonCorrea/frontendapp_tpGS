@@ -1,4 +1,4 @@
-# Plataforma digital de gestión académica para institutos secundarios - Repositorio de Frontend
+# Plataforma digital de gestión académica para institutos secundarios - Repositorio de Aplicación Frontend
 
 ## Grupo
 ### Integrantes
