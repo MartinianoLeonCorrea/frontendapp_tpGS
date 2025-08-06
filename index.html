@@ -1,16 +1,19 @@
+<!--
+Archivo HTML principal de la aplicación React.
+Usado por el servidor de desarrollo y como plantilla base para generar el build de producción.
+No cambiar el nombre ni eliminar este archivo.
+-->
+
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icono.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TP Gestión Secundaria</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="./index.js" defer></script>
+    <title>Gestión secundaria</title>
   </head>
   <body>
-    <h1>Gestión TU SECUNDARIA</h1>
-    <input type="text" id="task-name" />
-    <button id="get-task">Obtener Tarea</button>
-    <button id="create-task">Crear tarea</button>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
