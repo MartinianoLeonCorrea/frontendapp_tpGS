@@ -1,105 +1,38 @@
-// src/App.jsx
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
   useNavigate,
 } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import './App.css';
+import DashboardAlumno from './pages/alumno/DashboardAlumno';
+import DashboardDocente from './pages/docente/DashboardDocente';
+import MateriasAlumno from './pages/alumno/MateriasAlumno';
 
 function Home() {
   const navigate = useNavigate();
   return (
-    <div className="home-container">
-      <h1>Home</h1>
-      <p>Bienvenido a la aplicación de gestión "Tu secundaria".</p>
-      <button onClick={() => navigate('/materias')}>
-        Ver listado materias
-      </button>
-    </div>
-  );
-}
-
-function Materias() {
-  const [materias, setMaterias] = useState([]);
-  const [materiaBuscada, setMateriaBuscada] = useState('');
-  const [materiaEncontrada, setMateriaEncontrada] = useState(null);
-
-  useEffect(() => {
-    const fetchMaterias = async () => {
-      try {
-        const response = await fetch('/api/materias');
-        if (!response.ok) {
-          throw new Error('Error al obtener las materias');
-        }
-        const data = await response.json();
-        setMaterias(data);
-      } catch (error) {
-        console.error('Fetch error:', error);
-      }
-    };
-    fetchMaterias();
-  }, []);
-
-  const handleSearch = async () => {
-    if (!materiaBuscada) {
-      setMateriaEncontrada(null);
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/materias/${materiaBuscada}`);
-      if (!response.ok) {
-        setMateriaEncontrada(null);
-        throw new Error('Materia no encontrada');
-      }
-      const data = await response.json();
-      setMateriaEncontrada(data);
-    } catch (error) {
-      console.error('Search error:', error);
-    }
-  };
-
-  return (
-    <div className="app-container">
-      <h1>Gestión TU SECUNDARIA</h1>
-      <h2> Listado Materias </h2>
-      <div className="search-section">
-        <input
-          type="text"
-          value={materiaBuscada}
-          onChange={(e) => setMateriaBuscada(e.target.value)}
-          placeholder="Buscar materia por ID"
-        />
-        <button onClick={handleSearch}>Buscar Materia</button>
-      </div>
-
-      {materiaEncontrada && (
-        <div className="found-materia">
-          <h3>Materia Encontrada:</h3>
-          <p>ID: {materiaEncontrada.id}</p>
-          <p>Nombre: {materiaEncontrada.nombre}</p>
-          <p>Descripción: {materiaEncontrada.descripcion}</p>
+    <>
+      <header className="main-header">
+        <div className="logo-box">
+          <img src={''} alt="Imagen Logo" className="logo-img" />
         </div>
-      )}
-
-      <hr />
-
-      <h2>Listado de Materias</h2>
-      {materias.length > 0 ? (
-        <ul>
-          {materias.map((materia) => (
-            <li key={materia.id}>
-              ID: {materia.id} - Nombre: {materia.nombre}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No hay materias disponibles.</p>
-      )}
-    </div>
+        <h1 className="header-title">Gestión Tu Secundaria</h1>
+      </header>
+      <div className="home-container">
+        <h2>Home</h2>
+        <p>Bienvenido a la aplicación de gestión "Tu secundaria".</p>
+        <button onClick={() => navigate('/alumno/dashboard')}>
+          Vista Alumno
+        </button>
+        <button
+          onClick={() => navigate('/docente/dashboard')}
+          style={{ marginLeft: '16px' }}
+        >
+          Vista Docente
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -108,7 +41,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/materias" element={<Materias />} />
+        <Route path="/alumno/dashboard" element={<DashboardAlumno />} />
+        <Route path="/docente/dashboard" element={<DashboardDocente />} />
+        <Route path="/alumno/materias" element={<MateriasAlumno />} />
       </Routes>
     </Router>
   );
