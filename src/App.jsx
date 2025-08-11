@@ -5,32 +5,28 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import './App.css';
+import Header from './components/Header';
 import DashboardAlumno from './pages/alumno/DashboardAlumno';
 import DashboardDocente from './pages/docente/DashboardDocente';
 import MateriasAlumno from './pages/alumno/MateriasAlumno';
 
+// Componente Home sin el header
 function Home() {
   const navigate = useNavigate();
   return (
     <>
-      <header className="main-header">
-        <div className="logo-box">
-          <img src={''} alt="Imagen Logo" className="logo-img" />
-        </div>
-        <h1 className="header-title">Gestión Tu Secundaria</h1>
-      </header>
+      <Header title="Gestión Tu Secundaria" />
       <div className="home-container">
         <h2>Home</h2>
         <p>Bienvenido a la aplicación de gestión "Tu secundaria".</p>
-        <button onClick={() => navigate('/alumno/dashboard')}>
-          Vista Alumno
-        </button>
-        <button
-          onClick={() => navigate('/docente/dashboard')}
-          style={{ marginLeft: '16px' }}
-        >
-          Vista Docente
-        </button>
+        <div className="button-row">
+          <button onClick={() => navigate('/alumno/dashboard')}>
+            Vista Alumno
+          </button>
+          <button onClick={() => navigate('/docente/dashboard')}>
+            Vista Docente
+          </button>
+        </div>
       </div>
     </>
   );

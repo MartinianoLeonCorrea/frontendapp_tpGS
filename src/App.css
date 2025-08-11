@@ -1,7 +1,7 @@
 /* Estiliza solo el componente App */
 .app-container {
   font-family: sans-serif;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f4f4f4;
@@ -68,21 +68,21 @@ ul {
 }
 
 .main-header {
-  width: 100vw;
-  min-height: 80px;
+  width: 100%;
+  min-height: 100px;
   background: #007bff;
   display: flex;
   align-items: center;
-  padding: 0 0 0 30px;
+  padding: 0 0 0 10px;
   box-sizing: border-box;
   position: relative;
 }
 
 .logo-box {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   background: #fff;
-  border-radius: 10px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,8 +91,8 @@ ul {
 }
 
 .logo-img {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
 }
 
@@ -107,20 +107,20 @@ ul {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: top;
   min-height: 70vh;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
-  padding: 60px 30px;
-  margin: 40px auto 0 auto;
-  max-width: 900px;
+  padding: 40px 20px;
+  margin: 25px auto;
+  width: calc(100vw - 65px);
 }
 
 .home-container h2 {
   color: #007bff;
   margin-bottom: 10px;
-  font-size: 2rem;
+  font-size: 3rem;
 }
 
 .home-container p {
@@ -143,4 +143,11 @@ ul {
 
 .home-container button:hover {
   background-color: #0056b3;
+}
+
+.button-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
 }
