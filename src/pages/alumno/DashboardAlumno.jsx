@@ -1,15 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/Header';
+import Sidebar from '../../components/Sidebar';
 
 function DashboardAlumno() {
   const navigate = useNavigate();
   return (
     <>
-      <Header title="Dashboard Alumno" />
-      <div className="logo-box">
-        <img src={''} alt="imagen logo" className="logo-img" />
-      </div>
-      <h1 className="header-title">Gestión Tu Secundaria</h1>
+      <Sidebar />
       <div className="home-container">
         <h2>Dashboard Alumno</h2>
         <button onClick={() => navigate('/alumno/materias')}>
