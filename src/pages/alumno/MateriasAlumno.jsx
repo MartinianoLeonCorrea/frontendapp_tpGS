@@ -42,9 +42,8 @@ function MateriasAlumno() {
   };
 
   return (
-    <div className="app-container">
-      <h1>Gestión TU SECUNDARIA</h1>
-      <h2>Listado Materias</h2>
+    <div className="body">
+      <h2 id="titulo">Listado Materias</h2>
       <div className="search-section">
         <input
           type="text"
@@ -63,10 +62,6 @@ function MateriasAlumno() {
           <p>Descripción: {materiaEncontrada.descripcion}</p>
         </div>
       )}
-
-      <hr />
-
-      <h2>Listado de Materias</h2>
       {materias.length > 0 ? (
         <ul>
           {materias.map((materia) => (
