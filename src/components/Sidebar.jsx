@@ -1,49 +1,110 @@
-// components/Sidebar.jsx
+// src/components/Sidebar.jsx
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  CalendarIcon,
+  FileTextIcon,
+  GraduationCapIcon,
+  ClipboardListIcon,
+  ArrowLeftIcon,
+  SettingsIcon,
+} from './Icons';
 
-const Sidebar = () => {
+function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Define los items del menú con sus rutas
+  const menuItems = [
+    {
+      id: 'examenes',
+      label: 'Exámenes',
+      icon: GraduationCapIcon,
+      path: '/alumno/examenes',
+    },
+    { id: 'notas', label: 'Notas', icon: FileTextIcon, path: '/alumno/notas' },
+    {
+      id: 'asistencias',
+      label: 'Asistencias',
+      icon: ClipboardListIcon,
+      path: '/alumno/asistencias',
+    },
+    {
+      id: 'dictados',
+      label: 'Dictados',
+      icon: GraduationCapIcon,
+      path: '/docente/dictados',
+    },
+    {
+      id: 'calendario',
+      label: 'Calendario',
+      icon: CalendarIcon,
+      path: '/calendario',
+    },
+  ];
+
+  const handleMenuClick = (path) => {
+    if (path === 'atras') {
+      navigate(-1);
+    } else {
+      navigate(path);
+    }
+  };
+
+  // Verifica el rol del usuario (Alumno/Docente) y filtra el menú
   const isAlumno = location.pathname.startsWith('/alumno');
   const isDocente = location.pathname.startsWith('/docente');
 
-  const handleBack = () => {
-    navigate(-1);
+  const filteredItems = menuItems.filter((item) => {
+    if (isAlumno) {
+      return ['examenes', 'notas', 'asistencias', 'calendario'].includes(
+        item.id
+      );
+    }
+    if (isDocente) {
+      return ['dictados', 'calendario'].includes(item.id);
+    }
+    // Por defecto, muestra solo las opciones básicas si no está en una ruta específica
+    return ['calendario'].includes(item.id);
+  });
+
+  const backButton = {
+    id: 'atras',
+    label: 'Atrás',
+    icon: ArrowLeftIcon,
+    path: 'atras',
   };
-  const handleCalendario = () => {
-    navigate('/calendario');
-  };
+  filteredItems.push(backButton);
+
   return (
-    <div className="sidebar">
-      <div className="logo-box">
-        <img src="/icono.svg" alt="Imagen Logo" className="logo-img" />
+    <div className="sidebar-container">
+      <div className="sidebar-logo-section">
+        <div className="sidebar-logo-box">
+          <div className="sidebar-logo-text">Logo</div>
+          <div className="sidebar-logo-text">App</div>
+        </div>
       </div>
-      <h3>Opciones</h3>
 
-      {/* Botones para Alumno */}
-      {isAlumno && (
-        <>
-          <button onClick={() => navigate('/alumno/examenes')}>Exámenes</button>
-          <button onClick={() => navigate('/alumno/asistencias')}>
-            Asistencias
-          </button>
-          <button onClick={() => navigate('/alumno/notas')}>Notas</button>
-        </>
-      )}
-
-      {/* Botones para Docente */}
-      {isDocente && (
-        <>
-          <button onClick={() => navigate('/docente/dictado')}>Dictado</button>
-        </>
-      )}
-
-      {/* Botones base */}
-      <button onClick={handleCalendario}>Calendario</button>
-      <button onClick={handleBack}>Atrás</button>
+      <nav className="sidebar-navigation">
+        {filteredItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+          return (
+            <button
+              key={item.id}
+              className={`sidebar-menu-item ${isActive ? 'active' : ''}`}
+              onClick={() => handleMenuClick(item.path)}
+              aria-label={`Ir a ${item.label}`}
+            >
+              <div className="sidebar-icon">
+                <Icon size={18} />
+              </div>
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
-};
+}
 
 export default Sidebar;

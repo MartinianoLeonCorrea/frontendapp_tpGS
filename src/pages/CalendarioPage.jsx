@@ -2,6 +2,7 @@ import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import dayjs from 'dayjs';
 
+//No es responsivo no entiendo por qué
 function CalendarioPage() {
   const localizer = dayjsLocalizer(dayjs);
   const events = [

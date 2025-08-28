@@ -18,11 +18,8 @@ const Layout = () => {
   return (
     <div className="app-container">
       <Sidebar />
-      <div className="perfil-box">
-        <p>Perfil</p>
-      </div>
       <div className="main-content">
-        <Header title="Tu Secundaria" />
+        <Header />
         <div className="body">
           <Outlet />
         </div>
