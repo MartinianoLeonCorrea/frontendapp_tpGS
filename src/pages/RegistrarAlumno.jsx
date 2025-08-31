@@ -1,4 +1,4 @@
-import FormularioRegistro from "/home/joni/TrabajoPracticoDSW/frontendapp_tpGS/src/components/FormularioRegistro.jsx";
+import Form from "/home/joni/TrabajoPracticoDSW/frontendapp_tpGS/src/components/Form.jsx";
 
 const camposAlumno = [
   { name: "nombre", label: "Nombre", type: "text", required: true },
@@ -8,14 +8,14 @@ const camposAlumno = [
   { name: "fechaNacimiento", label: "Fecha de Nacimiento", type: "date", required: true },
 ];
 
-function RegistrarAlumno() {
+function CreateAlumno() {
   const handleRegistro = (datos) => {
     // Aquí puedes hacer la petición al backend
     console.log("Datos del alumno:", datos);
   };
 
   return (
-    <FormularioRegistro
+    <Form
       campos={camposAlumno}
       titulo="Registrar Alumno"
       onSubmit={handleRegistro}
@@ -24,4 +24,4 @@ function RegistrarAlumno() {
   );
 }
 
-export default RegistrarAlumno;
+export default CreateAlumno;
