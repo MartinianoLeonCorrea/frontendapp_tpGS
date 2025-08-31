@@ -27,6 +27,10 @@ function Header() {
       title: 'Escuela Secundaria San Martín',
       subtitle: 'Matemáticas', // Esto será dinámico
     },
+    '/registrar': {
+      title: 'Registrar Alumno',
+      subtitle: '',
+    },
   };
 
   // Obtener el título y subtítulo según la ruta actual

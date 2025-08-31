@@ -1,8 +1,13 @@
-import { useForm } from "react-hook-form";
-import "/home/joni/TrabajoPracticoDSW/frontendapp_tpGS/src/App.css";
+import { useForm } from 'react-hook-form';
+import '../App.css';
 
-function Form({ campos, titulo, onSubmit, textoBoton = "Registrar" }) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+function Form({ campos, titulo, onSubmit, textoBoton = 'Registrar' }) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
   const submitHandler = (data) => {
     onSubmit(data);
@@ -19,12 +24,10 @@ function Form({ campos, titulo, onSubmit, textoBoton = "Registrar" }) {
             <input
               type={campo.type}
               {...register(campo.name, { required: campo.required })}
-              className={`form-input${errors[campo.name] ? " error" : ""}`}
+              className={`form-input${errors[campo.name] ? ' error' : ''}`}
             />
             {errors[campo.name] && (
-              <span className="form-error">
-                Este campo es obligatorio
-              </span>
+              <span className="form-error">Este campo es obligatorio</span>
             )}
           </div>
         ))}
