@@ -1,6 +1,6 @@
 // src/pages/alumno/DashboardAlumno.jsx
 import { useEffect, useState } from 'react';
-import { CardMateria } from '../../components/CardMAteria';
+import { CardMateria } from '../../components/CardMateria';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 export default function DashboardAlumno() {
