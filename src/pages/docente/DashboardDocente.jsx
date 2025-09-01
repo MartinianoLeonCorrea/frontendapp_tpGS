@@ -1,31 +1,84 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 function DashboardDocente() {
+  const [dictados, setDictados] = useState([]);
+
+  const recentNews = [
+    'Nueva fecha de examen de Matemáticas: 15 de Septiembre',
+    'Recordatorio: Entrega de trabajos prácticos hasta el viernes',
+  ];
+  const navigate = useNavigate();
+  useEffect(() => {
+    // Petición GET al backend
+    fetch('/api/dictados')
+      .then((res) => res.json())
+      .then((data) => {
+        // Si el backend devuelve un objeto con la propiedad 'data'
+        if (data.data) {
+          setDictados(data.data);
+        } else {
+          setDictados(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error al obtener dictados:', err);
+      });
+  }, []);
+  const handleSubjectClick = (subjectId, subjectName) => {
+    // Acá hay que agregar la lógica para navegar a la página de la materia
+    console.log(`Navegando al dictado: ${subjectName} (ID: ${subjectId})`);
+    // Ejemplo de navegación a una página de materia específica
+    navigate(`/alumno/dictados/${subjectId}`);
+  };
+
   return (
-    <>
-      <h2 id="titulo">Dashboard Docente</h2>
-      <h3 id="subtitulo">Bienvenido Prof. Rodriguez</h3>
-      <div id="cajas">
-        <div id="columna">
-          <div id="caja">
-            <p>Dictado 1</p>
+    <main className="dashboard-content">
+      <div className="dashboard-layout">
+        {/* Sección Principal - Dictados */}
+        <section className="subjects-section">
+          <div className="content-card">
+            <h2 className="section-title">Mis Dictados</h2>
+            <div className="subjects-grid">
+              {dictados.length === 0 ? (
+                <p>No hay materias disponibles.</p>
+              ) : (
+                dictados.map((dictado) => (
+                  <CardMateria
+                    key={dictado.id}
+                    title={dictado.nombre}
+                    description={dictado.descripcion}
+                    onClick={() =>
+                      handleSubjectClick(dictado.id, dictado.nombre)
+                    }
+                  />
+                ))
+              )}
+            </div>
           </div>
-          <div id="caja">
-            <p>Dictado 2</p>
-          </div>
-        </div>
-        <div id="columna">
-          <div id="caja">
-            <p>Dictado 3</p>
-          </div>
-          <div id="caja">
-            <p>Dictado 4</p>
-          </div>
-        </div>
+        </section>
+        {/* Sidebar Derecho */}
+        <aside className="right-sidebar">
+          {/* Sección de Novedades */}
+          <section className="news-section">
+            <h3 className="sidebar-section-title">Novedades</h3>
+            <p className="sidebar-subtitle">(Publicaciones recientes)</p>
+
+            {recentNews.length > 0 ? (
+              <div className="news-list">
+                {recentNews.map((news, index) => (
+                  <div key={index} className="info-placeholder">
+                    {news}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="info-placeholder">No hay novedades recientes</p>
+            )}
+          </section>
+        </aside>
       </div>
-      <div className="novedades">
-        <h3>Novedades</h3>
-        <p>No hay novedades por el momento.</p>
-      </div>
-    </>
+    </main>
   );
 }
 

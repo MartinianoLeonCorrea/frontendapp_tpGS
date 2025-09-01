@@ -166,14 +166,17 @@ ul {
 
 .calendario {
   width: 100%;
-  max-width: 100%;
-  height: 75vh;
-  background-color: #c2bebe;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: 350px; /* Asegura altura mínima */
+  box-sizing: border-box;
 }
 
 .rbc-calendar {
   width: 100% !important;
-  min-width: 300px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .left-column {
@@ -521,7 +524,6 @@ button:hover {
 @media (max-width: 768px) {
   .sidebar-container {
     width: 4rem;
-
   }
 
   .sidebar-menu-item {
@@ -546,9 +548,12 @@ button:hover {
   }
 
   .calendario {
-    width: 100%;
-    height: auto;
-    /* or a smaller height */
+    max-width: 100%;
+    padding: 0.5rem;
+    min-height: 250px;
+  }
+  .rbc-calendar {
+    font-size: 0.85rem;
   }
 }
 
