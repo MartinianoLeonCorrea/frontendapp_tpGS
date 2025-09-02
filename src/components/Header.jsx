@@ -20,7 +20,7 @@ function Header() {
       subtitle: '¡Bienvenido, Prof. Rodríguez!',
     },
     '/calendario': {
-      title: 'Calendario',
+      title: 'Calendario general',
       subtitle: '',
     },
     '/alumno/materias': {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CardDictado } from '../../components/CardDictado.jsx';
 
 function DashboardDocente() {
   const [dictados, setDictados] = useState([]);
@@ -14,22 +15,25 @@ function DashboardDocente() {
     fetch('/api/dictados')
       .then((res) => res.json())
       .then((data) => {
-        // Si el backend devuelve un objeto con la propiedad 'data'
-        if (data.data) {
+        // Si la respuesta tiene 'data' y es un array, úsala. Si no, usa []
+        if (Array.isArray(data.data)) {
           setDictados(data.data);
-        } else {
+        } else if (Array.isArray(data)) {
           setDictados(data);
+        } else {
+          setDictados([]);
         }
       })
       .catch((err) => {
         console.error('Error al obtener dictados:', err);
+        setDictados([]);
       });
   }, []);
-  const handleSubjectClick = (subjectId, subjectName) => {
-    // Acá hay que agregar la lógica para navegar a la página de la materia
-    console.log(`Navegando al dictado: ${subjectName} (ID: ${subjectId})`);
-    // Ejemplo de navegación a una página de materia específica
-    navigate(`/alumno/dictados/${subjectId}`);
+  const handleDictadoClick = (dictadoId) => {
+    // Acá hay que agregar la lógica para navegar a la página del dictado
+    console.log(`Navegando al dictado: ${dictadoId}`);
+    // Ejemplo de navegación a una página de dictado específica
+    navigate(`/docente/dictado/`, { state: { dictadoId } });
   };
 
   return (
@@ -41,16 +45,19 @@ function DashboardDocente() {
             <h2 className="section-title">Mis Dictados</h2>
             <div className="subjects-grid">
               {dictados.length === 0 ? (
-                <p>No hay materias disponibles.</p>
+                <p>No hay dictados disponibles.</p>
               ) : (
                 dictados.map((dictado) => (
-                  <CardMateria
+                  <CardDictado
                     key={dictado.id}
-                    title={dictado.nombre}
-                    description={dictado.descripcion}
-                    onClick={() =>
-                      handleSubjectClick(dictado.id, dictado.nombre)
+                    materiaNombre={dictado.materia?.nombre || 'Sin materia'}
+                    docenteNombre={
+                      dictado.docente
+                        ? `${dictado.docente.nombre} ${dictado.docente.apellido}`
+                        : 'Sin docente'
                     }
+                    cursoNroLetra={dictado.curso?.nro_letra || 'Sin curso'}
+                    onClick={() => handleDictadoClick(dictado.id)}
                   />
                 ))
               )}
