@@ -13,6 +13,7 @@ import MateriasAlumno from './pages/alumno/MateriasAlumno';
 import RegistrarAlumno from './pages/RegistrarAlumno';
 import Sidebar from './components/Sidebar';
 import CalendarioPage from './pages/CalendarioPage';
+import PerfilAlumno from './pages/alumno/PerfilAlumno';
 
 const Layout = () => {
   return (
@@ -56,6 +57,7 @@ function App() {
           <Route path="docente/dashboard" element={<DashboardDocente />} />
           <Route path="registrar" element={<RegistrarAlumno />} />
           <Route path="calendario" element={<CalendarioPage />} />
+          <Route path="/alumno/perfil" element={<PerfilAlumno />} />
         </Route>
       </Routes>
     </Router>

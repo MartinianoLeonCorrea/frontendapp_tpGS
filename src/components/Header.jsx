@@ -1,10 +1,10 @@
 // src/components/Header.jsx
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { UserIcon } from './Icons';
 
 function Header() {
   const location = useLocation();
-
+  const navigate = useNavigate();
   // Mapeo de rutas a títulos y subtítulos
   const pageInfo = {
     '/': {
@@ -20,7 +20,7 @@ function Header() {
       subtitle: '¡Bienvenido, Prof. Rodríguez!',
     },
     '/calendario': {
-      title: 'Calendario general',
+      title: 'Calendario',
       subtitle: '',
     },
     '/alumno/materias': {
@@ -30,6 +30,10 @@ function Header() {
     '/registrar': {
       title: 'Registrar Alumno',
       subtitle: '',
+    },
+    '/alumno/perfil': {
+      title: 'Escuela Secundaria San Martín',
+      subtitle: 'Perfil del Alumno',
     },
   };
 
@@ -52,7 +56,7 @@ function Header() {
   // Puedes expandir esta lógica para manejar otros títulos dinámicos si es necesario
 
   const handleProfileClick = () => {
-    console.log('Opening user profile');
+    navigate('/alumno/perfil');
   };
 
   return (
@@ -62,16 +66,18 @@ function Header() {
         {subtitle && <p className="welcome-message">{subtitle}</p>}
       </div>
 
-      <button
-        className="header-profile-section"
-        onClick={handleProfileClick}
-        aria-label="Abrir perfil de usuario"
-      >
-        <div className="profile-icon">
-          <UserIcon size={24} />
-        </div>
-        <p className="profile-label">Perfil</p>
-      </button>
+      {location.pathname === '/alumno/dashboard' && (
+        <button
+          className="header-profile-section"
+          onClick={handleProfileClick}
+          aria-label="Abrir perfil de usuario"
+        >
+          <div className="profile-icon">
+            <UserIcon size={24} />
+          </div>
+          <p className="profile-label">Perfil</p>
+        </button>
+         )}
     </header>
   );
 }
