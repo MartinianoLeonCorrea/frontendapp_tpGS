@@ -35,6 +35,18 @@ function Header() {
       title: 'Escuela Secundaria San Martín',
       subtitle: 'Perfil del Alumno',
     },
+    '/alumno/examenes': {
+      title: 'Mis Exámenes',
+      subtitle: '',
+    },
+    '/alumno/notas': {
+      title: 'Mis Notas',
+      subtitle: '',
+    },
+    '/alumno/asistencias': {
+      title: 'Mis Asistencias',
+      subtitle: '',
+    },
   };
 
   // Obtener el título y subtítulo según la ruta actual

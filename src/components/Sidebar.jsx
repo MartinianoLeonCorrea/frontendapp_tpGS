@@ -6,7 +6,7 @@ import {
   GraduationCapIcon,
   ClipboardListIcon,
   ArrowLeftIcon,
-  SettingsIcon,
+  LogOutIcon,
 } from './Icons';
 
 function Sidebar() {
@@ -54,6 +54,18 @@ function Sidebar() {
   const isAlumno = location.pathname.startsWith('/alumno');
   const isDocente = location.pathname.startsWith('/docente');
 
+  // Maneja el click en el logo
+  const handleLogoClick = () => {
+    if (isAlumno) {
+      navigate('/alumno/dashboard');
+    } else if (isDocente) {
+      navigate('/docente/dashboard');
+    } else {
+      navigate('/'); // O ruta por defecto
+    }
+  };
+
+  // Verifica el rol del usuario (Alumno/Docente) y filtra el menú
   const filteredItems = menuItems.filter((item) => {
     if (isAlumno) {
       return ['examenes', 'notas', 'asistencias', 'calendario'].includes(
@@ -75,9 +87,18 @@ function Sidebar() {
   };
   filteredItems.push(backButton);
 
+  // Botón cerrar sesión
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   return (
     <div className="sidebar-container">
-      <div className="sidebar-logo-section">
+      <div
+        className="sidebar-logo-section"
+        onClick={handleLogoClick}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="sidebar-logo-box">
           <div className="sidebar-logo-text">Logo</div>
           <div className="sidebar-logo-text">App</div>
@@ -103,6 +124,19 @@ function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Botón cerrar sesión al final */}
+      <div className="sidebar-logout-section">
+        <button
+          className="sidebar-menu-item logout"
+          onClick={handleLogout}
+        >
+          <div className="sidebar-icon">
+            <LogOutIcon size={18} />
+          </div>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
     </div>
   );
 }

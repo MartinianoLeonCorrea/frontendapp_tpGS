@@ -15,6 +15,10 @@ import Sidebar from './components/Sidebar';
 import CalendarioPage from './pages/CalendarioPage';
 import PerfilAlumno from './pages/alumno/PerfilAlumno';
 import MateriaPage from './pages/alumno/MateriaPage';
+import ExamenesPage from './pages/alumno/ExamenesPage';
+import NotasPage from './pages/alumno/NotasPage';
+import AsistenciasPage from './pages/alumno/AsistenciasPage';
+import { UserProvider } from './context/UserProvider';
 
 const Layout = () => {
   return (
@@ -50,18 +54,23 @@ function Home() {
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="alumno/dashboard" element={<DashboardAlumno />} />
-          <Route path="alumno/materias" element={<MateriasAlumno />} />
-          <Route path="docente/dashboard" element={<DashboardDocente />} />
-          <Route path="registrar" element={<RegistrarAlumno />} />
-          <Route path="calendario" element={<CalendarioPage />} />
-          <Route path="/alumno/perfil" element={<PerfilAlumno />} />
-          <Route path="/alumno/materia" element={<MateriaPage />} />
-        </Route>
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="alumno/dashboard" element={<DashboardAlumno />} />
+            <Route path="alumno/materias" element={<MateriasAlumno />} />
+            <Route path="docente/dashboard" element={<DashboardDocente />} />
+            <Route path="registrar" element={<RegistrarAlumno />} />
+            <Route path="calendario" element={<CalendarioPage />} />
+            <Route path="/alumno/perfil" element={<PerfilAlumno />} />
+            <Route path="/alumno/materia" element={<MateriaPage />} />
+            <Route path="/alumno/examenes" element={<ExamenesPage />} />
+            <Route path="/alumno/notas" element={<NotasPage />} />
+            <Route path="/alumno/asistencias" element={<AsistenciasPage />} />
+          </Route>
+        </Routes>
+      </UserProvider>
     </Router>
   );
 }

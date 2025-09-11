@@ -2,15 +2,14 @@
 import { useEffect, useState } from 'react';
 import { CardMateria } from '../../components/CardMateria';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
 export default function DashboardAlumno() {
   const [materias, setMaterias] = useState([]);
   const [proximoExamen, setProximoExamen] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const dni = 20000001;
+  const { dni } = useUser();
   const navigate = useNavigate();
-
-  console.log('DashboardAlumno renderizado');
 
   useEffect(() => {
     // Definimos una función asincrónica para centralizar toda la lógica de carga

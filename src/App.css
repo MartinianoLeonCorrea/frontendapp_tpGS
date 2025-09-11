@@ -872,3 +872,105 @@ button:hover {
     height: 300px;
   }
 }
+
+/* ==============================================
+  ESTILOS DE NOTAS Y ASISTENCIAS (No desarrolladas)
+   ============================================== */
+
+.notas-page,
+.asistencias-page {
+  margin: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+/* ==============================================
+            ESTILOS DE EXAMENES PAGE
+   ============================================== */
+
+.examenes-filtros {
+  margin-bottom: 16px;
+  text-align: right;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.examenes-select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #10b981;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+}
+.examenes-page {
+  width: 100%;
+  padding-top: 1rem;
+}
+
+.examenes-list {
+  list-style: none;
+  padding: 0;
+}
+.examenes-listado.fade {
+  opacity: 0.3;
+  transition: opacity 0.35s;
+}
+.examenes-listado {
+  transition: opacity 0.35s;
+  transition-timing-function: linear(
+    0 0%,
+    0 1.8%,
+    0.01 3.6%,
+    0.03 6.35%,
+    0.07 9.1%,
+    0.13 11.4%,
+    0.19 13.4%,
+    0.27 15%,
+    0.34 16.1%,
+    0.54 18.35%,
+    0.66 20.6%,
+    0.72 22.4%,
+    0.77 24.6%,
+    0.81 27.3%,
+    0.85 30.4%,
+    0.88 35.1%,
+    0.92 40.6%,
+    0.94 47.2%,
+    0.96 55%,
+    0.98 64%,
+    0.99 74.4%,
+    1 86.4%,
+    1 100%
+  );
+}
+
+.examen-card {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #fafafa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.examen-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.examen-materia {
+  font-size: 1.1em;
+}
+.examen-fecha {
+  color: #059669;
+  font-weight: bold;
+}
+.examen-temas,
+.examen-docente,
+.examen-copias {
+  margin-bottom: 4px;
+}
