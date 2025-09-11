@@ -26,7 +26,6 @@
 }
 
 hr {
-  position: absolute;
   top: 103px;
   width: 95%;
   border: 1px solid #6e6e6e;
@@ -121,9 +120,7 @@ ul {
 li {
   background-color: white;
   padding: 10px;
-  margin-bottom: 5px;
   border: 1px solid #eee;
-  border-radius: 4px;
 }
 
 p {
@@ -296,6 +293,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 103px;
 }
 
 .header-info-section {
@@ -468,24 +466,37 @@ button:hover {
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
-
-.sidebar-section-title {
+.section-header {
   margin-bottom: 0.5rem;
+}
+.sidebar-main-title,
+.sidebar-section-title {
+  margin: 0;
   color: #374151;
   /* gray-700 */
-  margin-top: 0;
+  font-weight: 700;
 }
 
-.sidebar-subtitle {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: #6b7280;
-  /* gray-500 */
-  margin: 0;
+.sidebar-main-title {
+  font-size: 1.25rem;
+}
+
+.sidebar-section-title {
+  font-size: 1.125rem;
+}
+.title-divider {
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  margin-top: 0.5rem;
+}
+.exam-card {
+  background-color: #f9fafb;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .info-placeholder {
-  margin-top: 1rem;
   padding: 0.75rem;
   background-color: #f9fafb;
   /* gray-50 */
@@ -512,10 +523,6 @@ button:hover {
 
 .news-list .info-placeholder:last-child {
   margin-bottom: 0;
-}
-
-.exam-info {
-  margin-top: 1rem;
 }
 
 /* ==============================================
@@ -624,4 +631,244 @@ button:hover {
 
 .form-button:hover {
   background: #306b38;
+}
+
+/* ==============================================
+   ESTILOS DEL MATERIA PAGE
+   ============================================== */
+
+.materia-page {
+  width: 100%;
+  margin: 0;
+  padding: 1rem 0;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  min-height: 100vh;
+  background: #f3f4f6;
+  gap: 1.5rem;
+}
+
+.materia-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.materia-header h1 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.materia-info {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.profesor-label {
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 1.15rem;
+}
+
+.descripcion-label {
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+  display: block;
+  font-size: 1.15rem;
+  border-bottom: 2px solid #4b5563;
+  padding-bottom: 0.5rem;
+}
+
+.examenes-section {
+  padding: 1.5rem;
+}
+
+.examenes-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.examenes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.examen-item {
+  padding: 0.5rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+.examen-item:last-child {
+  border-bottom: none;
+}
+
+.material-section {
+  padding: 1.5rem;
+}
+
+.material-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.material-button {
+  width: 100%;
+  padding: 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.material-button:hover {
+  background: #2563eb;
+}
+
+.material-placeholder {
+  text-align: center;
+  padding: 2rem;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  color: #6b7280;
+}
+
+.foro-sidebar {
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+  width: 350px;
+  margin-left: auto;
+}
+
+/* ==============================================
+                ESTILOS DEL FORO
+   ============================================== */
+
+.foro-container {
+  background: #f0f9ff;
+  border: 2px solid #5d5e5d;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.foro-header {
+  background: #10b981;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+.foro-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.foro-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.foro-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background: white;
+}
+
+.no-messages {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 2rem;
+}
+
+.no-messages p {
+  margin: 0;
+}
+
+.foro-input-section {
+  padding: 1rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.foro-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 60px;
+  margin-bottom: 0.5rem;
+  font-family: inherit;
+}
+
+.foro-textarea:focus {
+  outline: none;
+  border-color: #7d7e80;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.foro-publish-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.foro-publish-button:hover:not(:disabled) {
+  background: #10b981;
+}
+
+.foro-publish-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .materia-page {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .foro-sidebar {
+    position: static;
+    order: -1;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .foro-container {
+    height: 300px;
+  }
 }

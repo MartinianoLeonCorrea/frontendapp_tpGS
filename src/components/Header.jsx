@@ -42,18 +42,12 @@ function Header() {
   let title = pageInfo[currentPath]?.title || 'Página no encontrada';
   let subtitle = pageInfo[currentPath]?.subtitle || '';
 
-  // Lógica para manejar rutas dinámicas como 'alumno/materias/:id'
-  if (currentPath.startsWith('/alumno/materias/')) {
-    // Aquí podrías obtener el nombre de la materia de la URL o un estado global
-    // Por ahora, usamos un ejemplo estático
-    const materiaId = currentPath.split('/').pop();
-    const materiaNombre =
-      materiaId.charAt(0).toUpperCase() + materiaId.slice(1);
-    title = 'Escuela Secundaria San Martín';
-    subtitle = materiaNombre;
+  // Si estás en la página de materia, muestra el nombre desde el estado
+  if (currentPath === '/alumno/materia' && location.state?.materiaNombre) {
+    title = location.state.materiaNombre;
   }
-
-  // Puedes expandir esta lógica para manejar otros títulos dinámicos si es necesario
+  const showProfile =
+    currentPath.startsWith('/alumno/') || currentPath.startsWith('/docente/');
 
   const handleProfileClick = () => {
     navigate('/alumno/perfil');
@@ -66,7 +60,7 @@ function Header() {
         {subtitle && <p className="welcome-message">{subtitle}</p>}
       </div>
 
-      {location.pathname === '/alumno/dashboard' && (
+      {showProfile && (
         <button
           className="header-profile-section"
           onClick={handleProfileClick}
@@ -77,7 +71,7 @@ function Header() {
           </div>
           <p className="profile-label">Perfil</p>
         </button>
-         )}
+      )}
     </header>
   );
 }
