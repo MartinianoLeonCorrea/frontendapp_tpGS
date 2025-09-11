@@ -1,10 +1,16 @@
 // src/components/Header.jsx
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { UserIcon } from './Icons';
+import { useUser } from '../context/UserContext';
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { dni } = useUser();
+  const [apellidoDocente, setApellidoDocente] = useState('');
+  const [nombreAlumno, setNombreAlumno] = useState('');
+
   // Mapeo de rutas a títulos y subtítulos
   const pageInfo = {
     '/': {
@@ -13,19 +19,36 @@ function Header() {
     },
     '/alumno/dashboard': {
       title: 'Escuela Secundaria San Martín',
-      subtitle: '¡Bienvenido, Juan!',
+      subtitle: '',
     },
     '/docente/dashboard': {
       title: 'Escuela Secundaria San Martín',
-      subtitle: '¡Bienvenido, Prof. Rodríguez!',
+      subtitle: '',
+    },
+    '/docente/dictado': {
+      title: 'Panel del Dictado',
+      subtitle: '',
+    },
+
+    '/docente/dictado/examen/nuevo': {
+      title: 'Nuevo examen',
+      subtitle: '',
+    },
+    '/docente/dictado/examen/editar': {
+      title: 'Editar examen',
+      subtitle: '',
+    },
+    '/docente/dictado/examen/borrar': {
+      title: 'Borrar examen',
+      subtitle: '',
+    },
+    '/docente/dictado/notas/subir': {
+      title: 'Subir notas',
+      subtitle: '',
     },
     '/calendario': {
       title: 'Calendario',
       subtitle: '',
-    },
-    '/alumno/materias': {
-      title: 'Escuela Secundaria San Martín',
-      subtitle: 'Matemáticas', // Esto será dinámico
     },
     '/registrar': {
       title: 'Registrar Alumno',
@@ -58,6 +81,40 @@ function Header() {
   if (currentPath === '/alumno/materia' && location.state?.materiaNombre) {
     title = location.state.materiaNombre;
   }
+
+  // Si es dashboard docente, obtener el apellido dinámicamente
+  useEffect(() => {
+    const fetchPersona = async () => {
+      if (
+        (currentPath === '/docente/dashboard' ||
+          currentPath === '/alumno/dashboard') &&
+        dni
+      ) {
+        try {
+          const res = await fetch(`/api/personas/${dni}`);
+          const data = await res.json();
+          if (currentPath === '/docente/dashboard') {
+            setApellidoDocente(data.data?.apellido || '');
+          }
+          if (currentPath === '/alumno/dashboard') {
+            setNombreAlumno(data.data?.nombre || '');
+          }
+        } catch {
+          setApellidoDocente('');
+          setNombreAlumno('');
+        }
+      }
+    };
+    fetchPersona();
+  }, [currentPath, dni]);
+
+  if (currentPath === '/docente/dashboard' && apellidoDocente) {
+    subtitle = `¡Bienvenido, Prof. ${apellidoDocente}!`;
+  }
+  if (currentPath === '/alumno/dashboard' && nombreAlumno) {
+    subtitle = `¡Bienvenido, ${nombreAlumno}!`;
+  }
+
   const showProfile =
     currentPath.startsWith('/alumno/') || currentPath.startsWith('/docente/');
 

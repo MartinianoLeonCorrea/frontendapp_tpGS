@@ -10,7 +10,7 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     // Detecta la vista por la ruta y asigna el dni correspondiente
     if (location.pathname.startsWith('/docente')) {
-      setDni(1000001); // Docente
+      setDni(10000001); // Docente
     } else if (location.pathname.startsWith('/alumno')) {
       setDni(20000001); // Alumno
     } else {

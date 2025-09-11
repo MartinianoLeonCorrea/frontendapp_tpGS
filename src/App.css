@@ -23,6 +23,7 @@
   gap: 10px;
   margin: 10px;
   width: auto;
+  height: auto;
 }
 
 hr {
@@ -973,4 +974,93 @@ button:hover {
 .examen-docente,
 .examen-copias {
   margin-bottom: 4px;
+}
+/* ==============================================
+              ESTILOS DE EXAMENES PAGE
+   ============================================== */
+
+.dictado-page {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  background: #f3f4f6;
+  gap: 1.5rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dictado-content {
+  display: flex;
+  flex-direction: column;
+}
+.dictado-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: 1.2rem 0 1.2rem 0;
+  padding: 0;
+  background: none;
+  font-size: 1.08rem;
+}
+
+.dictado-info h3.subtitle {
+  margin-bottom: 0.2rem;
+  color: #374151;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.dictado-info p {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.dictado-info strong {
+  color: #059669;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.dictado-actions {
+  padding: 1rem 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+.dictado-actions button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.08);
+  transition: background 0.2s, transform 0.2s;
+  min-height: 38px;
+  white-space: normal;
+  word-break: break-word;
+  margin-bottom: 0;
+  display: inline-block;
+  text-align: center;
+}
+
+.dictado-actions button:hover {
+  background-color: #059669;
+  transform: translateY(-2px) scale(1.04);
+}
+.alumnos-section h3 {
+  color: #374151;
+  font-weight: 600;
+  font-size: 1.08rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.25rem;
 }

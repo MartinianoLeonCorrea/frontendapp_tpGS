@@ -12,6 +12,8 @@ export default function DashboardAlumno() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!dni) return;
+
     // Definimos una función asincrónica para centralizar toda la lógica de carga
     const fetchDashboardData = async () => {
       console.log('fetchDashboardData ejecutado');

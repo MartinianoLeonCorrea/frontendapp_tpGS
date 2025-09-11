@@ -1,39 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardDictado } from '../../components/CardDictado.jsx';
+import { useUser } from '../../context/UserContext';
 
 function DashboardDocente() {
   const [dictados, setDictados] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { dni } = useUser();
 
-  const recentNews = [
-    'Nueva fecha de examen de Matemáticas: 15 de Septiembre',
-    'Recordatorio: Entrega de trabajos prácticos hasta el viernes',
-  ];
   const navigate = useNavigate();
+
   useEffect(() => {
-    // Petición GET al backend
-    fetch('/api/dictados')
-      .then((res) => res.json())
-      .then((data) => {
-        // Si la respuesta tiene 'data' y es un array, úsala. Si no, usa []
-        if (Array.isArray(data.data)) {
-          setDictados(data.data);
-        } else if (Array.isArray(data)) {
-          setDictados(data);
-        } else {
-          setDictados([]);
-        }
-      })
-      .catch((err) => {
-        console.error('Error al obtener dictados:', err);
+    if (!dni) return; // No ejecutar si el dni no está definido
+
+    const fetchDashboardData = async () => {
+      console.log('fetchDashboardData DOCENTE ejecutado');
+      setIsLoading(true);
+
+      try {
+        // 1. Obtener dictados del docente usando el dni logueado
+        const docenteRes = await fetch(`/api/personas/${dni}`);
+        const docenteData = await docenteRes.json();
+        console.log('Docente recibido:', docenteData);
+
+        // Suponiendo que el backend tiene un endpoint para dictados por docente
+        const dictadosRes = await fetch(`/api/dictados/persona/${dni}`);
+        const dictadosData = await dictadosRes.json();
+        console.log('Dictados recibidos:', dictadosData);
+
+        const todosDictados = Array.isArray(dictadosData) ? dictadosData : [];
+        console.log(
+          'Tipo de todosDictados:',
+          Array.isArray(todosDictados),
+          todosDictados
+        );
+
+        setDictados(todosDictados);
+      } catch (error) {
         setDictados([]);
-      });
-  }, []);
+        console.error('Error al cargar datos del dashboard docente:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [dni]);
+
   const handleDictadoClick = (dictadoId) => {
-    // Acá hay que agregar la lógica para navegar a la página del dictado
-    console.log(`Navegando al dictado: ${dictadoId}`);
-    // Ejemplo de navegación a una página de dictado específica
-    navigate(`/docente/dictado/`, { state: { dictadoId } });
+    navigate(`/docente/dictado`, { state: { dictadoId } });
   };
 
   return (
@@ -44,7 +59,9 @@ function DashboardDocente() {
           <div className="content-card">
             <h2 className="section-title">Mis Dictados</h2>
             <div className="subjects-grid">
-              {dictados.length === 0 ? (
+              {isLoading ? (
+                <p className="loading-message">Cargando dictados...</p>
+              ) : dictados.length === 0 ? (
                 <p>No hay dictados disponibles.</p>
               ) : (
                 dictados.map((dictado) => (
@@ -68,20 +85,16 @@ function DashboardDocente() {
         <aside className="right-sidebar">
           {/* Sección de Novedades */}
           <section className="news-section">
-            <h3 className="sidebar-section-title">Novedades</h3>
-            <p className="sidebar-subtitle">(Publicaciones recientes)</p>
-
-            {recentNews.length > 0 ? (
-              <div className="news-list">
-                {recentNews.map((news, index) => (
-                  <div key={index} className="info-placeholder">
-                    {news}
-                  </div>
-                ))}
+            <div className="section-header">
+              <h3 className="sidebar-main-title">Novedades</h3>
+              <hr className="title-divider" />
+            </div>
+            {/* Puedes agregar aquí novedades específicas del docente */}
+            <div className="news-list">
+              <div className="info-placeholder">
+                Ejemplo de novedad para docentes.
               </div>
-            ) : (
-              <p className="info-placeholder">No hay novedades recientes</p>
-            )}
+            </div>
           </section>
         </aside>
       </div>

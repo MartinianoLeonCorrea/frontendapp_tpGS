@@ -1,12 +1,5 @@
-import { useState } from 'react';
-//TODO: - Que los mensajes del foro queden guardados
-//      - Que el foro sea el mismo para todos los usuarios
-// Simula el usuario logueado
-const USUARIO_LOGUEADO = {
-  id: 2000001,
-  nombre: 'Juan',
-  apellido: 'Pérez',
-};
+import { useState, useEffect } from 'react';
+import { useUser } from '../context/UserContext';
 
 function formatHora(fecha) {
   const d = new Date(fecha);
@@ -19,12 +12,28 @@ function formatHora(fecha) {
 export default function Foro({ className = '' }) {
   const [mensaje, setMensaje] = useState('');
   const [mensajes, setMensajes] = useState([]);
+  const { dni } = useUser();
+  const [usuario, setUsuario] = useState({ nombre: '', apellido: '' });
+
+  useEffect(() => {
+    if (dni) {
+      fetch(`/api/personas/${dni}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setUsuario({
+            nombre: data.data?.nombre || '',
+            apellido: data.data?.apellido || '',
+          });
+        })
+        .catch(() => setUsuario({ nombre: '', apellido: '' }));
+    }
+  }, [dni]);
 
   const handlePublicar = () => {
     if (mensaje.trim()) {
       const nuevoMensaje = {
         texto: mensaje,
-        usuario: `${USUARIO_LOGUEADO.nombre} ${USUARIO_LOGUEADO.apellido}`,
+        usuario: `${usuario.nombre} ${usuario.apellido}`,
         hora: formatHora(new Date()),
       };
       setMensajes([nuevoMensaje, ...mensajes]);

@@ -19,6 +19,11 @@ import ExamenesPage from './pages/alumno/ExamenesPage';
 import NotasPage from './pages/alumno/NotasPage';
 import AsistenciasPage from './pages/alumno/AsistenciasPage';
 import { UserProvider } from './context/UserProvider';
+import DictadoPage from './pages/docente/DictadoPage';
+import NuevoExamenPage from './pages/docente/NuevoExamenPage';
+import EditarExamenPage from './pages/docente/EditarExamenPage';
+import BorrarExamenPage from './pages/docente/BorrarExamenPage';
+import SubirNotasPage from './pages/docente/SubirNotasPage';
 
 const Layout = () => {
   return (
@@ -68,6 +73,23 @@ function App() {
             <Route path="/alumno/examenes" element={<ExamenesPage />} />
             <Route path="/alumno/notas" element={<NotasPage />} />
             <Route path="/alumno/asistencias" element={<AsistenciasPage />} />
+            <Route path="/docente/dictado" element={<DictadoPage />} />
+            <Route
+              path="docente/dictado/examen/nuevo"
+              element={<NuevoExamenPage />}
+            />
+            <Route
+              path="docente/dictado/examen/editar"
+              element={<EditarExamenPage />}
+            />
+            <Route
+              path="docente/dictado/examen/borrar"
+              element={<BorrarExamenPage />}
+            />
+            <Route
+              path="docente/dictado/notas/subir"
+              element={<SubirNotasPage />}
+            />
           </Route>
         </Routes>
       </UserProvider>
