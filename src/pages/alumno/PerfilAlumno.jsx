@@ -5,44 +5,31 @@ import './PerfilAlumno.css';
 
 const alumnoService = {
   getAlumno: () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          nombre: 'Juan',
-          apellido: 'Pérez',
-          curso: '3° Año "A"',
-          dni: '1234567',
-          email: 'juan.perez@example.com',
-          telefono: '11-2233-4455',
-          direccion: 'Av. Siempre Viva 742',
-        });
-      }, 1500); // Simula un retraso de 1.5 segundos
+    return Promise.resolve({
+      nombre: 'Juan',
+      apellido: 'Pérez',
+      curso: '3° Año "A"',
+      dni: '1234567',
+      email: 'juan.perez@example.com',
+      telefono: '11-2233-4455',
+      direccion: 'Av. Siempre Viva 742',
     });
   },
 };
 
 export default function PerfilAlumno() {
-  // Estado para almacenar los datos del alumno que no cambian (los originales)
   const [alumno, setAlumno] = useState(null);
-  
-  // Estado para los datos del formulario que sí se pueden editar
   const [formData, setFormData] = useState({});
-  
-  // Estado para controlar si estamos en modo "vista" o "edición"
   const [isEditing, setIsEditing] = useState(false);
-  
-  // Estado para manejar la carga inicial de datos
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Estado para manejar posibles errores
   const [error, setError] = useState(null);
 
-  // useEffect para cargar los datos del alumno cuando el componente se monta
   useEffect(() => {
     alumnoService.getAlumno()
       .then(data => {
+        console.log('Datos cargados:', data);
         setAlumno(data);
-        setFormData(data); // Inicializamos el formulario con los datos cargados
+        setFormData(data);
       })
       .catch(err => {
         setError('No se pudieron cargar los datos del alumno.');
@@ -51,18 +38,23 @@ export default function PerfilAlumno() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []); // El array vacío [] asegura que esto se ejecute solo una vez
+  }, []);
 
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing); // Cambia el estado de edición
-    // Si cancelamos, restauramos los datos originales en el formulario
-    if (isEditing) {
-      setFormData(alumno);
-    }
+  const handleEditClick = () => {
+    console.log('Botón editar presionado. Estado actual isEditing:', isEditing);
+    setIsEditing(true);
+    console.log('Estado cambiado a isEditing:', true);
+  };
+
+  const handleCancelClick = () => {
+    console.log('Cancelar presionado');
+    setFormData({ ...alumno }); // Restaurar datos originales
+    setIsEditing(false);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Cambio en campo ${name}:`, value);
     setFormData(prevState => ({
       ...prevState,
       [name]: value,
@@ -70,24 +62,36 @@ export default function PerfilAlumno() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevenimos que el formulario recargue la página
-    console.log('Datos a guardar:', formData);
-    // Aquí iría la lógica para enviar los datos a un backend (ej: alumnoService.updateAlumno(formData))
-    setAlumno(formData); // Actualizamos los datos principales con los del formulario
-    setIsEditing(false); // Volvemos al modo de visualización
+    e.preventDefault();
+    console.log('Formulario enviado con datos:', formData);
+    setAlumno({ ...formData });
+    setIsEditing(false);
+    alert('¡Datos guardados correctamente!');
   };
 
   if (isLoading) {
-    return <main className="perfil-container"><p>Cargando perfil...</p></main>;
+    return (
+      <main className="perfil-container">
+        <div className="perfil-card">
+          <p>Cargando perfil...</p>
+        </div>
+      </main>
+    );
   }
 
   if (error) {
-    return <main className="perfil-container"><p className="error-message">{error}</p></main>;
+    return (
+      <main className="perfil-container">
+        <div className="perfil-card">
+          <p className="error-message">{error}</p>
+        </div>
+      </main>
+    );
   }
 
   return (
     <main className="perfil-container">
-      <form className="perfil-card" onSubmit={handleSubmit}>
+      <div className="perfil-card">
         
         <div className="perfil-header">
           <div className="perfil-avatar">
@@ -95,39 +99,138 @@ export default function PerfilAlumno() {
             <p>Perfil</p>
           </div>
           <div className="perfil-info-principal">
-            <h2>{alumno.nombre} {alumno.apellido}</h2>
-            <p>Curso [{alumno.curso}]</p>
+            <h2>
+              {isEditing ? (
+                <div className="nombre-editing">
+                  <input 
+                    type="text" 
+                    name="nombre" 
+                    value={formData.nombre || ''} 
+                    onChange={handleInputChange}
+                    className="input-nombre"
+                    placeholder="Nombre"
+                  />
+                  <input 
+                    type="text" 
+                    name="apellido" 
+                    value={formData.apellido || ''} 
+                    onChange={handleInputChange}
+                    className="input-apellido"
+                    placeholder="Apellido"
+                  />
+                </div>
+              ) : (
+                `${alumno?.nombre || ''} ${alumno?.apellido || ''}`
+              )}
+            </h2>
+            <p>
+              {isEditing ? (
+                <input 
+                  type="text" 
+                  name="curso" 
+                  value={formData.curso || ''} 
+                  onChange={handleInputChange}
+                  className="input-curso"
+                  placeholder="Curso"
+                />
+              ) : (
+                `Curso [${alumno?.curso || ''}]`
+              )}
+            </p>
           </div>
         </div>
 
         <div className="perfil-datos-personales">
           <h3>Datos personales</h3>
-          <ul>
-            <li><strong>DNI:</strong> {isEditing ? <input type="text" name="dni" value={formData.dni} onChange={handleInputChange} /> : alumno.dni}</li>
-            <li><strong>Correo electrónico:</strong> {isEditing ? <input type="email" name="email" value={formData.email} onChange={handleInputChange} /> : alumno.email}</li>
-            <li><strong>Teléfono de contacto:</strong> {isEditing ? <input type="tel" name="telefono" value={formData.telefono} onChange={handleInputChange} /> : alumno.telefono}</li>
-            <li><strong>Dirección:</strong> {isEditing ? <input type="text" name="direccion" value={formData.direccion} onChange={handleInputChange} /> : alumno.direccion}</li>
-          </ul>
+          <div className="datos-lista">
+            <div className="dato-item">
+              <strong>DNI:</strong> 
+              {isEditing ? (
+                <input 
+                  type="text" 
+                  name="dni" 
+                  value={formData.dni || ''} 
+                  onChange={handleInputChange}
+                  className="input-dato"
+                />
+              ) : (
+                <span>{alumno?.dni || ''}</span>
+              )}
+            </div>
+            
+            <div className="dato-item">
+              <strong>Correo electrónico:</strong> 
+              {isEditing ? (
+                <input 
+                  type="email" 
+                  name="email" 
+                  value={formData.email || ''} 
+                  onChange={handleInputChange}
+                  className="input-dato"
+                />
+              ) : (
+                <span>{alumno?.email || ''}</span>
+              )}
+            </div>
+            
+            <div className="dato-item">
+              <strong>Teléfono de contacto:</strong> 
+              {isEditing ? (
+                <input 
+                  type="tel" 
+                  name="telefono" 
+                  value={formData.telefono || ''} 
+                  onChange={handleInputChange}
+                  className="input-dato"
+                />
+              ) : (
+                <span>{alumno?.telefono || ''}</span>
+              )}
+            </div>
+            
+            <div className="dato-item">
+              <strong>Dirección:</strong> 
+              {isEditing ? (
+                <input 
+                  type="text" 
+                  name="direccion" 
+                  value={formData.direccion || ''} 
+                  onChange={handleInputChange}
+                  className="input-dato"
+                />
+              ) : (
+                <span>{alumno?.direccion || ''}</span>
+              )}
+            </div>
+          </div>
         </div>
         
         <div className="perfil-acciones">
           {!isEditing ? (
-            <button type="button" onClick={handleEditToggle} className="btn-editar">
+            <button 
+              type="button" 
+              onClick={handleEditClick} 
+              className="btn-editar"
+            >
               Editar Datos
             </button>
           ) : (
-            <>
+            <form onSubmit={handleSubmit} className="form-botones">
               <button type="submit" className="btn-confirmar">
                 Confirmar Cambios
               </button>
-              <button type="button" onClick={handleEditToggle} className="btn-cancelar">
+              <button 
+                type="button" 
+                onClick={handleCancelClick} 
+                className="btn-cancelar"
+              >
                 Cancelar
               </button>
-            </>
+            </form>
           )}
         </div>
         
-      </form>
+      </div>
     </main>
   );
 }
