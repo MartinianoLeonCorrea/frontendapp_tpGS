@@ -14,6 +14,7 @@ import RegistrarAlumno from './pages/RegistrarAlumno';
 import Sidebar from './components/Sidebar';
 import CalendarioPage from './pages/CalendarioPage';
 import PerfilAlumno from './pages/alumno/PerfilAlumno';
+import MateriaPage from './pages/alumno/MateriaPage';
 
 const Layout = () => {
   return (
@@ -58,6 +59,7 @@ function App() {
           <Route path="registrar" element={<RegistrarAlumno />} />
           <Route path="calendario" element={<CalendarioPage />} />
           <Route path="/alumno/perfil" element={<PerfilAlumno />} />
+          <Route path="/alumno/materia" element={<MateriaPage />} />
         </Route>
       </Routes>
     </Router>
