@@ -13,21 +13,16 @@ function DashboardDocente() {
   useEffect(() => {
     if (!dni) return; // No ejecutar si el dni no está definido
 
-    const fetchDashboardData = async () => {
-      console.log('fetchDashboardData DOCENTE ejecutado');
+    const fetchDictados = async () => {
       setIsLoading(true);
 
       try {
-        // 1. Obtener dictados del docente usando el dni logueado
-        const docenteRes = await fetch(`/api/personas/${dni}`);
-        const docenteData = await docenteRes.json();
-        console.log('Docente recibido:', docenteData);
-
-        // Suponiendo que el backend tiene un endpoint para dictados por docente
+        // Obtener dictados asociados al docente
         const dictadosRes = await fetch(`/api/dictados/persona/${dni}`);
         const dictadosData = await dictadosRes.json();
         console.log('Dictados recibidos:', dictadosData);
 
+        // Hacer que siempre sea un array para evitar errores
         const todosDictados = Array.isArray(dictadosData) ? dictadosData : [];
         console.log(
           'Tipo de todosDictados:',
@@ -38,13 +33,13 @@ function DashboardDocente() {
         setDictados(todosDictados);
       } catch (error) {
         setDictados([]);
-        console.error('Error al cargar datos del dashboard docente:', error);
+        console.error('Error al cargar dictados del dashboard docente:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDashboardData();
+    fetchDictados();
   }, [dni]);
 
   const handleDictadoClick = (dictadoId) => {
