@@ -1,44 +1,36 @@
 // src/pages/alumno/PerfilAlumno.jsx
 
 import React, { useState, useEffect } from 'react';
-import './PerfilAlumno.css'; 
-
-const alumnoService = {
-  getAlumno: () => {
-    return Promise.resolve({
-      nombre: 'Juan',
-      apellido: 'Pérez',
-      curso: '3° Año "A"',
-      dni: '1234567',
-      email: 'juan.perez@example.com',
-      telefono: '11-2233-4455',
-      direccion: 'Av. Siempre Viva 742',
-    });
-  },
-};
+import { useUser } from '../../context/UserContext';
+import './PerfilAlumno.css';
 
 export default function PerfilAlumno() {
   const [alumno, setAlumno] = useState(null);
+  const [curso, setCurso] = useState(null);
   const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { dni } = useUser();
 
   useEffect(() => {
-    alumnoService.getAlumno()
-      .then(data => {
+    if (!dni) return;
+    fetch(`/api/personas/${dni}?includeCurso=true`)
+      .then((res) => res.json())
+      .then((data) => {
         console.log('Datos cargados:', data);
-        setAlumno(data);
-        setFormData(data);
+        setAlumno(data.data);
+        setFormData(data.data);
+        setCurso(data.data?.curso || null);
       })
-      .catch(err => {
+      .catch((err) => {
         setError('No se pudieron cargar los datos del alumno.');
         console.error(err);
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [dni]);
 
   const handleEditClick = () => {
     console.log('Botón editar presionado. Estado actual isEditing:', isEditing);
@@ -55,7 +47,7 @@ export default function PerfilAlumno() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     console.log(`Cambio en campo ${name}:`, value);
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -92,7 +84,6 @@ export default function PerfilAlumno() {
   return (
     <main className="perfil-container">
       <div className="perfil-card">
-        
         <div className="perfil-header">
           <div className="perfil-avatar">
             <span className="perfil-icon">👤</span>
@@ -102,18 +93,18 @@ export default function PerfilAlumno() {
             <h2>
               {isEditing ? (
                 <div className="nombre-editing">
-                  <input 
-                    type="text" 
-                    name="nombre" 
-                    value={formData.nombre || ''} 
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre || ''}
                     onChange={handleInputChange}
                     className="input-nombre"
                     placeholder="Nombre"
                   />
-                  <input 
-                    type="text" 
-                    name="apellido" 
-                    value={formData.apellido || ''} 
+                  <input
+                    type="text"
+                    name="apellido"
+                    value={formData.apellido || ''}
                     onChange={handleInputChange}
                     className="input-apellido"
                     placeholder="Apellido"
@@ -125,16 +116,16 @@ export default function PerfilAlumno() {
             </h2>
             <p>
               {isEditing ? (
-                <input 
-                  type="text" 
-                  name="curso" 
-                  value={formData.curso || ''} 
+                <input
+                  type="text"
+                  name="curso"
+                  value={formData.curso || ''}
                   onChange={handleInputChange}
                   className="input-curso"
                   placeholder="Curso"
                 />
               ) : (
-                `Curso [${alumno?.curso || ''}]`
+                `Curso [${curso?.nro_letra || ''} - ${curso?.turno || ''}]`
               )}
             </p>
           </div>
@@ -144,12 +135,12 @@ export default function PerfilAlumno() {
           <h3>Datos personales</h3>
           <div className="datos-lista">
             <div className="dato-item">
-              <strong>DNI:</strong> 
+              <strong>DNI:</strong>
               {isEditing ? (
-                <input 
-                  type="text" 
-                  name="dni" 
-                  value={formData.dni || ''} 
+                <input
+                  type="text"
+                  name="dni"
+                  value={formData.dni || ''}
                   onChange={handleInputChange}
                   className="input-dato"
                 />
@@ -157,14 +148,14 @@ export default function PerfilAlumno() {
                 <span>{alumno?.dni || ''}</span>
               )}
             </div>
-            
+
             <div className="dato-item">
-              <strong>Correo electrónico:</strong> 
+              <strong>Correo electrónico:</strong>
               {isEditing ? (
-                <input 
-                  type="email" 
-                  name="email" 
-                  value={formData.email || ''} 
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email || ''}
                   onChange={handleInputChange}
                   className="input-dato"
                 />
@@ -172,14 +163,14 @@ export default function PerfilAlumno() {
                 <span>{alumno?.email || ''}</span>
               )}
             </div>
-            
+
             <div className="dato-item">
-              <strong>Teléfono de contacto:</strong> 
+              <strong>Teléfono de contacto:</strong>
               {isEditing ? (
-                <input 
-                  type="tel" 
-                  name="telefono" 
-                  value={formData.telefono || ''} 
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono || ''}
                   onChange={handleInputChange}
                   className="input-dato"
                 />
@@ -187,14 +178,14 @@ export default function PerfilAlumno() {
                 <span>{alumno?.telefono || ''}</span>
               )}
             </div>
-            
+
             <div className="dato-item">
-              <strong>Dirección:</strong> 
+              <strong>Dirección:</strong>
               {isEditing ? (
-                <input 
-                  type="text" 
-                  name="direccion" 
-                  value={formData.direccion || ''} 
+                <input
+                  type="text"
+                  name="direccion"
+                  value={formData.direccion || ''}
                   onChange={handleInputChange}
                   className="input-dato"
                 />
@@ -204,12 +195,12 @@ export default function PerfilAlumno() {
             </div>
           </div>
         </div>
-        
+
         <div className="perfil-acciones">
           {!isEditing ? (
-            <button 
-              type="button" 
-              onClick={handleEditClick} 
+            <button
+              type="button"
+              onClick={handleEditClick}
               className="btn-editar"
             >
               Editar Datos
@@ -219,9 +210,9 @@ export default function PerfilAlumno() {
               <button type="submit" className="btn-confirmar">
                 Confirmar Cambios
               </button>
-              <button 
-                type="button" 
-                onClick={handleCancelClick} 
+              <button
+                type="button"
+                onClick={handleCancelClick}
                 className="btn-cancelar"
               >
                 Cancelar
@@ -229,7 +220,6 @@ export default function PerfilAlumno() {
             </form>
           )}
         </div>
-        
       </div>
     </main>
   );
