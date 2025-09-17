@@ -29,7 +29,6 @@ function Header() {
       title: 'Panel del Dictado',
       subtitle: '',
     },
-
     '/docente/dictado/examen/nuevo': {
       title: 'Nuevo examen',
       subtitle: '',
@@ -57,6 +56,10 @@ function Header() {
     '/alumno/perfil': {
       title: 'Escuela Secundaria San Martín',
       subtitle: 'Perfil del Alumno',
+    },
+    '/docente/perfil': {
+      title: 'Escuela Secundaria San Martín',
+      subtitle: 'Perfil del Docente',
     },
     '/alumno/examenes': {
       title: 'Mis Exámenes',
@@ -118,8 +121,13 @@ function Header() {
   const showProfile =
     currentPath.startsWith('/alumno/') || currentPath.startsWith('/docente/');
 
+  // Navegación inteligente del perfil según el tipo de usuario
   const handleProfileClick = () => {
-    navigate('/alumno/perfil');
+    if (currentPath.startsWith('/docente/')) {
+      navigate('/docente/perfil');
+    } else if (currentPath.startsWith('/alumno/')) {
+      navigate('/alumno/perfil');
+    }
   };
 
   return (

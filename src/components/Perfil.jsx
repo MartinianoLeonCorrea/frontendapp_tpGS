@@ -1,36 +1,94 @@
-// src/pages/alumno/PerfilAlumno.jsx
+// src/components/Perfil.jsx
 
-import React, { useState, useEffect } from 'react';
-import { useUser } from '../../context/UserContext';
-import './PerfilAlumno.css';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useUser } from '../context/UserContext';
+import '../pages/alumno/PerfilAlumno.css'; // Reutilizamos los estilos existentes
 
-export default function PerfilAlumno() {
-  const [alumno, setAlumno] = useState(null);
-  const [curso, setCurso] = useState(null);
+export default function Perfil({ userType = 'alumno' }) {
+  const [userData, setUserData] = useState(null);
+  const [additionalInfo, setAdditionalInfo] = useState(null);
   const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { dni } = useUser();
 
+  // Configuración específica por tipo de usuario (solo para formateo)
+  const config = useMemo(() => {
+    const userConfig = {
+      alumno: {
+        icon: '🎓',
+        formatAdditionalInfo: (info) => `[${info?.nro_letra || ''} - ${info?.turno || ''}]`
+      },
+      docente: {
+        icon: '👨‍🏫',
+        formatAdditionalInfo: (dictados) => {
+          if (!Array.isArray(dictados) || dictados.length === 0) {
+            return 'Sin dictados asignados';
+          }
+          return `${dictados.length} dictado${dictados.length > 1 ? 's' : ''} asignado${dictados.length > 1 ? 's' : ''}`;
+        }
+      }
+    };
+
+    return userConfig[userType] || userConfig.alumno;
+  }, [userType]);
+
   useEffect(() => {
     if (!dni) return;
-    fetch(`/api/personas/${dni}?includeCurso=true`)
-      .then((res) => res.json())
-      .then((data) => {
+
+    const loadUserData = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Determinar endpoint según el tipo de usuario
+        const apiEndpoint = userType === 'alumno' 
+          ? `/api/personas/${dni}?includeCurso=true`
+          : `/api/personas/${dni}`;
+
+        // Cargar datos básicos del usuario
+        const response = await fetch(apiEndpoint);
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Error al cargar datos');
+        }
+
         console.log('Datos cargados:', data);
-        setAlumno(data.data);
+        setUserData(data.data);
         setFormData(data.data);
-        setCurso(data.data?.curso || null);
-      })
-      .catch((err) => {
-        setError('No se pudieron cargar los datos del alumno.');
+
+        // Cargar información adicional específica por tipo de usuario
+        let additionalData = null;
+        
+        if (userType === 'alumno') {
+          // Para alumnos, usar los datos del curso ya incluidos
+          additionalData = data.data?.curso;
+        } else if (userType === 'docente') {
+          // Para docentes, hacer llamada paralela para dictados (más eficiente)
+          try {
+            const dictadosRes = await fetch(`/api/dictados/persona/${dni}`);
+            const dictadosData = await dictadosRes.json();
+            additionalData = Array.isArray(dictadosData) ? dictadosData : [];
+          } catch (dictadosError) {
+            console.error('Error al cargar dictados:', dictadosError);
+            additionalData = [];
+          }
+        }
+        
+        setAdditionalInfo(additionalData);
+
+      } catch (err) {
+        setError(`No se pudieron cargar los datos del ${userType}.`);
         console.error(err);
-      })
-      .finally(() => {
+      } finally {
         setIsLoading(false);
-      });
-  }, [dni]);
+      }
+    };
+
+    loadUserData();
+  }, [dni, userType]); // Dependencias mínimas
 
   const handleEditClick = () => {
     console.log('Botón editar presionado. Estado actual isEditing:', isEditing);
@@ -40,7 +98,7 @@ export default function PerfilAlumno() {
 
   const handleCancelClick = () => {
     console.log('Cancelar presionado');
-    setFormData({ ...alumno }); // Restaurar datos originales
+    setFormData({ ...userData }); // Restaurar datos originales
     setIsEditing(false);
   };
 
@@ -53,12 +111,26 @@ export default function PerfilAlumno() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Formulario enviado con datos:', formData);
-    setAlumno({ ...formData });
-    setIsEditing(false);
-    alert('¡Datos guardados correctamente!');
+    
+    try {
+      // Aquí podrías agregar la lógica para enviar los datos al backend
+      // const response = await fetch(`/api/personas/${dni}`, {
+      //   method: 'PUT',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(formData)
+      // });
+      
+      // Por ahora solo actualizamos el estado local
+      setUserData({ ...formData });
+      setIsEditing(false);
+      alert('¡Datos guardados correctamente!');
+    } catch (error) {
+      console.error('Error al guardar los datos:', error);
+      alert('Error al guardar los datos. Por favor, intenta de nuevo.');
+    }
   };
 
   if (isLoading) {
@@ -86,8 +158,8 @@ export default function PerfilAlumno() {
       <div className="perfil-card">
         <div className="perfil-header">
           <div className="perfil-avatar">
-            <span className="perfil-icon">👤</span>
-            <p>Perfil</p>
+            <span className="perfil-icon">{config.icon}</span>
+            <p>{config.title}</p>
           </div>
           <div className="perfil-info-principal">
             <h2>
@@ -111,22 +183,11 @@ export default function PerfilAlumno() {
                   />
                 </div>
               ) : (
-                `${alumno?.nombre || ''} ${alumno?.apellido || ''}`
+                `${userData?.nombre || ''} ${userData?.apellido || ''}`
               )}
             </h2>
             <p>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="curso"
-                  value={formData.curso || ''}
-                  onChange={handleInputChange}
-                  className="input-curso"
-                  placeholder="Curso"
-                />
-              ) : (
-                `Curso [${curso?.nro_letra || ''} - ${curso?.turno || ''}]`
-              )}
+              {config.formatAdditionalInfo(additionalInfo)}
             </p>
           </div>
         </div>
@@ -143,9 +204,10 @@ export default function PerfilAlumno() {
                   value={formData.dni || ''}
                   onChange={handleInputChange}
                   className="input-dato"
+                  disabled // DNI no debería ser editable
                 />
               ) : (
-                <span>{alumno?.dni || ''}</span>
+                <span>{userData?.dni || ''}</span>
               )}
             </div>
 
@@ -160,7 +222,7 @@ export default function PerfilAlumno() {
                   className="input-dato"
                 />
               ) : (
-                <span>{alumno?.email || ''}</span>
+                <span>{userData?.email || ''}</span>
               )}
             </div>
 
@@ -175,7 +237,7 @@ export default function PerfilAlumno() {
                   className="input-dato"
                 />
               ) : (
-                <span>{alumno?.telefono || ''}</span>
+                <span>{userData?.telefono || ''}</span>
               )}
             </div>
 
@@ -190,7 +252,7 @@ export default function PerfilAlumno() {
                   className="input-dato"
                 />
               ) : (
-                <span>{alumno?.direccion || ''}</span>
+                <span>{userData?.direccion || ''}</span>
               )}
             </div>
           </div>

@@ -13,7 +13,7 @@ import MateriasAlumno from './pages/alumno/MateriasAlumno';
 import RegistrarAlumno from './pages/RegistrarAlumno';
 import Sidebar from './components/Sidebar';
 import CalendarioPage from './pages/CalendarioPage';
-import PerfilAlumno from './pages/alumno/PerfilAlumno';
+import Perfil from './components/Perfil';
 import MateriaPage from './pages/alumno/MateriaPage';
 import ExamenesPage from './pages/alumno/ExamenesPage';
 import NotasPage from './pages/alumno/NotasPage';
@@ -68,7 +68,8 @@ function App() {
             <Route path="docente/dashboard" element={<DashboardDocente />} />
             <Route path="registrar" element={<RegistrarAlumno />} />
             <Route path="calendario" element={<CalendarioPage />} />
-            <Route path="/alumno/perfil" element={<PerfilAlumno />} />
+            <Route path="/alumno/perfil" element={<Perfil userType="alumno" />} />
+            <Route path="/docente/perfil" element={<Perfil userType="docente" />} />
             <Route path="/alumno/materia" element={<MateriaPage />} />
             <Route path="/alumno/examenes" element={<ExamenesPage />} />
             <Route path="/alumno/notas" element={<NotasPage />} />
