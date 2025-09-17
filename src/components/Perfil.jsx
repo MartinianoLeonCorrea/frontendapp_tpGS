@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
-import '../pages/alumno/PerfilAlumno.css'; // Reutilizamos los estilos existentes
+import '../App.css';
 
 export default function Perfil({ userType = 'alumno' }) {
   const [userData, setUserData] = useState(null);

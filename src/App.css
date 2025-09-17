@@ -1064,3 +1064,260 @@ button:hover {
   padding-bottom: 0.5rem;
   padding-left: 0.25rem;
 }
+/* Estilos para centrar el perfil */
+.perfil-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.perfil-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 0 auto;
+}
+
+.perfil-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.perfil-avatar {
+  border: 3px solid #e0e0e0;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+}
+
+.perfil-icon {
+  font-size: 2.5rem;
+  color: #007bff;
+  margin-bottom: 0.2rem;
+}
+
+.perfil-avatar p {
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.8rem;
+}
+
+.perfil-info-principal h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1c1e21;
+  font-weight: 600;
+}
+
+.perfil-info-principal p {
+  margin: 0.5rem 0 0;
+  color: #606770;
+  font-size: 1rem;
+}
+
+/* Estilos para inputs del header en modo edición */
+.nombre-editing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.input-nombre, .input-apellido {
+  padding: 0.5rem;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  width: 200px;
+  max-width: 100%;
+}
+
+.input-curso {
+  padding: 0.4rem;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-align: center;
+  width: 200px;
+  max-width: 100%;
+  color: #606770;
+}
+
+.perfil-datos-personales {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #fafafa;
+}
+
+.perfil-datos-personales h3 {
+  margin: 0 0 1rem 0;
+  color: #28a745;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+.datos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dato-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.dato-item strong {
+  color: #333;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.dato-item span {
+  color: #555;
+  padding: 0.3rem 0;
+  font-size: 0.95rem;
+}
+
+.input-dato {
+  width: 100%;
+  padding: 0.6rem;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.input-dato:focus {
+  outline: none;
+  border-color: #0056b3;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.perfil-acciones {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.form-botones {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.perfil-acciones button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: none;
+}
+
+.perfil-acciones button:active {
+  transform: scale(0.98);
+}
+
+.btn-editar {
+  background-color: #007bff;
+  color: white;
+  border: 2px solid #007bff;
+}
+
+.btn-editar:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-confirmar {
+  background-color: #28a745;
+  color: white;
+  border: 2px solid #28a745;
+}
+
+.btn-confirmar:hover {
+  background-color: #218838;
+  border-color: #218838;
+}
+
+.btn-cancelar {
+  background-color: #6c757d;
+  color: white;
+  border: 2px solid #6c757d;
+}
+
+.btn-cancelar:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  font-weight: 500;
+  padding: 1rem;
+}
+
+/* Responsive design */
+@media (min-width: 768px) {
+  .perfil-header {
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+  }
+  
+  .perfil-info-principal {
+    text-align: left;
+  }
+  
+  .nombre-editing {
+    flex-direction: row;
+    align-items: baseline;
+  }
+  
+  .dato-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .dato-item strong {
+    min-width: 180px;
+    flex-shrink: 0;
+  }
+  
+  .perfil-acciones {
+    justify-content: flex-end;
+  }
+}
