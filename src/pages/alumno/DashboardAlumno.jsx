@@ -56,7 +56,10 @@ export default function DashboardAlumno() {
         }
 
         // 3. Extraer materias de los dictados
-        const materiasUnicas = todosDictados.map((dictado) => dictado.materia);
+        const todasLasMaterias = todosDictados.map((dictado) => dictado.materia);
+        const materiasUnicas = todasLasMaterias.filter((materia, index, array) => 
+          materia && array.findIndex(m => m.id === materia.id) === index
+        );
         setMaterias(materiasUnicas);
         console.log('Materias extraídas:', materiasUnicas);
 
