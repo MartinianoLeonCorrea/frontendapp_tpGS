@@ -10,6 +10,7 @@ export default function Perfil({ userType = 'alumno' }) {
   const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const { dni } = useUser();
 
@@ -18,10 +19,12 @@ export default function Perfil({ userType = 'alumno' }) {
     const userConfig = {
       alumno: {
         icon: '🎓',
+        title: 'Alumno',
         formatAdditionalInfo: (info) => `[${info?.nro_letra || ''} - ${info?.turno || ''}]`
       },
       docente: {
         icon: '👨‍🏫',
+        title: 'Docente',
         formatAdditionalInfo: (dictados) => {
           if (!Array.isArray(dictados) || dictados.length === 0) {
             return 'Sin dictados asignados';
@@ -66,11 +69,11 @@ export default function Perfil({ userType = 'alumno' }) {
           // Para alumnos, usar los datos del curso ya incluidos
           additionalData = data.data?.curso;
         } else if (userType === 'docente') {
-          // Para docentes, hacer llamada paralela para dictados (más eficiente)
+          // Para docentes, hacer llamada paralela para dictados
           try {
-            const dictadosRes = await fetch(`/api/dictados/persona/${dni}`);
+            const dictadosRes = await fetch(`/api/personas/${dni}?includeDictados=true`);
             const dictadosData = await dictadosRes.json();
-            additionalData = Array.isArray(dictadosData) ? dictadosData : [];
+            additionalData = dictadosData.data?.dictados || [];
           } catch (dictadosError) {
             console.error('Error al cargar dictados:', dictadosError);
             additionalData = [];
@@ -88,7 +91,7 @@ export default function Perfil({ userType = 'alumno' }) {
     };
 
     loadUserData();
-  }, [dni, userType]); // Dependencias mínimas
+  }, [dni, userType]);
 
   const handleEditClick = () => {
     console.log('Botón editar presionado. Estado actual isEditing:', isEditing);
@@ -115,21 +118,56 @@ export default function Perfil({ userType = 'alumno' }) {
     e.preventDefault();
     console.log('Formulario enviado con datos:', formData);
     
+    setIsSaving(true);
+    setError(null);
+
     try {
-      // Aquí podrías agregar la lógica para enviar los datos al backend
-      // const response = await fetch(`/api/personas/${dni}`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      // Preparar datos para enviar (excluir campos que no deben actualizarse)
+      const dataToUpdate = {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        email: formData.email,
+        telefono: formData.telefono,
+        direccion: formData.direccion
+      };
+
+      // Si es docente, incluir especialidad si existe
+      if (userType === 'docente' && formData.especialidad !== undefined) {
+        dataToUpdate.especialidad = formData.especialidad;
+      }
+
+      console.log('Enviando datos al servidor:', dataToUpdate);
+
+      const response = await fetch(`/api/personas/${dni}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToUpdate)
+      });
+
+      const result = await response.json();
       
-      // Por ahora solo actualizamos el estado local
-      setUserData({ ...formData });
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al actualizar los datos');
+      }
+
+      console.log('Respuesta del servidor:', result);
+
+      // Actualizar el estado local con los datos guardados
+      setUserData(result.data);
+      setFormData(result.data);
       setIsEditing(false);
+      
+      // Mostrar mensaje de éxito
       alert('¡Datos guardados correctamente!');
+      
     } catch (error) {
       console.error('Error al guardar los datos:', error);
-      alert('Error al guardar los datos. Por favor, intenta de nuevo.');
+      setError(`Error al guardar los datos: ${error.message}`);
+      alert(`Error al guardar los datos: ${error.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -143,7 +181,7 @@ export default function Perfil({ userType = 'alumno' }) {
     );
   }
 
-  if (error) {
+  if (error && !userData) {
     return (
       <main className="perfil-container">
         <div className="perfil-card">
@@ -172,6 +210,7 @@ export default function Perfil({ userType = 'alumno' }) {
                     onChange={handleInputChange}
                     className="input-nombre"
                     placeholder="Nombre"
+                    required
                   />
                   <input
                     type="text"
@@ -180,6 +219,7 @@ export default function Perfil({ userType = 'alumno' }) {
                     onChange={handleInputChange}
                     className="input-apellido"
                     placeholder="Apellido"
+                    required
                   />
                 </div>
               ) : (
@@ -191,6 +231,12 @@ export default function Perfil({ userType = 'alumno' }) {
             </p>
           </div>
         </div>
+
+        {error && userData && (
+          <div className="error-message" style={{marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#fee', border: '1px solid #fcc', borderRadius: '4px'}}>
+            {error}
+          </div>
+        )}
 
         <div className="perfil-datos-personales">
           <h3>Datos personales</h3>
@@ -205,6 +251,7 @@ export default function Perfil({ userType = 'alumno' }) {
                   onChange={handleInputChange}
                   className="input-dato"
                   disabled // DNI no debería ser editable
+                  style={{backgroundColor: '#f5f5f5', cursor: 'not-allowed'}}
                 />
               ) : (
                 <span>{userData?.dni || ''}</span>
@@ -220,6 +267,7 @@ export default function Perfil({ userType = 'alumno' }) {
                   value={formData.email || ''}
                   onChange={handleInputChange}
                   className="input-dato"
+                  required
                 />
               ) : (
                 <span>{userData?.email || ''}</span>
@@ -235,6 +283,7 @@ export default function Perfil({ userType = 'alumno' }) {
                   value={formData.telefono || ''}
                   onChange={handleInputChange}
                   className="input-dato"
+                  required
                 />
               ) : (
                 <span>{userData?.telefono || ''}</span>
@@ -250,11 +299,31 @@ export default function Perfil({ userType = 'alumno' }) {
                   value={formData.direccion || ''}
                   onChange={handleInputChange}
                   className="input-dato"
+                  required
                 />
               ) : (
                 <span>{userData?.direccion || ''}</span>
               )}
             </div>
+
+            {/* Mostrar especialidad solo para docentes */}
+            {userType === 'docente' && (
+              <div className="dato-item">
+                <strong>Especialidad:</strong>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="especialidad"
+                    value={formData.especialidad || ''}
+                    onChange={handleInputChange}
+                    className="input-dato"
+                    placeholder="Especialidad del docente"
+                  />
+                ) : (
+                  <span>{userData?.especialidad || 'No especificada'}</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -269,13 +338,18 @@ export default function Perfil({ userType = 'alumno' }) {
             </button>
           ) : (
             <form onSubmit={handleSubmit} className="form-botones">
-              <button type="submit" className="btn-confirmar">
-                Confirmar Cambios
+              <button 
+                type="submit" 
+                className="btn-confirmar"
+                disabled={isSaving}
+              >
+                {isSaving ? 'Guardando...' : 'Confirmar Cambios'}
               </button>
               <button
                 type="button"
                 onClick={handleCancelClick}
                 className="btn-cancelar"
+                disabled={isSaving}
               >
                 Cancelar
               </button>
