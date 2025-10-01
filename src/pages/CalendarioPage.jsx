@@ -1,39 +1,107 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Calendar, dayjsLocalizer, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import dayjs from 'dayjs';
+import { useUser } from '../context/UserContext';
 
 // Configurar el localizador de dayjs
 const localizer = dayjsLocalizer(dayjs);
 
+// Componente personalizado para eventos con hover
+function CustomEvent({ event }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      className={`calendar-event${hovered ? ' hovered' : ''}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        transition: 'all 0.2s',
+        overflow: 'hidden',
+        whiteSpace: hovered ? 'normal' : 'nowrap',
+        textOverflow: 'ellipsis',
+        padding: hovered ? '16px' : '4px',
+        fontWeight: hovered ? 'bold' : 'normal',
+        zIndex: hovered ? 10 : 1,
+      }}
+    >
+      {hovered ? (
+        <div>
+          <div>{event.title}</div>
+          {event.temas && (
+            <div style={{ fontSize: '0.9rem', marginTop: '4px' }}>
+              Temas: {event.temas}
+            </div>
+          )}
+          {event.docente && (
+            <div style={{ fontSize: '0.9rem' }}>
+              Docente: {event.docente.nombre} {event.docente.apellido}
+            </div>
+          )}
+        </div>
+      ) : (
+        event.title
+      )}
+    </div>
+  );
+}
+
 function CalendarioPage() {
   // Estado para controlar la fecha actual que se muestra
   const [date, setDate] = useState(new Date());
-
+  const { dni } = useUser();
   // Estado para controlar la vista (mes, semana, día)
   const [view, setView] = useState(Views.MONTH);
-
-  // Eventos
-  const events = [
-    {
-      title: 'Evento de prueba',
-      // DATO: Los meses en el objeto Date de JS van de 0 (Enero) a 11 (Diciembre).
-      // Septiembre es el mes 8.
-      start: new Date(2025, 8, 1, 10, 0, 0), // 1 de Septiembre de 2025 a las 10:00
-      end: new Date(2025, 8, 1, 11, 30, 0), // 1 de Septiembre de 2025 a las 11:30
-    },
-  ];
+  const [events, setEvents] = useState([]);
 
   // Función para manejar el cambio de fecha (ej: al hacer clic en las flechas)
-  const onNavigate = useCallback((newDate) => setDate(newDate), [setDate]);
+  const onNavigate = useCallback((newDate) => setDate(newDate), []);
 
   // Función para manejar el cambio de vista (ej: al hacer clic en "semana")
-  const onView = useCallback((newView) => setView(newView), [setView]);
+  const onView = useCallback((newView) => setView(newView), []);
+
+  useEffect(() => {
+    async function fetchEventos() {
+      if (!dni) return;
+      const alumnoRes = await fetch(`/api/personas/${dni}`);
+      const alumnoData = await alumnoRes.json();
+      const cursoId = alumnoData.data?.cursoId;
+      if (!cursoId) return;
+
+      const dictadosRes = await fetch(`/api/dictados?cursoId=${cursoId}`);
+      const dictadosData = await dictadosRes.json();
+      const dictados = Array.isArray(dictadosData) ? dictadosData : [];
+
+      const todosExamenes = dictados.flatMap((dictado) =>
+        (dictado.examenes || []).map((examen) => ({
+          ...examen,
+          materia: dictado.materia,
+          docente: dictado.docente,
+        }))
+      );
+
+      const events = todosExamenes.map((examen) => ({
+        title: `${examen.materia?.nombre || 'Materia'} - Examen`,
+        start: new Date(examen.fecha_examen),
+        end: new Date(examen.fecha_examen),
+        examenId: examen.id,
+        temas: examen.temas,
+        docente: examen.docente,
+      }));
+
+      setEvents(events);
+    }
+    fetchEventos();
+  }, [dni]);
 
   return (
     <Calendar
       localizer={localizer}
       events={events}
+      components={{
+        event: CustomEvent,
+      }}
       startAccessor="start"
       endAccessor="end"
       date={date}
