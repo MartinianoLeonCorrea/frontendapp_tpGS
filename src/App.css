@@ -1194,7 +1194,9 @@ button:hover {
   padding-bottom: 0.5rem;
   padding-left: 0.25rem;
 }
-/* Estilos para centrar el perfil */
+/* ==============================================
+              ESTILOS DE PERFIL PAGE
+   ============================================== */
 .perfil-container {
   display: flex;
   justify-content: center;
@@ -1267,7 +1269,9 @@ button:hover {
   font-size: 1rem;
 }
 
-/* Estilos para inputs del header en modo edición */
+/* ==============================================
+              ESTILOS DE INPUTS EN PERFIL
+   ============================================== */
 .nombre-editing {
   display: flex;
   flex-direction: column;
@@ -1453,7 +1457,9 @@ button:hover {
     justify-content: flex-end;
   }
 }
-/* Estilos para el componente Home - Agregar a App.css */
+/* ==============================================
+            ESTILOS DE USUARIOS EN HOME
+   ============================================== */
 
 .home-container {
   padding: 2rem;
@@ -1635,7 +1641,9 @@ row {
   background: #2196f3;
   color: white;
 }
-
+/* ==============================================
+      ESTILOS DE INPUTS EN REGISTRAR ALUMNOS
+   ============================================== */
 input,
 select {
   background-color: white;
@@ -1651,4 +1659,82 @@ select:focus {
   outline: none;
   border-color: #10b981;
   box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+}
+
+/* ==============================================
+          ESTILOS DE NUEVO EXAMEN PAGE
+   ============================================== */
+
+.nuevo-examen-page {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.nuevo-examen-page h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.nuevo-examen-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nuevo-examen-page label {
+  font-weight: bold;
+  color: #555;
+}
+
+.nuevo-examen-page input,
+.nuevo-examen-page textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.nuevo-examen-page input:focus,
+.nuevo-examen-page textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+}
+
+.nuevo-examen-page button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.nuevo-examen-page button:hover {
+  background-color: #0e9668;
+}
+
+.nuevo-examen-page .error-message {
+  color: #d9534f;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.nuevo-examen-page textarea {
+  background-color: white;
+  color: black;
+  min-height: 100px;
+}
+.nuevo-examen-temas {
+  display: flex;
+  flex-direction: column;
 }

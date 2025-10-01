@@ -28,7 +28,10 @@ function DictadoPage() {
     : [];
   // Handlers para los botones
   const handleNuevoExamen = () => {
-    navigate('/docente/dictado/examen/nuevo', { state: { dictadoId } });
+    const cantidadAlumnos = alumnos.length;
+    navigate('/docente/dictado/examen/nuevo', {
+      state: { dictadoId, cantidadAlumnos },
+    });
   };
   const handleEditarExamen = () => {
     navigate('/docente/dictado/examen/editar', { state: { dictadoId } });
