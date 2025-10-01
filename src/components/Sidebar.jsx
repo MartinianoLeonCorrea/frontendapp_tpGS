@@ -1,5 +1,6 @@
 // src/components/Sidebar.jsx
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 import {
   CalendarIcon,
   FileTextIcon,
@@ -12,6 +13,7 @@ import {
 function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useUser();
 
   // Define los items del menú con sus rutas
   const menuItems = [
@@ -53,6 +55,8 @@ function Sidebar() {
   // Verifica el rol del usuario (Alumno/Docente) y filtra el menú
   const isAlumno = location.pathname.startsWith('/alumno');
   const isDocente = location.pathname.startsWith('/docente');
+  const isRegistro = location.pathname.startsWith('/registrar');
+  const showLogout = (isAlumno || isDocente) && !isRegistro;
 
   // Maneja el click en el logo
   const handleLogoClick = () => {
@@ -89,6 +93,7 @@ function Sidebar() {
 
   // Botón cerrar sesión
   const handleLogout = () => {
+    logout(); // Limpia el usuario del contexto y localStorage
     navigate('/');
   };
 
@@ -126,17 +131,16 @@ function Sidebar() {
       </nav>
 
       {/* Botón cerrar sesión al final */}
-      <div className="sidebar-logout-section">
-        <button
-          className="sidebar-menu-item logout"
-          onClick={handleLogout}
-        >
-          <div className="sidebar-icon">
-            <LogOutIcon size={18} />
-          </div>
-          <span>Cerrar sesión</span>
-        </button>
-      </div>
+      {showLogout && (
+        <div className="sidebar-logout-section">
+          <button className="sidebar-menu-item logout" onClick={handleLogout}>
+            <div className="sidebar-icon">
+              <LogOutIcon size={18} />
+            </div>
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

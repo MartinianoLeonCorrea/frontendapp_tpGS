@@ -1,5 +1,6 @@
 // src/components/MainContent.jsx
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 import DashboardAlumno from '../pages/alumno/DashboardAlumno';
 import DashboardDocente from '../pages/docente/DashboardDocente';
 import MateriasAlumno from '../pages/alumno/MateriasAlumno';
@@ -9,13 +10,25 @@ import CalendarioPage from '../pages/CalendarioPage';
 // El componente Home se mantiene igual
 function Home() {
   const navigate = useNavigate();
+  const { login } = useUser();
+  
+  const handleVistaAlumno = () => {
+    login(20000001, 'alumno');
+    navigate('/alumno/dashboard');
+  };
+
+  const handleVistaDocente = () => {
+    login(10000001, 'docente');
+    navigate('/docente/dashboard');
+  };
+
   return (
     <>
       <div className="button-row">
-        <button onClick={() => navigate('/alumno/dashboard')}>
+        <button onClick={handleVistaAlumno}>
           Vista Alumno
         </button>
-        <button onClick={() => navigate('/docente/dashboard')}>
+        <button onClick={handleVistaDocente}>
           Vista Docente
         </button>
         <button onClick={() => navigate('/registrar')}>Registrar Alumno</button>

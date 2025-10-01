@@ -12,6 +12,7 @@ const camposBase = [
 
 function RegistrarAlumno() {
   const [campos, setCampos] = useState(camposBase);
+  const [errores, setErrores] = useState({});
 
   useEffect(() => {
     const fetchCursos = async () => {
@@ -35,7 +36,6 @@ function RegistrarAlumno() {
         ]);
       } catch (err) {
         console.error('Error al cargar cursos:', err);
-        // Podrías manejar el error aquí (ej. mostrar un mensaje al usuario)
       }
     };
 
@@ -44,6 +44,24 @@ function RegistrarAlumno() {
 
   const handleRegistro = async (datos) => {
     const alumno = { ...datos, tipo: 'alumno' };
+
+    // Validaciones
+    const errores = {};
+    if (!/^[\d]{7,9}$/.test(alumno.dni)) {
+      errores.dni = 'El DNI debe ser un número entre 1,000,000 y 999,999,999';
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(alumno.email)) {
+      errores.email = 'El email debe tener un formato válido';
+    }
+    if (!/^[\d\s\-+()]*$/.test(alumno.telefono)) {
+      errores.telefono = 'El teléfono contiene caracteres no válidos';
+    }
+
+    if (Object.keys(errores).length > 0) {
+      setErrores(errores);
+      return;
+    }
+
     try {
       const res = await fetch('/api/personas/alumnos', {
         method: 'POST',
@@ -53,8 +71,9 @@ function RegistrarAlumno() {
       const result = await res.json();
       if (res.ok) {
         alert('Alumno registrado correctamente');
+        setErrores({}); // Limpiar errores
       } else {
-        alert(result.error || 'Error al registrar alumno');
+        alert(result.message || 'Error al registrar alumno');
       }
     } catch (err) {
       alert('Error de conexión: ' + err.message);
@@ -67,6 +86,7 @@ function RegistrarAlumno() {
       titulo="Nuevo Alumno"
       onSubmit={handleRegistro}
       textoBoton="Registrar"
+      errores={errores} // Pasar errores al componente Form
     />
   );
 }

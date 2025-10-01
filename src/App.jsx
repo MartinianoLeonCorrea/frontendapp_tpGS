@@ -19,13 +19,13 @@ import ExamenesPage from './pages/alumno/ExamenesPage';
 import NotasPage from './pages/alumno/NotasPage';
 import AsistenciasPage from './pages/alumno/AsistenciasPage';
 import { UserProvider } from './context/UserProvider';
+import { useUser } from './context/UserContext';
 import DictadoPage from './pages/docente/DictadoPage';
 import NuevoExamenPage from './pages/docente/NuevoExamenPage';
 import EditarExamenPage from './pages/docente/EditarExamenPage';
 import BorrarExamenPage from './pages/docente/BorrarExamenPage';
 import SubirNotasPage from './pages/docente/SubirNotasPage';
 import React, { useState, useEffect } from 'react';
-import { useUser } from './context/UserContext';
 
 const Layout = () => {
   return (
@@ -44,7 +44,7 @@ const Layout = () => {
 function Home() {
   const navigate = useNavigate();
   const { login, userData } = useUser();
-  
+
   const [alumnos, setAlumnos] = useState([]);
   const [docentes, setDocentes] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -56,18 +56,19 @@ function Home() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        
+
         // Obtener alumnos con información del curso
-        const alumnosRes = await fetch('/api/personas/alumnos?includeCurso=true');
+        const alumnosRes = await fetch(
+          '/api/personas/alumnos?includeCurso=true'
+        );
         const alumnosData = await alumnosRes.json();
-        
-        // Obtener docentes  
+
+        // Obtener docentes
         const docentesRes = await fetch('/api/personas/docentes');
         const docentesData = await docentesRes.json();
 
         setAlumnos(alumnosData.data || []);
         setDocentes(docentesData.data || []);
-        
       } catch (err) {
         console.error('Error al cargar usuarios:', err);
         setError('Error al cargar la lista de usuarios');
@@ -107,6 +108,19 @@ function Home() {
     navigate('/docente/dashboard');
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.user-card')) {
+        setSelectedUser(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="home-container">
@@ -129,21 +143,32 @@ function Home() {
 
   return (
     <div className="home-container">
-      <h1>Sistema de Gestión Escolar</h1>
-      
       {/* Información del usuario seleccionado */}
       {selectedUser && (
         <div className="selected-user-info">
           <h3>Usuario seleccionado:</h3>
           <div className="user-card selected">
-            <p><strong>{selectedUser.nombre} {selectedUser.apellido}</strong></p>
+            <p>
+              <strong>
+                {selectedUser.nombre} {selectedUser.apellido}
+              </strong>
+            </p>
             <p>DNI: {selectedUser.dni}</p>
-            <p>Tipo: {selectedUser.tipo.charAt(0).toUpperCase() + selectedUser.tipo.slice(1)}</p>
+            <p>
+              Tipo:{' '}
+              {selectedUser.tipo.charAt(0).toUpperCase() +
+                selectedUser.tipo.slice(1)}
+            </p>
             {selectedUser.email && <p>Email: {selectedUser.email}</p>}
             {selectedUser.curso && (
-              <p>Curso: {selectedUser.curso.nro_letra} - {selectedUser.curso.turno}</p>
+              <p>
+                Curso: {selectedUser.curso.nro_letra} -{' '}
+                {selectedUser.curso.turno}
+              </p>
             )}
-            {selectedUser.especialidad && <p>Especialidad: {selectedUser.especialidad}</p>}
+            {selectedUser.especialidad && (
+              <p>Especialidad: {selectedUser.especialidad}</p>
+            )}
           </div>
         </div>
       )}
@@ -159,15 +184,16 @@ function Home() {
               alumnos.map((alumno) => (
                 <div
                   key={alumno.dni}
-                  className={`user-card ${selectedUser?.dni === alumno.dni ? 'selected' : ''}`}
+                  className={`user-card ${
+                    selectedUser?.dni === alumno.dni ? 'selected' : ''
+                  }`}
                   onClick={() => handleUserSelect(alumno)}
                 >
-                  <p><strong>{alumno.nombre} {alumno.apellido}</strong></p>
-                  <p>DNI: {alumno.dni}</p>
-                  {alumno.curso && (
-                    <p>Curso: {alumno.curso.nro_letra} - {alumno.curso.turno}</p>
-                  )}
-                  {alumno.email && <p>Email: {alumno.email}</p>}
+                  <p>
+                    <strong>
+                      {alumno.nombre} {alumno.apellido}
+                    </strong>
+                  </p>
                 </div>
               ))
             )}
@@ -183,13 +209,16 @@ function Home() {
               docentes.map((docente) => (
                 <div
                   key={docente.dni}
-                  className={`user-card ${selectedUser?.dni === docente.dni ? 'selected' : ''}`}
+                  className={`user-card ${
+                    selectedUser?.dni === docente.dni ? 'selected' : ''
+                  }`}
                   onClick={() => handleUserSelect(docente)}
                 >
-                  <p><strong>{docente.nombre} {docente.apellido}</strong></p>
-                  <p>DNI: {docente.dni}</p>
-                  {docente.especialidad && <p>Especialidad: {docente.especialidad}</p>}
-                  {docente.email && <p>Email: {docente.email}</p>}
+                  <p>
+                    <strong>
+                      {docente.nombre} {docente.apellido}
+                    </strong>
+                  </p>
                 </div>
               ))
             )}
@@ -199,25 +228,23 @@ function Home() {
 
       {/* Botones de navegación */}
       <div className="button-row">
-        <button 
+        <button
           onClick={handleNavigateAlumno}
           className={selectedUser?.tipo === 'alumno' ? 'active' : 'disabled'}
           disabled={!selectedUser || selectedUser.tipo !== 'alumno'}
         >
           Ir a Vista Alumno
         </button>
-        
-        <button 
+
+        <button
           onClick={handleNavigateDocente}
           className={selectedUser?.tipo === 'docente' ? 'active' : 'disabled'}
           disabled={!selectedUser || selectedUser.tipo !== 'docente'}
         >
           Ir a Vista Docente
         </button>
-        
-        <button onClick={() => navigate('/registrar')}>
-          Registrar Alumno
-        </button>
+
+        <button onClick={() => navigate('/registrar')}>Registrar Alumno</button>
       </div>
     </div>
   );
@@ -235,8 +262,14 @@ function App() {
             <Route path="docente/dashboard" element={<DashboardDocente />} />
             <Route path="registrar" element={<RegistrarAlumno />} />
             <Route path="calendario" element={<CalendarioPage />} />
-            <Route path="/alumno/perfil" element={<Perfil userType="alumno" />} />
-            <Route path="/docente/perfil" element={<Perfil userType="docente" />} />
+            <Route
+              path="/alumno/perfil"
+              element={<Perfil userType="alumno" />}
+            />
+            <Route
+              path="/docente/perfil"
+              element={<Perfil userType="docente" />}
+            />
             <Route path="/alumno/materia" element={<MateriaPage />} />
             <Route path="/alumno/examenes" element={<ExamenesPage />} />
             <Route path="/alumno/notas" element={<NotasPage />} />
