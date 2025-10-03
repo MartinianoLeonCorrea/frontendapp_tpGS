@@ -1738,3 +1738,335 @@ select:focus {
   display: flex;
   flex-direction: column;
 }
+
+/* ========================================
+   ESTILOS PARA GESTIÓN DE EXÁMENES
+   ======================================== */
+
+/* Sección de exámenes en DictadoPage */
+.examenes-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.examenes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-nuevo-examen {
+  background-color: #28a745;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn-nuevo-examen:hover {
+  background-color: #218838;
+}
+
+.examenes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.examen-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.3s ease;
+}
+
+.examen-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.examen-info {
+  flex: 1;
+}
+
+.examen-fecha {
+  color: #495057;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.examen-temas {
+  color: #6c757d;
+  margin: 0.5rem 0;
+}
+
+.examen-copias {
+  color: #6c757d;
+  margin: 0.5rem 0;
+}
+
+.examen-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-editar,
+.btn-eliminar {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-editar {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-editar:hover {
+  background-color: #0056b3;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background-color: #c82333;
+}
+
+.no-data {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Páginas de Editar y Nuevo Examen */
+.editar-examen-page,
+.nuevo-examen-page {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.editar-examen-page h2,
+.nuevo-examen-page h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+}
+
+.editar-examen-page form,
+.nuevo-examen-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.editar-examen-page label,
+.nuevo-examen-page label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.editar-examen-page input,
+.nuevo-examen-page input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.editar-examen-temas textarea,
+.nuevo-examen-temas textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.form-actions button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.form-actions button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+}
+
+.form-actions button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.btn-cancelar {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background-color: #5a6268;
+}
+
+/* Página de Borrar Examen */
+.borrar-examen-page {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.borrar-examen-page h2 {
+  color: #dc3545;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #dc3545;
+  padding-bottom: 0.5rem;
+}
+
+.warning-message {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.warning-message p {
+  margin: 0;
+  color: #856404;
+}
+
+.examen-details {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-item strong {
+  color: #495057;
+}
+
+.detail-item span {
+  color: #212529;
+}
+
+.confirmation-message {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.confirmation-message p {
+  margin: 0;
+  color: #721c24;
+  font-weight: 500;
+}
+
+.btn-eliminar-confirm {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-eliminar-confirm:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.btn-eliminar-confirm:disabled {
+  background-color: #e4606d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .examen-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .examen-actions {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .examen-actions button {
+    flex: 1;
+  }
+
+  .examenes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .btn-nuevo-examen {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
