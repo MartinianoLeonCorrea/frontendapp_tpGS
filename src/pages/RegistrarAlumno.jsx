@@ -50,11 +50,17 @@ function RegistrarAlumno() {
     if (!/^[\d]{7,9}$/.test(alumno.dni)) {
       errores.dni = 'El DNI debe ser un número entre 1,000,000 y 999,999,999';
     }
+    if (!alumno.email || alumno.email.length < 6) {
+      errores.email = 'El email debe tener al menos 6 caracteres';
+    }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(alumno.email)) {
       errores.email = 'El email debe tener un formato válido';
     }
     if (!/^[\d\s\-+()]*$/.test(alumno.telefono)) {
       errores.telefono = 'El teléfono contiene caracteres no válidos';
+    }
+    if (!alumno.direccion || alumno.direccion.length < 5) {
+      errores.direccion = 'La dirección debe tener al menos 5 caracteres';
     }
 
     if (Object.keys(errores).length > 0) {
@@ -72,6 +78,7 @@ function RegistrarAlumno() {
       if (res.ok) {
         alert('Alumno registrado correctamente');
         setErrores({}); // Limpiar errores
+
       } else {
         alert(result.message || 'Error al registrar alumno');
       }
