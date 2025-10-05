@@ -1,189 +1,7 @@
-/* Estiliza solo el componente App */
-.app-container {
-  font-family: sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f4;
-  width: 100%;
-  display: flex;
-}
-
-.main-content {
-  display: flex;
-  flex-direction: column;
-  width: calc(100% - 190px);
-  min-height: 100%;
-}
-
-.body {
-  background: #dddddd;
-  border-radius: 10px;
-  flex: 1;
-  display: flex;
-  gap: 10px;
-  margin: 10px;
-  width: auto;
-  height: auto;
-}
-
-hr {
-  top: 103px;
-  width: 95%;
-  border: 1px solid #6e6e6e;
-}
-
-.button-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  width: 100%;
-  align-items: center;
-}
-
-.button-row button {
-  background-color: #10b981;
-  color: black;
-  border: none;
-  border-radius: 7px;
-  padding: 15px 30px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  height: 50px;
-}
-
-.button-row button:hover {
-  background-color: #306b38;
-}
-
-button {
-  background-color: #418e4c;
-  color: black;
-  border: none;
-  border-radius: 7px;
-  padding: 15px 30px;
-  font-size: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button:hover {
-  background-color: #306b38;
-}
-
-body {
-  background-color: black;
-  height: auto;
-}
-
-h1,
-h2 {
-  color: #333;
-}
-
-h3 {
-  color: green;
-  margin: 0;
-}
-
-.search-section {
-  margin-bottom: 20px;
-}
-
-.search-section input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.search-section button {
-  padding: 8px 12px;
-  background-color: #10b981;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.found-materia {
-  background-color: #e9f5ff;
-  border: 1px solid #b3d7ff;
-  padding: 15px;
-  border-radius: 4px;
-  margin-top: 15px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  background-color: white;
-  padding: 10px;
-  border: 1px solid #eee;
-}
-
-p {
-  margin: 0;
-  color: #555;
-}
-
-ul {
-  color: #222;
-}
-
-#cajas {
-  width: 60%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-#columna {
-  display: flex;
-  height: 47%;
-  width: 100%;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
-#caja {
-  flex: 1 1 45%;
-  background-color: white;
-  border-radius: 10px;
-  padding: 15px;
-  min-width: 200px;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-}
-
-#caja p {
-  font-size: 1rem;
-  margin: 0;
-}
-
-.left-column {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 35%;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.novedades,
-.proximo-examen {
-  background-color: #ffffff;
-  border-radius: 10px;
-  padding: 10px;
-
-  flex: 1 1 50%;
-  overflow-y: auto;
-}
-
 /* ==============================================
-   ESTILOS GENERALES
+   MOBILE FIRST - ESTILOS BASE (MÓVIL)
    ============================================== */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -195,12 +13,30 @@ body {
     'Helvetica Neue', Arial, sans-serif;
   color: #333;
   background-color: #f3f4f6;
-  /* gray-100 */
+  margin: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* ==============================================
-   LAYOUT PRINCIPAL DE LA APLICACIÓN
+   LAYOUT PRINCIPAL - MÓVIL
    ============================================== */
+.app-container {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+}
 
 .main-content-wrapper {
   flex: 1;
@@ -208,11 +44,23 @@ body {
   flex-direction: column;
 }
 
+.body {
+  background: #dddddd;
+  border-radius: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px;
+  width: auto;
+  height: auto;
+}
+
 /* ==============================================
-   ESTILOS DEL SIDEBAR
+   SIDEBAR - MÓVIL (SIMPLIFICADO)
    ============================================== */
 .sidebar-container {
-  width: 12rem;
+  width: 4rem;
   background-color: #374151;
   min-height: 100vh;
   display: flex;
@@ -233,6 +81,7 @@ body {
 
 .sidebar-logo-text {
   color: #374151;
+  font-size: 0.8rem;
 }
 
 .sidebar-navigation {
@@ -242,16 +91,21 @@ body {
 
 .sidebar-menu-item {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   text-align: left;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   transition: background-color 0.2s ease;
   color: white;
   border: none;
   background: none;
   cursor: pointer;
+}
+
+.sidebar-menu-item span {
+  display: none;
 }
 
 .sidebar-menu-item:hover {
@@ -268,31 +122,34 @@ body {
 }
 
 /* ==============================================
-   ESTILOS DEL HEADER
+   HEADER - MÓVIL
    ============================================== */
 .header-container {
   background-color: #10b981;
   color: white;
   padding: 1rem;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 1rem;
   align-items: center;
   min-height: 103px;
 }
 
 .header-info-section {
   flex: 1;
+  text-align: center;
 }
 
 .school-name-title {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
+  font-size: 1.1rem;
+  line-height: 1.5rem;
   margin: 0;
 }
 
 .welcome-message {
   color: #d1fae5;
   margin: 0;
+  font-size: 0.9rem;
 }
 
 .header-profile-section {
@@ -321,13 +178,19 @@ body {
   margin: 0;
 }
 
-/* ==============================================
-   ESTILOS DEL CONTENIDO EN HOME
-   ============================================== */
+hr {
+  top: 103px;
+  width: 95%;
+  border: 1px solid #6e6e6e;
+}
 
+/* ==============================================
+   BOTONES - MÓVIL
+   ============================================== */
 .button-row {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 1rem;
   justify-content: center;
   width: 100%;
   align-items: center;
@@ -342,6 +205,8 @@ body {
   font-size: 1.2rem;
   cursor: pointer;
   height: 50px;
+  width: 100%;
+  max-width: 300px;
 }
 
 .button-row button:hover {
@@ -362,15 +227,176 @@ button {
 button:hover {
   background-color: #306b38;
 }
+
 /* ==============================================
-            ESTILOS DEL CALENDARIO
+   CONTENIDO DASHBOARD - MÓVIL
+   ============================================== */
+.dashboard-content {
+  flex: 1;
+  padding: 1rem;
+  background-color: #f3f4f6;
+}
+
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subjects-section {
+  flex: 1;
+}
+
+.content-card {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  margin-bottom: 1rem;
+  color: #374151;
+  margin-top: 0;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.card-materia {
+  background-color: white;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: border-color 0.2s ease;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.card-materia:hover {
+  border-color: #9ca3af;
+  background-color: #bcffb3;
+}
+
+.card-materia-title {
+  color: #374151;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 0.25rem;
+}
+
+.card-materia-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* ==============================================
+   SIDEBAR DERECHO - MÓVIL
+   ============================================== */
+.right-sidebar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  order: -1;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.novedades,
+.proximo-examen,
+.news-section,
+.exam-section {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 10px;
+  flex: 1 1 50%;
+  overflow-y: auto;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-main-title,
+.sidebar-section-title {
+  margin: 0;
+  color: #374151;
+  font-weight: 700;
+}
+
+.sidebar-main-title {
+  font-size: 1.25rem;
+}
+
+.sidebar-section-title {
+  font-size: 1.125rem;
+}
+
+.title-divider {
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  margin-top: 0.5rem;
+}
+
+.exam-card {
+  background-color: #f9fafb;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.info-placeholder {
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #6b7280;
+  margin-bottom: 0;
+}
+
+.news-list {
+  margin-top: 1rem;
+}
+
+.news-list .info-placeholder {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.news-list .info-placeholder:first-child {
+  margin-top: 1rem;
+}
+
+.news-list .info-placeholder:last-child {
+  margin-bottom: 0;
+}
+
+/* ==============================================
+   CALENDARIO - MÓVIL
    ============================================== */
 .calendario {
   width: 100%;
-  max-width: 900px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 1rem;
-  min-height: 350px; /* Asegura altura mínima */
+  padding: 0.5rem;
+  min-height: 250px;
   box-sizing: border-box;
 }
 
@@ -378,7 +404,9 @@ button:hover {
   width: 100% !important;
   min-width: 0;
   overflow-x: auto;
+  font-size: 0.85rem;
 }
+
 .rbc-event {
   transition: all 0.3s ease;
   overflow: hidden;
@@ -392,7 +420,6 @@ button:hover {
   padding: 0 !important;
 }
 
-/* Efecto hover - agranda el evento y muestra texto completo */
 .rbc-event:hover {
   transform: scale(1.05);
   z-index: 999;
@@ -407,12 +434,13 @@ button:hover {
   max-width: 1000px;
 }
 
-/* Para eventos en vista de mes */
 .rbc-month-view .rbc-event:hover {
   position: relative;
   min-height: auto;
   height: auto !important;
   background-color: #0e9668;
+  margin: -2px;
+  padding: 2px 4px;
 }
 
 .calendar-event.hovered,
@@ -427,6 +455,7 @@ button:hover {
   position: relative;
   z-index: 1 !important;
 }
+
 .rbc-button-link {
   z-index: 0 !important;
 }
@@ -435,6 +464,7 @@ button:hover {
   overflow: visible !important;
   position: relative !important;
 }
+
 .rbc-row {
   overflow: visible !important;
 }
@@ -447,14 +477,12 @@ button:hover {
   overflow: visible !important;
 }
 
-/* Para eventos en vista de semana/día */
 .rbc-time-view .rbc-event:hover {
   position: absolute;
   min-width: 200px;
   max-width: 300px;
 }
 
-/* Asegurar que el texto sea visible en hover */
 .rbc-event:hover .rbc-event-content {
   overflow: visible;
   white-space: normal;
@@ -466,11 +494,6 @@ button:hover {
 .rbc-day-slot .rbc-selected.rbc-background-event {
   cursor: pointer;
   background-color: #0e9668 !important;
-}
-
-.rbc-month-view .rbc-event:hover {
-  margin: -2px;
-  padding: 2px 4px;
 }
 
 .rbc-agenda-view .rbc-event:hover {
@@ -511,202 +534,12 @@ button:hover {
 }
 
 /* ==============================================
-   ESTILOS DEL CONTENIDO PRINCIPAL
+   FORMULARIOS - MÓVIL
    ============================================== */
-.dashboard-content {
-  flex: 1;
-  padding: 1.5rem;
-  background-color: #f3f4f6;
-}
-
-.dashboard-layout {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.subjects-section {
-  flex: 1;
-}
-
-.content-card {
-  background-color: white;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.section-title {
-  margin-bottom: 1rem;
-  color: #374151;
-  margin-top: 0;
-}
-
-.subjects-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.card-materia {
-  background-color: white;
-  border: 2px solid #d1d5db;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  transition: border-color 0.2s ease;
-  min-height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.card-materia:hover {
-  border-color: #9ca3af;
-  background-color: #bcffb3;
-}
-
-.card-materia-title {
-  color: #374151;
-  text-align: center;
-  margin: 0;
-  margin-bottom: 0.25rem;
-}
-
-.card-materia-description {
-  color: #6b7280;
-  font-size: 0.875rem;
-  text-align: center;
-  margin: 0;
-}
-
-/* ==============================================
-   ESTILOS DEL SIDEBAR DERECHO (COLUMNA NOVEDADES Y EXAMENES)
-   ============================================== */
-.right-sidebar {
-  width: 16rem;
-  /* 256px */
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.news-section,
-.exam-section {
-  background-color: white;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-.section-header {
-  margin-bottom: 0.5rem;
-}
-.sidebar-main-title,
-.sidebar-section-title {
-  margin: 0;
-  color: #374151;
-  /* gray-700 */
-  font-weight: 700;
-}
-
-.sidebar-main-title {
-  font-size: 1.25rem;
-}
-
-.sidebar-section-title {
-  font-size: 1.125rem;
-}
-.title-divider {
-  border: none;
-  border-bottom: 1px solid #e5e7eb;
-  margin-top: 0.5rem;
-}
-.exam-card {
-  background-color: #f9fafb;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.info-placeholder {
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  /* gray-50 */
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: #6b7280;
-  /* gray-500 */
-  margin-bottom: 0;
-}
-
-.news-list {
-  margin-top: 1rem;
-}
-
-.news-list .info-placeholder {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.news-list .info-placeholder:first-child {
-  margin-top: 1rem;
-}
-
-.news-list .info-placeholder:last-child {
-  margin-bottom: 0;
-}
-
-/* ==============================================
-   DISEÑO RESPONSIVE
-   ============================================== */
-@media (max-width: 768px) {
-  .sidebar-container {
-    width: 4rem;
-  }
-
-  .sidebar-menu-item {
-    padding: 0.75rem;
-    justify-content: center;
-  }
-
-  .sidebar-menu-item span {
-    display: none;
-  }
-
-  .dashboard-layout {
-    flex-direction: column;
-  }
-
-  .right-sidebar {
-    width: 100%;
-  }
-
-  .subjects-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .calendario {
-    max-width: 100%;
-    padding: 0.5rem;
-    min-height: 250px;
-  }
-  .rbc-calendar {
-    font-size: 0.85rem;
-  }
-}
-
-/* ==============================================
-   ESTILOS DE LOS IMPUTS
-   ============================================== */
-
 .form-container {
-  width: 90%;
-  /* ocupa el 90% del ancho disponible */
-  max-width: 700px;
-  /* pero no más de 700px en pantallas grandes */
-  margin: 2rem auto;
-  /* centrado */
-  padding: 2rem;
+  width: 100%;
+  margin: 1rem auto;
+  padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: #fff;
@@ -764,19 +597,35 @@ button:hover {
   background: #306b38;
 }
 
-/* ==============================================
-   ESTILOS DEL MATERIA PAGE
-   ============================================== */
+input,
+select {
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 1rem;
+}
 
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+}
+
+/* ==============================================
+   MATERIA PAGE - MÓVIL
+   ============================================== */
 .materia-page {
   width: 100%;
   margin: 0;
-  padding: 1rem 0;
-  display: grid;
-  grid-template-columns: 1fr 350px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: #f3f4f6;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .materia-content {
@@ -884,23 +733,20 @@ button:hover {
 }
 
 .foro-sidebar {
-  position: sticky;
-  top: 2rem;
-  height: fit-content;
-  width: 350px;
-  margin-left: auto;
+  position: static;
+  width: 100%;
+  margin-bottom: 2rem;
 }
 
 /* ==============================================
-                ESTILOS DEL FORO
+   FORO - MÓVIL
    ============================================== */
-
 .foro-container {
   background: #f0f9ff;
   border: 2px solid #5d5e5d;
   border-radius: 8px;
   overflow: hidden;
-  height: 400px;
+  height: 300px;
   display: flex;
   flex-direction: column;
 }
@@ -984,46 +830,19 @@ button:hover {
   cursor: not-allowed;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .materia-page {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1rem;
-  }
-
-  .foro-sidebar {
-    position: static;
-    order: -1;
-    width: 100%;
-    margin-bottom: 2rem;
-  }
-
-  .foro-container {
-    height: 300px;
-  }
-}
-
 /* ==============================================
-  ESTILOS DE NOTAS Y ASISTENCIAS (No desarrolladas)
+   EXÁMENES PAGE - MÓVIL
    ============================================== */
-
-.notas-page,
-.asistencias-page {
-  margin: 0;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
+.examenes-page {
+  width: 100%;
+  padding-top: 1rem;
 }
-/* ==============================================
-            ESTILOS DE EXAMENES PAGE
-   ============================================== */
 
 .examenes-filtros {
   margin-bottom: 16px;
-  text-align: right;
+  text-align: center;
   width: 100%;
-  padding: 0 2rem;
+  padding: 0 1rem;
 }
 
 .examenes-select {
@@ -1033,20 +852,15 @@ button:hover {
   font-size: 1rem;
   background: #fff;
   color: #333;
-}
-.examenes-page {
   width: 100%;
-  padding-top: 1rem;
+  max-width: 300px;
 }
 
-.examenes-list {
-  list-style: none;
-  padding: 0;
-}
 .examenes-listado.fade {
   opacity: 0.3;
   transition: opacity 0.35s;
 }
+
 .examenes-listado {
   transition: opacity 0.35s;
   transition-timing-function: linear(
@@ -1077,9 +891,7 @@ button:hover {
 }
 
 .examen-card {
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -1090,31 +902,35 @@ button:hover {
 
 .examen-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-bottom: 8px;
 }
+
 .examen-materia {
   font-size: 1.1em;
 }
+
 .examen-fecha {
   color: #059669;
   font-weight: bold;
 }
+
 .examen-temas,
 .examen-docente,
 .examen-copias {
   margin-bottom: 4px;
 }
-/* ==============================================
-              ESTILOS DE EXAMENES PAGE
-   ============================================== */
 
+/* ==============================================
+   DICTADO PAGE - MÓVIL
+   ============================================== */
 .dictado-page {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 350px;
+  display: flex;
+  flex-direction: column;
   background: #f3f4f6;
-  gap: 1.5rem;
+  gap: 1rem;
   background-color: white;
   padding: 1rem;
   border-radius: 0.5rem;
@@ -1125,6 +941,7 @@ button:hover {
   display: flex;
   flex-direction: column;
 }
+
 .dictado-info {
   display: flex;
   flex-direction: column;
@@ -1145,7 +962,8 @@ button:hover {
 
 .dictado-info p {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
   margin: 0;
   font-size: 1rem;
   color: #333;
@@ -1159,11 +977,13 @@ button:hover {
 }
 
 .dictado-actions {
-  padding: 1rem 2rem;
+  padding: 1rem;
   margin-bottom: 1.5rem;
   display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
+
 .dictado-actions button {
   background-color: #10b981;
   color: white;
@@ -1181,12 +1001,14 @@ button:hover {
   margin-bottom: 0;
   display: inline-block;
   text-align: center;
+  width: 100%;
 }
 
 .dictado-actions button:hover {
   background-color: #059669;
   transform: translateY(-2px) scale(1.04);
 }
+
 .alumnos-section h3 {
   color: #374151;
   font-weight: 600;
@@ -1194,8 +1016,9 @@ button:hover {
   padding-bottom: 0.5rem;
   padding-left: 0.25rem;
 }
+
 /* ==============================================
-              ESTILOS DE PERFIL PAGE
+   PERFIL PAGE - MÓVIL
    ============================================== */
 .perfil-container {
   display: flex;
@@ -1213,7 +1036,7 @@ button:hover {
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  padding: 1.5rem;
   width: 100%;
   max-width: 500px;
   display: flex;
@@ -1269,9 +1092,6 @@ button:hover {
   font-size: 1rem;
 }
 
-/* ==============================================
-              ESTILOS DE INPUTS EN PERFIL
-   ============================================== */
 .nombre-editing {
   display: flex;
   flex-direction: column;
@@ -1366,8 +1186,10 @@ button:hover {
 
 .form-botones {
   display: flex;
+  flex-direction: column;
   gap: 0.8rem;
   justify-content: center;
+  width: 100%;
 }
 
 .perfil-acciones button {
@@ -1379,6 +1201,7 @@ button:hover {
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: none;
+  width: 100%;
 }
 
 .perfil-acciones button:active {
@@ -1425,44 +1248,11 @@ button:hover {
   padding: 1rem;
 }
 
-/* Responsive design */
-@media (min-width: 768px) {
-  .perfil-header {
-    flex-direction: row;
-    text-align: left;
-    align-items: center;
-  }
-
-  .perfil-info-principal {
-    text-align: left;
-  }
-
-  .nombre-editing {
-    flex-direction: row;
-    align-items: baseline;
-  }
-
-  .dato-item {
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .dato-item strong {
-    min-width: 180px;
-    flex-shrink: 0;
-  }
-
-  .perfil-acciones {
-    justify-content: flex-end;
-  }
-}
 /* ==============================================
-            ESTILOS DE USUARIOS EN HOME
+   HOME - MÓVIL
    ============================================== */
-
 .home-container {
-  padding: 2rem;
+  padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -1471,14 +1261,14 @@ button:hover {
   text-align: center;
   color: #333;
   margin-bottom: 2rem;
-  font-size: 2.5rem;
+  font-size: 1.8rem;
 }
 
 .selected-user-info {
   background: #e8f5e8;
   border: 2px solid #4caf50;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   margin-bottom: 2rem;
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
 }
@@ -1502,20 +1292,20 @@ button:hover {
   border-bottom: 3px solid #2196f3;
   padding-bottom: 0.5rem;
   margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 .users-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.2rem;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
   margin-bottom: 1rem;
 }
 
 .user-card {
   border: 2px solid #ddd;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
   background: white;
@@ -1546,79 +1336,6 @@ button:hover {
   color: #333;
 }
 
-.button-row button:not(.disabled):not(.active):hover {
-  background: #1976d2;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .home-container {
-    padding: 1rem;
-  }
-
-  .home-container h1 {
-    font-size: 2rem;
-  }
-
-  .users-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .button-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .button-row button {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .selected-user-info {
-    padding: 1rem;
-  }
-
-  .user-card {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .home-container h1 {
-    font-size: 1.8rem;
-  }
-
-  .user-type-section h2 {
-    font-size: 1.3rem;
-  }
-
-  .users-grid {
-    gap: 0.8rem;
-  }
-}
-row {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 3rem;
-}
-
-.button-row button {
-  padding: 1rem 2.5rem;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 180px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 .button-row button.active {
   background: #4caf50;
   color: white;
@@ -1641,59 +1358,55 @@ row {
   background: #2196f3;
   color: white;
 }
-/* ==============================================
-      ESTILOS DE INPUTS EN REGISTRAR ALUMNOS
-   ============================================== */
-input,
-select {
-  background-color: white;
-  color: black;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 1rem;
-}
 
-input:focus,
-select:focus {
-  outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+.button-row button:not(.disabled):not(.active):hover {
+  background: #1976d2;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
 }
 
 /* ==============================================
-          ESTILOS DE NUEVO EXAMEN PAGE
+   NUEVO EXAMEN PAGE - MÓVIL
    ============================================== */
-
-.nuevo-examen-page {
+.nuevo-examen-page,
+.editar-examen-page {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
-.nuevo-examen-page h2 {
+.nuevo-examen-page h2,
+.editar-examen-page h2 {
   color: #333;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
   text-align: center;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
 }
 
-.nuevo-examen-page form {
+.nuevo-examen-page form,
+.editar-examen-page form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.nuevo-examen-page label {
+.nuevo-examen-page label,
+.editar-examen-page label {
   font-weight: bold;
   color: #555;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 .nuevo-examen-page input,
-.nuevo-examen-page textarea {
+.nuevo-examen-page textarea,
+.editar-examen-page input,
+.editar-examen-page textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -1702,13 +1415,16 @@ select:focus {
 }
 
 .nuevo-examen-page input:focus,
-.nuevo-examen-page textarea:focus {
+.nuevo-examen-page textarea:focus,
+.editar-examen-page input:focus,
+.editar-examen-page textarea:focus {
   outline: none;
   border-color: #10b981;
   box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
 }
 
-.nuevo-examen-page button {
+.nuevo-examen-page button,
+.editar-examen-page button {
   background-color: #10b981;
   color: white;
   border: none;
@@ -1719,31 +1435,63 @@ select:focus {
   transition: background-color 0.3s ease;
 }
 
-.nuevo-examen-page button:hover {
+.nuevo-examen-page button:hover,
+.editar-examen-page button:hover {
   background-color: #0e9668;
 }
 
-.nuevo-examen-page .error-message {
-  color: #d9534f;
-  font-size: 0.9rem;
-  margin-top: 5px;
-}
-
-.nuevo-examen-page textarea {
+.nuevo-examen-page textarea,
+.editar-examen-page textarea {
   background-color: white;
   color: black;
   min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
 }
-.nuevo-examen-temas {
+
+.nuevo-examen-temas,
+.editar-examen-temas {
   display: flex;
   flex-direction: column;
 }
 
-/* ========================================
-   ESTILOS PARA GESTIÓN DE EXÁMENES
-   ======================================== */
+.nuevo-examen-temas textarea,
+.editar-examen-temas textarea {
+  width: 100%;
+  min-height: 120px;
+}
 
-/* Sección de exámenes en DictadoPage */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.form-actions button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-actions button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+}
+
+.form-actions button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* ==============================================
+   GESTIÓN DE EXÁMENES - MÓVIL
+   ============================================== */
 .examenes-section {
   margin: 2rem 0;
   padding: 1.5rem;
@@ -1753,8 +1501,8 @@ select:focus {
 
 .examenes-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -1767,16 +1515,11 @@ select:focus {
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.3s ease;
+  width: 100%;
 }
 
 .btn-nuevo-examen:hover {
   background-color: #218838;
-}
-
-.examenes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .examen-card {
@@ -1785,8 +1528,8 @@ select:focus {
   border-radius: 8px;
   padding: 1.5rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
   transition: box-shadow 0.3s ease;
 }
 
@@ -1816,7 +1559,9 @@ select:focus {
 
 .examen-actions {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .btn-editar,
@@ -1828,6 +1573,7 @@ select:focus {
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .btn-editar {
@@ -1855,107 +1601,13 @@ select:focus {
   padding: 2rem;
 }
 
-/* Páginas de Editar y Nuevo Examen */
-.editar-examen-page,
-.nuevo-examen-page {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.editar-examen-page h2,
-.nuevo-examen-page h2 {
-  color: #333;
-  margin-bottom: 1.5rem;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 0.5rem;
-}
-
-.editar-examen-page form,
-.nuevo-examen-page form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.editar-examen-page label,
-.nuevo-examen-page label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #495057;
-}
-
-.editar-examen-page input,
-.nuevo-examen-page input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-.editar-examen-temas textarea,
-.nuevo-examen-temas textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-}
-
-.error-message {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-
-.form-actions button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.form-actions button[type="submit"] {
-  background-color: #007bff;
-  color: white;
-}
-
-.form-actions button[type="submit"]:hover {
-  background-color: #0056b3;
-}
-
-.btn-cancelar {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-cancelar:hover {
-  background-color: #5a6268;
-}
-
-/* Página de Borrar Examen */
+/* ==============================================
+   BORRAR EXAMEN PAGE - MÓVIL
+   ============================================== */
 .borrar-examen-page {
-  max-width: 700px;
-  margin: 2rem auto;
-  padding: 2rem;
+  max-width: 100%;
+  margin: 1rem auto;
+  padding: 1.5rem;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1966,6 +1618,7 @@ select:focus {
   margin-bottom: 1.5rem;
   border-bottom: 2px solid #dc3545;
   padding-bottom: 0.5rem;
+  font-size: 1.3rem;
 }
 
 .warning-message {
@@ -1990,7 +1643,8 @@ select:focus {
 
 .detail-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.3rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid #dee2e6;
 }
@@ -2024,6 +1678,7 @@ select:focus {
 .btn-eliminar-confirm {
   background-color: #dc3545;
   color: white;
+  width: 100%;
 }
 
 .btn-eliminar-confirm:hover:not(:disabled) {
@@ -2036,37 +1691,439 @@ select:focus {
   opacity: 0.7;
 }
 
-/* Responsive para móviles */
-@media (max-width: 768px) {
+/* ==============================================
+   OTRAS PÁGINAS - MÓVIL
+   ============================================== */
+.notas-page,
+.asistencias-page {
+  margin: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-section {
+  margin-bottom: 20px;
+}
+
+.search-section input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.search-section button {
+  padding: 8px 12px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.found-materia {
+  background-color: #e9f5ff;
+  border: 1px solid #b3d7ff;
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 15px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  color: #222;
+}
+
+li {
+  background-color: white;
+  padding: 10px;
+  border: 1px solid #eee;
+}
+
+p {
+  margin: 0;
+  color: #555;
+}
+
+h1,
+h2 {
+  color: #333;
+}
+
+h3 {
+  color: green;
+  margin: 0;
+}
+
+#cajas {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+#columna {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: 100%;
+  gap: 1rem;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+#caja {
+  flex: 1 1 100%;
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+}
+
+#caja p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ==============================================
+   MEDIA QUERIES - TABLET (min-width: 768px)
+   ============================================== */
+@media (min-width: 768px) {
+  /* Layout principal */
+  .app-container {
+    flex-direction: row;
+  }
+
+  .main-content {
+    width: calc(100% - 190px);
+  }
+
+  /* Sidebar */
+  .sidebar-container {
+    width: 12rem;
+  }
+
+  .sidebar-menu-item {
+    padding: 0.75rem 1rem;
+    justify-content: flex-start;
+  }
+
+  .sidebar-menu-item span {
+    display: inline;
+  }
+
+  .sidebar-logo-text {
+    font-size: 1rem;
+  }
+
+  /* Header */
+  .header-container {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .header-info-section {
+    text-align: left;
+  }
+
+  .school-name-title {
+    font-size: 1.25rem;
+  }
+
+  .welcome-message {
+    font-size: 1rem;
+  }
+
+  /* Botones */
+  .button-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .button-row button {
+    width: auto;
+    min-width: 180px;
+  }
+
+  /* Dashboard */
+  .dashboard-layout {
+    flex-direction: row;
+  }
+
+  .dashboard-content {
+    padding: 1.5rem;
+  }
+
+  .subjects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .right-sidebar {
+    width: 16rem;
+    order: 0;
+  }
+
+  /* Calendario */
+  .calendario {
+    max-width: 900px;
+    padding: 1rem;
+    min-height: 350px;
+  }
+
+  .rbc-calendar {
+    font-size: 1rem;
+  }
+
+  /* Formularios */
+  .form-container {
+    width: 90%;
+    max-width: 700px;
+    padding: 2rem;
+  }
+
+  /* Materia Page */
+  .materia-page {
+    grid-template-columns: 1fr 350px;
+    padding: 1rem 0;
+  }
+
+  .foro-sidebar {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+    width: 350px;
+    margin-left: auto;
+    order: 0;
+  }
+
+  .foro-container {
+    height: 400px;
+  }
+
+  /* Exámenes */
+  .examenes-filtros {
+    text-align: right;
+    padding: 0 2rem;
+  }
+
+  .examenes-select {
+    width: auto;
+  }
+
   .examen-card {
-    flex-direction: column;
-    align-items: flex-start;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .examen-actions {
-    width: 100%;
-    margin-top: 1rem;
+  .examen-header {
+    flex-direction: row;
+    justify-content: space-between;
   }
 
-  .examen-actions button {
-    flex: 1;
+  /* Dictado Page */
+  .dictado-page {
+    grid-template-columns: 1fr 350px;
   }
 
-  .examenes-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .dictado-info p {
+    flex-direction: row;
     gap: 1rem;
   }
 
-  .btn-nuevo-examen {
-    width: 100%;
+  .dictado-actions {
+    flex-direction: row;
+    padding: 1rem 2rem;
+  }
+
+  .dictado-actions button {
+    width: auto;
+  }
+
+  /* Perfil */
+  .perfil-card {
+    padding: 2rem;
+  }
+
+  .perfil-header {
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+  }
+
+  .perfil-info-principal {
+    text-align: left;
+  }
+
+  .nombre-editing {
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  .dato-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .dato-item strong {
+    min-width: 180px;
+    flex-shrink: 0;
+  }
+
+  .perfil-acciones {
+    justify-content: flex-end;
+  }
+
+  .form-botones {
+    flex-direction: row;
+    width: auto;
+  }
+
+  .perfil-acciones button {
+    width: auto;
+  }
+
+  /* Home */
+  .home-container {
+    padding: 2rem;
+  }
+
+  .home-container h1 {
+    font-size: 2rem;
+  }
+
+  .selected-user-info {
+    padding: 1.5rem;
+  }
+
+  .user-type-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .user-card {
+    padding: 1.5rem;
+  }
+
+  /* Nuevo/Editar Examen */
+  .nuevo-examen-page,
+  .editar-examen-page {
+    max-width: 600px;
+  }
+
+  .nuevo-examen-page h2,
+  .editar-examen-page h2 {
+    font-size: 1.8rem;
   }
 
   .form-actions {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .form-actions button {
-    width: 100%;
+    width: auto;
+  }
+
+  /* Gestión de Exámenes */
+  .examenes-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-nuevo-examen {
+    width: auto;
+  }
+
+  .examen-card {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .examen-actions {
+    flex-direction: row;
+    width: auto;
+    margin-top: 0;
+  }
+
+  .examen-actions button {
+    width: auto;
+  }
+
+  /* Borrar Examen */
+  .borrar-examen-page {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 2rem;
+  }
+
+  .borrar-examen-page h2 {
+    font-size: 1.5rem;
+  }
+
+  .detail-item {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .btn-eliminar-confirm {
+    width: auto;
+  }
+
+  /* Otros */
+  #columna {
+    flex-direction: row;
+    height: 47%;
+  }
+
+  #caja {
+    flex: 1 1 45%;
+  }
+
+  #cajas {
+    width: 60%;
+  }
+
+  .left-column {
+    height: 100vh;
+    width: 35%;
+  }
+
+  .body {
+    flex-direction: row;
+  }
+
+  .search-section input {
+    width: auto;
+    margin-bottom: 0;
+  }
+
+  .search-section button {
+    width: auto;
+    margin-left: 10px;
+  }
+}
+
+/* ==============================================
+   MEDIA QUERIES - DESKTOP GRANDE (min-width: 1024px)
+   ============================================== */
+@media (min-width: 1024px) {
+  .home-container h1 {
+    font-size: 2.5rem;
+  }
+
+  .dashboard-content {
+    padding: 2rem;
   }
 }
