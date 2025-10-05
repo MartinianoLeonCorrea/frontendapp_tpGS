@@ -56,22 +56,35 @@ function Home() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
+        setError(null);
 
-        // Obtener alumnos con información del curso
-        const alumnosRes = await fetch(
-          '/api/personas/alumnos?includeCurso=true'
+        // Llamar a la API para obtener todas las personas
+        const response = await fetch('http://localhost:5173/api/personas');
+        if (!response.ok) {
+          throw new Error('Error al obtener las personas');
+        }
+
+        const data = await response.json();
+
+        // Verificar si la respuesta contiene la propiedad `data` y si es un arreglo
+        if (!data || !Array.isArray(data.data)) {
+          throw new Error(
+            'La respuesta de la API no contiene un arreglo válido en la propiedad `data`.'
+          );
+        }
+
+        // Filtrar alumnos y docentes según el tipo
+        const alumnosData = data.data.filter(
+          (persona) => persona.tipo === 'alumno'
         );
-        const alumnosData = await alumnosRes.json();
+        const docentesData = data.data.filter(
+          (persona) => persona.tipo === 'docente'
+        );
 
-        // Obtener docentes
-        const docentesRes = await fetch('/api/personas/docentes');
-        const docentesData = await docentesRes.json();
-
-        setAlumnos(alumnosData.data || []);
-        setDocentes(docentesData.data || []);
+        setAlumnos(alumnosData);
+        setDocentes(docentesData);
       } catch (err) {
-        console.error('Error al cargar usuarios:', err);
-        setError('Error al cargar la lista de usuarios');
+        setError(err.message);
       } finally {
         setLoading(false);
       }
