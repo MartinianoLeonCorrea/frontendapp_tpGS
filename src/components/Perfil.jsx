@@ -20,18 +20,14 @@ export default function Perfil({ userType = 'alumno' }) {
       alumno: {
         icon: '🎓',
         title: 'Alumno',
-        formatAdditionalInfo: (info) => `[${info?.nro_letra || ''} - ${info?.turno || ''}]`
+        formatAdditionalInfo: (info) =>
+          `[${info?.nro_letra || ''} - ${info?.turno || ''}]`,
       },
       docente: {
         icon: '👨‍🏫',
         title: 'Docente',
-        formatAdditionalInfo: (dictados) => {
-          if (!Array.isArray(dictados) || dictados.length === 0) {
-            return 'Sin dictados asignados';
-          }
-          return `${dictados.length} dictado${dictados.length > 1 ? 's' : ''} asignado${dictados.length > 1 ? 's' : ''}`;
-        }
-      }
+        formatAdditionalInfo: () => '', // No mostrar dictados asignados
+      },
     };
 
     return userConfig[userType] || userConfig.alumno;
@@ -43,17 +39,18 @@ export default function Perfil({ userType = 'alumno' }) {
     const loadUserData = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
         // Determinar endpoint según el tipo de usuario
-        const apiEndpoint = userType === 'alumno' 
-          ? `/api/personas/${dni}?includeCurso=true`
-          : `/api/personas/${dni}`;
+        const apiEndpoint =
+          userType === 'alumno'
+            ? `/api/personas/${dni}?includeCurso=true`
+            : `/api/personas/${dni}`;
 
         // Cargar datos básicos del usuario
         const response = await fetch(apiEndpoint);
         const data = await response.json();
-        
+
         if (!response.ok) {
           throw new Error(data.message || 'Error al cargar datos');
         }
@@ -64,24 +61,10 @@ export default function Perfil({ userType = 'alumno' }) {
 
         // Cargar información adicional específica por tipo de usuario
         let additionalData = null;
-        
         if (userType === 'alumno') {
-          // Para alumnos, usar los datos del curso ya incluidos
           additionalData = data.data?.curso;
-        } else if (userType === 'docente') {
-          // Para docentes, hacer llamada paralela para dictados
-          try {
-            const dictadosRes = await fetch(`/api/personas/${dni}?includeDictados=true`);
-            const dictadosData = await dictadosRes.json();
-            additionalData = dictadosData.data?.dictados || [];
-          } catch (dictadosError) {
-            console.error('Error al cargar dictados:', dictadosError);
-            additionalData = [];
-          }
         }
-        
         setAdditionalInfo(additionalData);
-
       } catch (err) {
         setError(`No se pudieron cargar los datos del ${userType}.`);
         console.error(err);
@@ -117,7 +100,7 @@ export default function Perfil({ userType = 'alumno' }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Formulario enviado con datos:', formData);
-    
+
     setIsSaving(true);
     setError(null);
 
@@ -128,7 +111,7 @@ export default function Perfil({ userType = 'alumno' }) {
         apellido: formData.apellido,
         email: formData.email,
         telefono: formData.telefono,
-        direccion: formData.direccion
+        direccion: formData.direccion,
       };
 
       // Si es docente, incluir especialidad si existe
@@ -140,14 +123,14 @@ export default function Perfil({ userType = 'alumno' }) {
 
       const response = await fetch(`/api/personas/${dni}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dataToUpdate)
+        body: JSON.stringify(dataToUpdate),
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.message || 'Error al actualizar los datos');
       }
@@ -158,10 +141,9 @@ export default function Perfil({ userType = 'alumno' }) {
       setUserData(result.data);
       setFormData(result.data);
       setIsEditing(false);
-      
+
       // Mostrar mensaje de éxito
       alert('¡Datos guardados correctamente!');
-      
     } catch (error) {
       console.error('Error al guardar los datos:', error);
       setError(`Error al guardar los datos: ${error.message}`);
@@ -226,14 +208,23 @@ export default function Perfil({ userType = 'alumno' }) {
                 `${userData?.nombre || ''} ${userData?.apellido || ''}`
               )}
             </h2>
-            <p>
-              {config.formatAdditionalInfo(additionalInfo)}
-            </p>
+            {userType === 'alumno' && (
+              <p>{config.formatAdditionalInfo(additionalInfo)}</p>
+            )}
           </div>
         </div>
 
         {error && userData && (
-          <div className="error-message" style={{marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#fee', border: '1px solid #fcc', borderRadius: '4px'}}>
+          <div
+            className="error-message"
+            style={{
+              marginBottom: '1rem',
+              padding: '0.5rem',
+              backgroundColor: '#fee',
+              border: '1px solid #fcc',
+              borderRadius: '4px',
+            }}
+          >
             {error}
           </div>
         )}
@@ -251,7 +242,7 @@ export default function Perfil({ userType = 'alumno' }) {
                   onChange={handleInputChange}
                   className="input-dato"
                   disabled // DNI no debería ser editable
-                  style={{backgroundColor: '#f5f5f5', cursor: 'not-allowed'}}
+                  style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
               ) : (
                 <span>{userData?.dni || ''}</span>
@@ -338,8 +329,8 @@ export default function Perfil({ userType = 'alumno' }) {
             </button>
           ) : (
             <form onSubmit={handleSubmit} className="form-botones">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn-confirmar"
                 disabled={isSaving}
               >

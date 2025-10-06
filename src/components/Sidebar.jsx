@@ -34,7 +34,7 @@ function Sidebar() {
       id: 'dictados',
       label: 'Dictados',
       icon: GraduationCapIcon,
-      path: '/docente/dictados',
+      path: '/docente/dictado',
     },
     {
       id: 'calendario',
