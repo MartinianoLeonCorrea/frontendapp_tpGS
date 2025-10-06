@@ -63,35 +63,79 @@ function CalendarioPage() {
 
   useEffect(() => {
     async function fetchEventos() {
-      if (!dni) return;
-      const alumnoRes = await fetch(`/api/personas/${dni}`);
-      const alumnoData = await alumnoRes.json();
-      const cursoId = alumnoData.data?.cursoId;
-      if (!cursoId) return;
+      if (!dni) {
+        console.log('DNI no disponible, no se pueden cargar eventos.');
+        return;
+      }
 
-      const dictadosRes = await fetch(`/api/dictados?cursoId=${cursoId}`);
-      const dictadosData = await dictadosRes.json();
-      const dictados = Array.isArray(dictadosData) ? dictadosData : [];
+      try {
+        const userRes = await fetch(`/api/personas/${dni}`);
+        const userData = await userRes.json();
+        const userType = userData.data?.tipo; // Suponiendo que el tipo de usuario viene en "tipo"
 
-      const todosExamenes = dictados.flatMap((dictado) =>
-        (dictado.examenes || []).map((examen) => ({
-          ...examen,
-          materia: dictado.materia,
-          docente: dictado.docente,
-        }))
-      );
+        if (!userType) {
+          console.log('No se pudo determinar el tipo de usuario.');
+          return;
+        }
 
-      const events = todosExamenes.map((examen) => ({
-        title: `${examen.materia?.nombre || 'Materia'} - Examen`,
-        start: new Date(examen.fecha_examen),
-        end: new Date(examen.fecha_examen),
-        examenId: examen.id,
-        temas: examen.temas,
-        docente: examen.docente,
-      }));
+        if (userType === 'alumno') {
+          const alumnoRes = await fetch(`/api/personas/${dni}`);
+          const alumnoData = await alumnoRes.json();
+          const cursoId = alumnoData.data?.cursoId;
+          if (!cursoId) {
+            console.log('El alumno no está asociado a ningún curso.');
+            return;
+          }
 
-      setEvents(events);
+          const dictadosRes = await fetch(`/api/dictados?cursoId=${cursoId}`);
+          const dictadosData = await dictadosRes.json();
+          const dictados = Array.isArray(dictadosData) ? dictadosData : [];
+
+          const todosExamenes = dictados.flatMap((dictado) =>
+            (dictado.examenes || []).map((examen) => ({
+              ...examen,
+              materia: dictado.materia,
+              docente: dictado.docente,
+            }))
+          );
+
+          const events = todosExamenes.map((examen) => ({
+            title: `${examen.materia?.nombre || 'Materia'} - Examen`,
+            start: new Date(examen.fecha_examen),
+            end: new Date(examen.fecha_examen),
+            examenId: examen.id,
+            temas: examen.temas,
+            docente: examen.docente,
+          }));
+
+          setEvents(events);
+        } else if (userType === 'docente') {
+          const dictadosRes = await fetch(`/api/dictados/persona/${dni}`);
+          const dictadosData = await dictadosRes.json();
+          const dictados = Array.isArray(dictadosData) ? dictadosData : [];
+
+          const todosExamenes = dictados.flatMap((dictado) =>
+            (dictado.examenes || []).map((examen) => ({
+              ...examen,
+              materia: dictado.materia,
+            }))
+          );
+
+          const events = todosExamenes.map((examen) => ({
+            title: `${examen.materia?.nombre || 'Materia'} - Examen`,
+            start: new Date(examen.fecha_examen),
+            end: new Date(examen.fecha_examen),
+            examenId: examen.id,
+            temas: examen.temas,
+          }));
+
+          setEvents(events);
+        }
+      } catch (error) {
+        console.error('Error al obtener los eventos:', error);
+      }
     }
+
     fetchEventos();
   }, [dni]);
 
