@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Foro from '../../components/Foro';
 import '../../App.css';
 
@@ -10,6 +10,20 @@ function DictadoPage() {
   const [dictado, setDictado] = useState(null);
   const [examenes, setExamenes] = useState([]);
   const [loadingExamenes, setLoadingExamenes] = useState(true);
+
+  const fetchExamenes = useCallback(async () => {
+    setLoadingExamenes(true);
+    try {
+      const response = await fetch(`/api/examenes?dictadoId=${dictadoId}`);
+      const result = await response.json();
+      setExamenes(result.data || []);
+    } catch (error) {
+      console.error('Error al cargar exámenes:', error);
+      setExamenes([]);
+    } finally {
+      setLoadingExamenes(false);
+    }
+  }, [dictadoId]);
 
   useEffect(() => {
     if (dictadoId) {
@@ -22,21 +36,7 @@ function DictadoPage() {
       // Cargar exámenes del dictado
       fetchExamenes();
     }
-  }, [dictadoId]);
-
-  const fetchExamenes = async () => {
-    setLoadingExamenes(true);
-    try {
-      const response = await fetch(`/api/examenes?dictadoId=${dictadoId}`);
-      const result = await response.json();
-      setExamenes(result.data || []);
-    } catch (error) {
-      console.error('Error al cargar exámenes:', error);
-      setExamenes([]);
-    } finally {
-      setLoadingExamenes(false);
-    }
-  };
+  }, [dictadoId, fetchExamenes]);
 
   if (!dictadoId) return <p>No se seleccionó dictado.</p>;
   if (!dictado) return <p>Cargando dictado...</p>;
@@ -67,8 +67,10 @@ function DictadoPage() {
     });
   };
 
-  const handleSubirNotas = () => {
-    navigate('/docente/dictado/notas/subir', { state: { dictadoId } });
+  const handleSubirNotas = (examenId) => {
+    navigate('/docente/dictado/notas/subir', {
+      state: { dictadoId, examenId },
+    });
   };
 
   const formatFecha = (fecha) => {
@@ -87,7 +89,7 @@ function DictadoPage() {
         <span className="dictado-info">
           <h3 className="subtitle">Curso</h3>
           <p>
-            <strong>Año y división:</strong> {curso?.nro_letra} |{' '}
+            <strong>Año y división:</strong> {curso?.nro_letra}{' '}
             <strong>Turno:</strong> {curso?.turno}
           </p>
         </span>
@@ -111,6 +113,12 @@ function DictadoPage() {
             <div className="examenes-list">
               {examenes.map((examen) => (
                 <div key={examen.id} className="examen-card">
+                  <button
+                    className="btn-eliminar-cruz"
+                    onClick={() => handleBorrarExamen(examen.id)}
+                  >
+                    ✖
+                  </button>
                   <div className="examen-info">
                     <h4 className="examen-fecha">
                       📅 {formatFecha(examen.fecha_examen)}
@@ -130,21 +138,16 @@ function DictadoPage() {
                       ✏️ Editar
                     </button>
                     <button
-                      className="btn-eliminar"
-                      onClick={() => handleBorrarExamen(examen.id)}
+                      className="btn-subir-notas"
+                      onClick={() => handleSubirNotas(examen)}
                     >
-                      🗑️ Eliminar
+                      📝 Subir Notas
                     </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-
-        {/* Botón de subir notas */}
-        <div className="dictado-actions">
-          <button onClick={handleSubirNotas}>Subir notas</button>
         </div>
 
         <div className="alumnos-section">

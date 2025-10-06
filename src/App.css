@@ -210,18 +210,17 @@ hr {
 }
 
 .button-row button:hover {
-  background-color: #306b38;
+  background-color: #818381;
 }
 
 button {
-  background-color: #418e4c;
+  background-color: #cfd1d0;
   color: black;
   border: none;
   border-radius: 7px;
-  padding: 15px 30px;
+  padding: 10px;
   font-size: 1rem;
   cursor: pointer;
-  font-weight: bold;
 }
 
 button:hover {
@@ -1480,12 +1479,12 @@ select:focus {
   width: 100%;
 }
 
-.form-actions button[type="submit"] {
+.form-actions button[type='submit'] {
   background-color: #007bff;
   color: white;
 }
 
-.form-actions button[type="submit"]:hover {
+.form-actions button[type='submit']:hover {
   background-color: #0056b3;
 }
 
@@ -1531,6 +1530,7 @@ select:focus {
   flex-direction: column;
   gap: 1rem;
   transition: box-shadow 0.3s ease;
+  position: relative;
 }
 
 .examen-card:hover {
@@ -1585,13 +1585,31 @@ select:focus {
   background-color: #0056b3;
 }
 
-.btn-eliminar {
-  background-color: #dc3545;
-  color: white;
+.btn-eliminar-cruz {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 30%;
 }
 
-.btn-eliminar:hover {
-  background-color: #c82333;
+.btn-eliminar-cruz:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.btn-subir-notas {
+  background-color: #d3d01b;
+  color: white;
+  font-weight: normal;
+  font-size: 14.4px;
 }
 
 .no-data {
@@ -1646,11 +1664,6 @@ select:focus {
   flex-direction: column;
   gap: 0.3rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.detail-item:last-child {
-  border-bottom: none;
 }
 
 .detail-item strong {
@@ -1689,6 +1702,85 @@ select:focus {
   background-color: #e4606d;
   cursor: not-allowed;
   opacity: 0.7;
+}
+/* ==============================================
+                  SUBIR NOTAS
+   ============================================== */
+.subir-notas-page {
+  width: 90%;
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.alumnos-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alumnos-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-bottom: 1px solid #ccc;
+}
+
+.alumnos-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.alumno-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.ausente-header {
+  text-align: center;
+}
+
+.ausente-checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.alumno-ausente {
+  background-color: #f5f5f5;
+  opacity: 0.7;
+}
+
+.ausente-checkbox input {
+  margin-right: 5px;
+}
+
+.input-disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+.submit-section {
+  display: flex;
+  justify-content: right;
+  margin: 10px 0px;
+}
+.btn-modificar-notas {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 25%;
+}
+.btn-modificar-notas:hover {
+  background-color: #2563eb;
 }
 
 /* ==============================================
@@ -2074,7 +2166,6 @@ h3 {
 
   .detail-item {
     flex-direction: row;
-    justify-content: space-between;
   }
 
   .btn-eliminar-confirm {
@@ -2102,6 +2193,7 @@ h3 {
 
   .body {
     flex-direction: row;
+    justify-content: center;
   }
 
   .search-section input {
@@ -2125,5 +2217,8 @@ h3 {
 
   .dashboard-content {
     padding: 2rem;
+  }
+  .body {
+    flex-direction: row;
   }
 }
