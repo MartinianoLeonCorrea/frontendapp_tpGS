@@ -112,10 +112,10 @@ function Header() {
   }, [currentPath, dni]);
 
   if (currentPath === '/docente/dashboard' && apellidoDocente) {
-    subtitle = `¡Bienvenido, Prof. ${apellidoDocente}!`;
+    subtitle = `¡Bienvenido/a, Prof. ${apellidoDocente}!`;
   }
   if (currentPath === '/alumno/dashboard' && nombreAlumno) {
-    subtitle = `¡Bienvenido, ${nombreAlumno}!`;
+    subtitle = `¡Bienvenido/a, ${nombreAlumno}!`;
   }
 
   const showProfile =

@@ -44,15 +44,120 @@ function Sidebar() {
     },
   ];
 
-  const handleMenuClick = (path) => {
-    if (path === 'atras') {
-      navigate(-1);
+    // ==== RUTAS ARREGLADAS ====
+
+  const getContextualBackPath = () => {
+    const path = location.pathname;
+    const state = location.state;
+
+    // ==== RUTAS DE DOCENTE ====
+    
+    // Operaciones de exámenes --> siempre volver a DictadoPage
+    if (path === '/docente/dictado/examen/nuevo') {
+      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+    }
+    
+    if (path === '/docente/dictado/examen/editar') {
+      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+    }
+    
+    if (path === '/docente/dictado/examen/borrar') {
+      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+    }
+
+    // Subir notas --> volver a DictadoPage
+    if (path === '/docente/dictado/notas/subir') {
+      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+    }
+
+    // DictadoPage específico --> volver al dashboard docente
+    if (path === '/docente/dictado') {
+      return { path: '/docente/dashboard' };
+    }
+
+    // Perfil docente --> volver al dashboard docente
+    if (path === '/docente/perfil') {
+      return { path: '/docente/dashboard' };
+    }
+
+    // Dashboard docente --> volver a home
+    if (path === '/docente/dashboard') {
+      return { path: '/' };
+    }
+
+    // ==== RUTAS DE ALUMNO ====
+    
+    // Materia específica --> volver al dashboard alumno
+    if (path === '/alumno/materia') {
+      return { path: '/alumno/dashboard' };
+    }
+
+    // Secciones de alumno (exámenes, notas, asistencias) --> volver al dashboard
+    if (path === '/alumno/examenes' || 
+        path === '/alumno/notas' || 
+        path === '/alumno/asistencias') {
+      return { path: '/alumno/dashboard' };
+    }
+
+    // Perfil alumno --> volver al dashboard alumno
+    if (path === '/alumno/perfil') {
+      return { path: '/alumno/dashboard' };
+    }
+
+    // Dashboard alumno --> volver a home
+    if (path === '/alumno/dashboard') {
+      return { path: '/' };
+    }
+
+    // ==== RUTAS PARA AMBOS ====
+    
+    // Calendario --> volver al dashboard correspondiente
+    if (path === '/calendario') {
+      if (location.pathname.includes('/docente/')) {
+        return { path: '/docente/dashboard' };
+      }
+      if (location.pathname.includes('/alumno/')) {
+        return { path: '/alumno/dashboard' };
+      }
+      // Si no hay contexto volver a home
+      return { path: '/' };
+    }
+
+    // Registro de alumno --> volver a home
+    if (path === '/registrar') {
+      return { path: '/' };
+    }
+
+    // ==== FALLBACK ====
+    // Osea, si no coincide con ninguna ruta específica, inferir por el prefijo
+    if (path.startsWith('/docente/')) {
+      return { path: '/docente/dashboard' };
+    }
+    
+    if (path.startsWith('/alumno/')) {
+      return { path: '/alumno/dashboard' };
+    }
+
+    // Por defecto volver a home
+    return { path: '/' };
+  };
+
+  const handleMenuClick = (itemPath) => {
+    if (itemPath === 'atras') {
+      const backNavigation = getContextualBackPath();
+      
+      // Si hay state para pasar usarlo: si no, navegar sin state
+      if (backNavigation.state) {
+        navigate(backNavigation.path, { state: backNavigation.state });
+      } else {
+        navigate(backNavigation.path);
+      }
     } else {
-      navigate(path);
+      navigate(itemPath);
     }
   };
 
-  // Verifica el rol del usuario (Alumno/Docente) y filtra el menú
+  // Verifica el rol del usuario (Alumno o Docente)
   const isAlumno = location.pathname.startsWith('/alumno');
   const isDocente = location.pathname.startsWith('/docente');
   const isRegistro = location.pathname.startsWith('/registrar');
@@ -65,11 +170,11 @@ function Sidebar() {
     } else if (isDocente) {
       navigate('/docente/dashboard');
     } else {
-      navigate('/'); // O ruta por defecto
+      navigate('/');
     }
   };
 
-  // Verifica el rol del usuario (Alumno/Docente) y filtra el menú
+  // Filtra los items del menú según el rol
   const filteredItems = menuItems.filter((item) => {
     if (isAlumno) {
       return ['examenes', 'notas', 'asistencias', 'calendario'].includes(
@@ -79,10 +184,10 @@ function Sidebar() {
     if (isDocente) {
       return ['dictados', 'calendario'].includes(item.id);
     }
-    // Por defecto, muestra solo las opciones básicas si no está en una ruta específica
     return ['calendario'].includes(item.id);
   });
 
+  // Agregar botón "Atrás"
   const backButton = {
     id: 'atras',
     label: 'Atrás',
@@ -93,7 +198,7 @@ function Sidebar() {
 
   // Botón cerrar sesión
   const handleLogout = () => {
-    logout(); // Limpia el usuario del contexto y localStorage
+    logout();
     navigate('/');
   };
 
@@ -130,7 +235,6 @@ function Sidebar() {
         })}
       </nav>
 
-      {/* Botón cerrar sesión al final */}
       {showLogout && (
         <div className="sidebar-logout-section">
           <button className="sidebar-menu-item logout" onClick={handleLogout}>
