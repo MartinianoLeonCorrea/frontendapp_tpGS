@@ -13,9 +13,10 @@ import {
 function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useUser();
+  const { logout, userData } = useUser();
 
   // Define los items del menú con sus rutas
+
   const menuItems = [
     {
       id: 'examenes',
@@ -34,40 +35,53 @@ function Sidebar() {
       id: 'dictados',
       label: 'Dictados',
       icon: GraduationCapIcon,
-      path: '/docente/dictado',
+      path: '/docente/dashboard',
     },
     {
       id: 'calendario',
       label: 'Calendario',
       icon: CalendarIcon,
       path: '/calendario',
+      userType: userData?.tipo, // Agregar tipo de usuario al item de calendario
     },
   ];
 
-    // ==== RUTAS ARREGLADAS ====
+  // ==== RUTAS ARREGLADAS ====
 
   const getContextualBackPath = () => {
     const path = location.pathname;
     const state = location.state;
 
     // ==== RUTAS DE DOCENTE ====
-    
+
     // Operaciones de exámenes --> siempre volver a DictadoPage
     if (path === '/docente/dictado/examen/nuevo') {
-      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+      return {
+        path: '/docente/dictado',
+        state: { dictadoId: state?.dictadoId },
+      };
     }
-    
+
     if (path === '/docente/dictado/examen/editar') {
-      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+      return {
+        path: '/docente/dictado',
+        state: { dictadoId: state?.dictadoId },
+      };
     }
-    
+
     if (path === '/docente/dictado/examen/borrar') {
-      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+      return {
+        path: '/docente/dictado',
+        state: { dictadoId: state?.dictadoId },
+      };
     }
 
     // Subir notas --> volver a DictadoPage
     if (path === '/docente/dictado/notas/subir') {
-      return { path: '/docente/dictado', state: { dictadoId: state?.dictadoId } };
+      return {
+        path: '/docente/dictado',
+        state: { dictadoId: state?.dictadoId },
+      };
     }
 
     // DictadoPage específico --> volver al dashboard docente
@@ -86,16 +100,18 @@ function Sidebar() {
     }
 
     // ==== RUTAS DE ALUMNO ====
-    
+
     // Materia específica --> volver al dashboard alumno
     if (path === '/alumno/materia') {
       return { path: '/alumno/dashboard' };
     }
 
     // Secciones de alumno (exámenes, notas, asistencias) --> volver al dashboard
-    if (path === '/alumno/examenes' || 
-        path === '/alumno/notas' || 
-        path === '/alumno/asistencias') {
+    if (
+      path === '/alumno/examenes' ||
+      path === '/alumno/notas' ||
+      path === '/alumno/asistencias'
+    ) {
       return { path: '/alumno/dashboard' };
     }
 
@@ -110,13 +126,14 @@ function Sidebar() {
     }
 
     // ==== RUTAS PARA AMBOS ====
-    
+
     // Calendario --> volver al dashboard correspondiente
     if (path === '/calendario') {
-      if (location.pathname.includes('/docente/')) {
+      // Usamos userData.tipo directamente
+      if (userData?.tipo === 'docente') {
         return { path: '/docente/dashboard' };
       }
-      if (location.pathname.includes('/alumno/')) {
+      if (userData?.tipo === 'alumno') {
         return { path: '/alumno/dashboard' };
       }
       // Si no hay contexto volver a home
@@ -133,7 +150,7 @@ function Sidebar() {
     if (path.startsWith('/docente/')) {
       return { path: '/docente/dashboard' };
     }
-    
+
     if (path.startsWith('/alumno/')) {
       return { path: '/alumno/dashboard' };
     }
@@ -145,7 +162,7 @@ function Sidebar() {
   const handleMenuClick = (itemPath) => {
     if (itemPath === 'atras') {
       const backNavigation = getContextualBackPath();
-      
+
       // Si hay state para pasar usarlo: si no, navegar sin state
       if (backNavigation.state) {
         navigate(backNavigation.path, { state: backNavigation.state });
@@ -158,16 +175,16 @@ function Sidebar() {
   };
 
   // Verifica el rol del usuario (Alumno o Docente)
-  const isAlumno = location.pathname.startsWith('/alumno');
-  const isDocente = location.pathname.startsWith('/docente');
+  const isUserPathAlumno = location.pathname.startsWith('/alumno');
+  const isUserPathDocente = location.pathname.startsWith('/docente');
   const isRegistro = location.pathname.startsWith('/registrar');
-  const showLogout = (isAlumno || isDocente) && !isRegistro;
+  const showLogout = (isUserPathAlumno || isUserPathDocente) && !isRegistro;
 
   // Maneja el click en el logo
   const handleLogoClick = () => {
-    if (isAlumno) {
+    if (userData?.tipo === 'alumno') {
       navigate('/alumno/dashboard');
-    } else if (isDocente) {
+    } else if (userData?.tipo === 'docente') {
       navigate('/docente/dashboard');
     } else {
       navigate('/');
@@ -176,12 +193,12 @@ function Sidebar() {
 
   // Filtra los items del menú según el rol
   const filteredItems = menuItems.filter((item) => {
-    if (isAlumno) {
+    if (userData?.tipo === 'alumno') {
       return ['examenes', 'notas', 'asistencias', 'calendario'].includes(
         item.id
       );
     }
-    if (isDocente) {
+    if (userData?.tipo === 'docente') {
       return ['dictados', 'calendario'].includes(item.id);
     }
     return ['calendario'].includes(item.id);
