@@ -227,8 +227,11 @@ function Sidebar() {
         style={{ cursor: 'pointer' }}
       >
         <div className="sidebar-logo-box">
-          <div className="sidebar-logo-text">Logo</div>
-          <div className="sidebar-logo-text">App</div>
+          <img
+            src="../../public/logo-nombre-skola.jpg"
+            alt="Logo"
+            style={{ width: '145px', height: '60px', objectFit: 'contain' }}
+          />
         </div>
       </div>
 
