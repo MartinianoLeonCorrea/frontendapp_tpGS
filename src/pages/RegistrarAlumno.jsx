@@ -80,7 +80,15 @@ function RegistrarAlumno() {
         setErrores({}); // Limpiar errores
 
       } else {
-        alert(result.message || 'Error al registrar alumno');
+        if (result.errors) {
+          const backendErrors = {};
+          result.errors.forEach(err => {
+            backendErrors[err.field] = err.message;
+          });
+          setErrores(backendErrors);
+        } else {
+          alert(result.message || 'Error al registrar alumno');
+        }
       }
     } catch (err) {
       alert('Error de conexión: ' + err.message);
