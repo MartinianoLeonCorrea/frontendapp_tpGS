@@ -74,9 +74,14 @@ body {
 
 .sidebar-logo-box {
   background-color: white;
-  padding: 0.75rem;
+  padding: 0.3rem;
   border-radius: 0.375rem;
   text-align: center;
+}
+#root > div > div.sidebar-container > div > div > img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .sidebar-logo-text {
@@ -1492,9 +1497,8 @@ select:focus {
    GESTIÓN DE EXÁMENES - MÓVIL
    ============================================== */
 .examenes-section {
-  margin: 2rem 0;
   padding: 1.5rem;
-  background: #f8f9fa;
+  background: #e1e9e1;
   border-radius: 8px;
 }
 
@@ -1847,7 +1851,7 @@ h2 {
 }
 
 h3 {
-  color: green;
+  color: #374151;
   margin: 0;
 }
 
@@ -2218,5 +2222,25 @@ h3 {
   }
   .body {
     flex-direction: row;
+  }
+  .dictado-page,
+  .materia-page {
+    flex-direction: row;
+    display: flex;
+  }
+  .dictado-content,
+  .materia-content {
+    flex: 1;
+    padding: 1rem;
+  }
+  #root
+    > div
+    > div.main-content
+    > div
+    > div
+    > div.dictado-content
+    > div.alumnos-section
+    > h3 {
+    margin-top: 0.7rem;
   }
 }
