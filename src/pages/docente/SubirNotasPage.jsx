@@ -71,8 +71,12 @@ function SubirNotasPage() {
         if (data.data) {
           const existingNotas = {};
           data.data.forEach((evaluacion) => {
-            existingNotas[evaluacion.alumnoId] =
-              evaluacion.nota === null ? 'ausente' : evaluacion.nota;
+            existingNotas[evaluacion.alumnoId] = {
+              nota: evaluacion.nota !== null ? evaluacion.nota : '',
+              ausente:
+                evaluacion.observaciones === 'Ausente' ||
+                evaluacion.observaciones?.includes('Ausente'),
+            };
           });
           setNotas(existingNotas);
           console.log('Existing notas:', existingNotas);
@@ -99,7 +103,13 @@ function SubirNotasPage() {
   const handleNotaChange = (dni, value) => {
     const numericValue = parseFloat(value);
     if (value === '') {
-      setNotas((prev) => ({ ...prev, [dni]: 'ausente' }));
+      setNotas((prev) => ({
+        ...prev,
+        [dni]: {
+          ...prev[dni],
+          nota: '',
+        },
+      }));
       setErrors((prev) => ({ ...prev, [dni]: '' }));
     } else if (isNaN(numericValue) || numericValue < 0 || numericValue > 10) {
       setErrors((prev) => ({
@@ -107,7 +117,13 @@ function SubirNotasPage() {
         [dni]: 'La nota debe ser un número entre 0 y 10.',
       }));
     } else {
-      setNotas((prev) => ({ ...prev, [dni]: numericValue }));
+      setNotas((prev) => ({
+        ...prev,
+        [dni]: {
+          ...prev[dni],
+          nota: numericValue,
+        },
+      }));
       setErrors((prev) => ({ ...prev, [dni]: '' }));
     }
   };
@@ -119,12 +135,17 @@ function SubirNotasPage() {
 
   const handleConfirmChanges = async () => {
     try {
-      const evaluaciones = Object.entries(notas).map(([dni, nota]) => ({
-        alumnoId: dni,
-        examenId,
-        nota: nota === 'ausente' ? null : Number(nota), // Asegurar que la nota sea un número
-        observacion: nota === 'ausente' ? 'Ausente' : null, // Observación para ausentes
-      }));
+      const evaluaciones = Object.entries(notas).map(([dni, data]) => {
+        const notaValue = data?.nota !== '' ? Number(data?.nota) : null;
+        const isAusente = data?.ausente || false;
+
+        return {
+          alumnoId: dni,
+          examenId,
+          nota: notaValue,
+          observaciones: isAusente ? 'Ausente' : null, // Solo "Ausente" si está marcado como ausente
+        };
+      });
 
       console.log('Datos preparados para enviar al backend:', evaluaciones); // Log para verificar los datos
 
@@ -133,7 +154,7 @@ function SubirNotasPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ evaluaciones }),
+        body: JSON.stringify({ evaluaciones }), // Enviar el objeto con la propiedad evaluaciones
       });
 
       if (response.ok) {
@@ -157,12 +178,13 @@ function SubirNotasPage() {
   };
 
   const handleAusenteChange = (dni, isAusente) => {
-    if (isAusente) {
-      setNotas((prev) => ({ ...prev, [dni]: 'ausente' }));
-      setEditMode((prev) => ({ ...prev, [dni]: false })); // Desactivar edición si está ausente
-    } else {
-      setNotas((prev) => ({ ...prev, [dni]: '' })); // Limpiar la nota
-    }
+    setNotas((prev) => ({
+      ...prev,
+      [dni]: {
+        nota: prev[dni]?.nota || '', // Mantener la nota existente
+        ausente: isAusente, // Cambiar solo el estado de ausencia
+      },
+    }));
   };
 
   if (!examenId) return <p>No se seleccionó un examen.</p>;
@@ -212,61 +234,67 @@ function SubirNotasPage() {
                 <div className="header-cell">Ausente</div>
               </div>
               <ul className="alumnos-list" role="list">
-                {alumnos.map((alumno) => (
-                  <li
-                    key={alumno.dni}
-                    className={`alumno-item ${
-                      notas[alumno.dni] === 'ausente' ? 'alumno-ausente' : ''
-                    }`}
-                  >
-                    <div className="cell alumno-info">
-                      <strong>
-                        {alumno.apellido}, {alumno.nombre}
-                      </strong>
-                    </div>
-                    <div className="cell nota-display">
-                      {editMode ? (
-                        <input
-                          type="number"
-                          className={`nota-input ${
-                            errors[alumno.dni] ? 'error' : ''
-                          }`}
-                          value={notas[alumno.dni] || ''}
-                          onChange={(e) =>
-                            handleNotaChange(alumno.dni, e.target.value)
-                          }
-                          placeholder="0-10"
-                          min="0"
-                          max="10"
-                          step="0.1"
-                        />
-                      ) : (
-                        <span
-                          className={`nota-value ${
-                            notas[alumno.dni] === 'ausente'
-                              ? 'ausente-text'
-                              : ''
-                          }`}
-                        >
-                          {notas[alumno.dni] || 'Sin calificar'}
-                        </span>
-                      )}
-                    </div>
-                    <div className="cell ausente-checkbox">
-                      <label className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          checked={notas[alumno.dni] === 'ausente'}
-                          onChange={(e) =>
-                            handleAusenteChange(alumno.dni, e.target.checked)
-                          }
-                          disabled={!editMode} // Deshabilitar si no está en modo edición
-                        />
-                        <span className="ausente-label">Ausente</span>
-                      </label>
-                    </div>
-                  </li>
-                ))}
+                {alumnos.map((alumno) => {
+                  const alumnoData = notas[alumno.dni] || {
+                    nota: '',
+                    ausente: false,
+                  };
+                  return (
+                    <li
+                      key={alumno.dni}
+                      className={`alumno-item ${
+                        alumnoData.ausente ? 'alumno-ausente' : ''
+                      }`}
+                    >
+                      <div className="cell alumno-info">
+                        <strong>
+                          {alumno.apellido}, {alumno.nombre}
+                        </strong>
+                      </div>
+                      <div className="cell nota-display">
+                        {editMode ? (
+                          <input
+                            type="number"
+                            className={`nota-input ${
+                              errors[alumno.dni] ? 'error' : ''
+                            }`}
+                            value={
+                              alumnoData.nota !== undefined
+                                ? alumnoData.nota
+                                : ''
+                            }
+                            onChange={(e) =>
+                              handleNotaChange(alumno.dni, e.target.value)
+                            }
+                            placeholder="0-10"
+                            min="0"
+                            max="10"
+                            step="0.1"
+                          />
+                        ) : (
+                          <span className="nota-value">
+                            {alumnoData.nota !== ''
+                              ? alumnoData.nota
+                              : 'Sin calificar'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="cell ausente-checkbox">
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={alumnoData.ausente}
+                            onChange={(e) =>
+                              handleAusenteChange(alumno.dni, e.target.checked)
+                            }
+                            disabled={!editMode} // Deshabilitar si no está en modo edición
+                          />
+                          <span className="ausente-label">Ausente</span>
+                        </label>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
