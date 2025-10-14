@@ -1041,8 +1041,7 @@ select:focus {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
-  width: 100%;
-  max-width: 500px;
+  width: fit-content;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
