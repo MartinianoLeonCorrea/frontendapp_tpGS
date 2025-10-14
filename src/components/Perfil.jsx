@@ -4,15 +4,18 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import '../App.css';
 
-export default function Perfil({ userType = 'alumno' }) {
-  const [userData, setUserData] = useState(null);
+export default function Perfil() {
+  const { userData, isAlumno, isDocente } = useUser(); // Obtener datos del contexto
+  const userType = isAlumno ? 'alumno' : isDocente ? 'docente' : null; // Determinar el tipo de usuario dinámicamente
+
+  const [userDataState, setUserDataState] = useState(null);
   const [additionalInfo, setAdditionalInfo] = useState(null);
   const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
-  const { dni } = useUser();
+  const [fieldErrors, setFieldErrors] = useState({});
 
   // Configuración específica por tipo de usuario (solo para formateo)
   const config = useMemo(() => {
@@ -30,11 +33,11 @@ export default function Perfil({ userType = 'alumno' }) {
       },
     };
 
-    return userConfig[userType] || userConfig.alumno;
+    return userConfig[userType] || {};
   }, [userType]);
 
   useEffect(() => {
-    if (!dni) return;
+    if (!userData) return;
 
     const loadUserData = async () => {
       setIsLoading(true);
@@ -44,8 +47,8 @@ export default function Perfil({ userType = 'alumno' }) {
         // Determinar endpoint según el tipo de usuario
         const apiEndpoint =
           userType === 'alumno'
-            ? `/api/personas/${dni}?includeCurso=true`
-            : `/api/personas/${dni}`;
+            ? `/api/personas/${userData.dni}?includeCurso=true`
+            : `/api/personas/${userData.dni}`;
 
         // Cargar datos básicos del usuario
         const response = await fetch(apiEndpoint);
@@ -56,7 +59,7 @@ export default function Perfil({ userType = 'alumno' }) {
         }
 
         console.log('Datos cargados:', data);
-        setUserData(data.data);
+        setUserDataState(data.data);
         setFormData(data.data);
 
         // Cargar información adicional específica por tipo de usuario
@@ -74,7 +77,7 @@ export default function Perfil({ userType = 'alumno' }) {
     };
 
     loadUserData();
-  }, [dni, userType]);
+  }, [userData, userType]);
 
   const handleEditClick = () => {
     console.log('Botón editar presionado. Estado actual isEditing:', isEditing);
@@ -84,7 +87,7 @@ export default function Perfil({ userType = 'alumno' }) {
 
   const handleCancelClick = () => {
     console.log('Cancelar presionado');
-    setFormData({ ...userData }); // Restaurar datos originales
+    setFormData({ ...userDataState }); // Restaurar datos originales
     setIsEditing(false);
   };
 
@@ -103,6 +106,7 @@ export default function Perfil({ userType = 'alumno' }) {
 
     setIsSaving(true);
     setError(null);
+    setFieldErrors({}); // Reset field errors before submission
 
     try {
       // Preparar datos para enviar (excluir campos que no deben actualizarse)
@@ -121,7 +125,7 @@ export default function Perfil({ userType = 'alumno' }) {
 
       console.log('Enviando datos al servidor:', dataToUpdate);
 
-      const response = await fetch(`/api/personas/${dni}`, {
+      const response = await fetch(`/api/personas/${userData.dni}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -132,13 +136,20 @@ export default function Perfil({ userType = 'alumno' }) {
       const result = await response.json();
 
       if (!response.ok) {
+        if (result.errors) {
+          const newFieldErrors = {};
+          result.errors.forEach((err) => {
+            newFieldErrors[err.field] = err.message;
+          });
+          setFieldErrors(newFieldErrors);
+        }
         throw new Error(result.message || 'Error al actualizar los datos');
       }
 
       console.log('Respuesta del servidor:', result);
 
       // Actualizar el estado local con los datos guardados
-      setUserData(result.data);
+      setUserDataState(result.data);
       setFormData(result.data);
       setIsEditing(false);
 
@@ -163,7 +174,7 @@ export default function Perfil({ userType = 'alumno' }) {
     );
   }
 
-  if (error && !userData) {
+  if (error && !userDataState) {
     return (
       <main className="perfil-container">
         <div className="perfil-card">
@@ -190,22 +201,34 @@ export default function Perfil({ userType = 'alumno' }) {
                     name="nombre"
                     value={formData.nombre || ''}
                     onChange={handleInputChange}
-                    className="input-nombre"
+                    className={`input-nombre ${
+                      fieldErrors.nombre ? 'input-error' : ''
+                    }`}
                     placeholder="Nombre"
                     required
                   />
+                  {fieldErrors.nombre && (
+                    <span className="error-text">{fieldErrors.nombre}</span>
+                  )}
                   <input
                     type="text"
                     name="apellido"
                     value={formData.apellido || ''}
                     onChange={handleInputChange}
-                    className="input-apellido"
+                    className={`input-apellido ${
+                      fieldErrors.apellido ? 'input-error' : ''
+                    }`}
                     placeholder="Apellido"
                     required
                   />
+                  {fieldErrors.apellido && (
+                    <span className="error-text">{fieldErrors.apellido}</span>
+                  )}
                 </div>
               ) : (
-                `${userData?.nombre || ''} ${userData?.apellido || ''}`
+                `${userDataState?.nombre || ''} ${
+                  userDataState?.apellido || ''
+                }`
               )}
             </h2>
             {userType === 'alumno' && (
@@ -214,7 +237,7 @@ export default function Perfil({ userType = 'alumno' }) {
           </div>
         </div>
 
-        {error && userData && (
+        {error && userDataState && (
           <div
             className="error-message"
             style={{
@@ -245,7 +268,7 @@ export default function Perfil({ userType = 'alumno' }) {
                   style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
               ) : (
-                <span>{userData?.dni || ''}</span>
+                <span>{userDataState?.dni || ''}</span>
               )}
             </div>
 
@@ -257,11 +280,16 @@ export default function Perfil({ userType = 'alumno' }) {
                   name="email"
                   value={formData.email || ''}
                   onChange={handleInputChange}
-                  className="input-dato"
+                  className={`input-dato ${
+                    fieldErrors.email ? 'input-error' : ''
+                  }`}
                   required
                 />
               ) : (
-                <span>{userData?.email || ''}</span>
+                <span>{userDataState?.email || ''}</span>
+              )}
+              {fieldErrors.email && (
+                <span className="error-text">{fieldErrors.email}</span>
               )}
             </div>
 
@@ -273,11 +301,16 @@ export default function Perfil({ userType = 'alumno' }) {
                   name="telefono"
                   value={formData.telefono || ''}
                   onChange={handleInputChange}
-                  className="input-dato"
+                  className={`input-dato ${
+                    fieldErrors.telefono ? 'input-error' : ''
+                  }`}
                   required
                 />
               ) : (
-                <span>{userData?.telefono || ''}</span>
+                <span>{userDataState?.telefono || ''}</span>
+              )}
+              {fieldErrors.telefono && (
+                <span className="error-text">{fieldErrors.telefono}</span>
               )}
             </div>
 
@@ -289,11 +322,16 @@ export default function Perfil({ userType = 'alumno' }) {
                   name="direccion"
                   value={formData.direccion || ''}
                   onChange={handleInputChange}
-                  className="input-dato"
+                  className={`input-dato ${
+                    fieldErrors.direccion ? 'input-error' : ''
+                  }`}
                   required
                 />
               ) : (
-                <span>{userData?.direccion || ''}</span>
+                <span>{userDataState?.direccion || ''}</span>
+              )}
+              {fieldErrors.direccion && (
+                <span className="error-text">{fieldErrors.direccion}</span>
               )}
             </div>
 
@@ -307,11 +345,18 @@ export default function Perfil({ userType = 'alumno' }) {
                     name="especialidad"
                     value={formData.especialidad || ''}
                     onChange={handleInputChange}
-                    className="input-dato"
+                    className={`input-dato ${
+                      fieldErrors.especialidad ? 'input-error' : ''
+                    }`}
                     placeholder="Especialidad del docente"
                   />
                 ) : (
-                  <span>{userData?.especialidad || 'No especificada'}</span>
+                  <span>
+                    {userDataState?.especialidad || 'No especificada'}
+                  </span>
+                )}
+                {fieldErrors.especialidad && (
+                  <span className="error-text">{fieldErrors.especialidad}</span>
                 )}
               </div>
             )}
