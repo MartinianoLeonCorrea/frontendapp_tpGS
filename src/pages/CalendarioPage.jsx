@@ -3,47 +3,46 @@ import { Calendar, dayjsLocalizer, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import dayjs from 'dayjs';
 import { useUser } from '../context/UserContext';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
 // Configurar el localizador de dayjs
 const localizer = dayjsLocalizer(dayjs);
 
-// Componente personalizado para eventos con hover
+// Componente personalizado para eventos con Tippy
 function CustomEvent({ event }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div
-      className={`calendar-event${hovered ? ' hovered' : ''}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        transition: 'all 0.2s',
-        overflow: 'hidden',
-        whiteSpace: hovered ? 'normal' : 'nowrap',
-        textOverflow: 'ellipsis',
-        padding: hovered ? '16px' : '4px',
-        fontWeight: hovered ? 'bold' : 'normal',
-        zIndex: hovered ? 10 : 1,
-      }}
-    >
-      {hovered ? (
-        <div>
-          <div>{event.title}</div>
-          {event.temas && (
-            <div style={{ fontSize: '0.9rem', marginTop: '4px' }}>
-              Temas: {event.temas}
-            </div>
-          )}
-          {event.docente && (
-            <div style={{ fontSize: '0.9rem' }}>
-              Docente: {event.docente.nombre} {event.docente.apellido}
-            </div>
-          )}
+  const tooltipContent = (
+    <div className="event-tooltip-content">
+      <div className="tooltip-title">{event.title}</div>
+      {event.temas && (
+        <div className="tooltip-section">
+          <strong>Temas:</strong>
+          <span>{event.temas}</span>
         </div>
-      ) : (
-        event.title
+      )}
+      {event.docente && (
+        <div className="tooltip-section">
+          <strong>Docente:</strong>
+          <span>{event.docente.nombre} {event.docente.apellido}</span>
+        </div>
       )}
     </div>
+  );
+
+  return (
+    <Tippy 
+      content={tooltipContent}
+      arrow={true}
+      theme="custom-green"
+      placement="auto"
+      interactive={true}
+      delay={[200, 0]}
+      maxWidth="none"
+    >
+      <div className="event-label">
+        {event.title}
+      </div>
+    </Tippy>
   );
 }
 
