@@ -12,6 +12,7 @@ function ExamenesPage() {
 
   useEffect(() => {
     if (!dni) return;
+    
     const fetchExamenes = async () => {
       setIsLoading(true);
       try {
@@ -19,30 +20,63 @@ function ExamenesPage() {
         const alumnoRes = await fetch(`/api/personas/${dni}`);
         const alumnoData = await alumnoRes.json();
         const cursoId = alumnoData.data?.cursoId;
+        
         if (!cursoId) {
+          console.error('No se encontró cursoId para el alumno');
           setExamenes([]);
           setIsLoading(false);
           return;
         }
 
-        // 2. Obtener dictados del curso (con materia, docente y examenes)
-        const dictadosRes = await fetch(`/api/dictados?cursoId=${cursoId}`);
+        console.log('CursoId del alumno:', cursoId);
+
+        // 2. Obtener dictados del curso usando la ruta correcta
+        const dictadosRes = await fetch(`/api/dictados/curso/${cursoId}`);
         const dictadosData = await dictadosRes.json();
-        const dictados = Array.isArray(dictadosData) ? dictadosData : [];
+        
+        console.log('Respuesta de dictados:', dictadosData);
+        
+        // La respuesta puede venir directamente como array o dentro de .data
+        const dictados = Array.isArray(dictadosData) 
+          ? dictadosData 
+          : (dictadosData.data || []);
 
-        // 3. Extraer todos los exámenes de los dictados
-        const todosExamenes = dictados.flatMap((dictado) =>
-          (dictado.examenes || []).map((examen) => ({
-            ...examen,
-            materia: dictado.materia,
-            docente: dictado.docente,
-          }))
-        );
+        console.log('Dictados encontrados:', dictados);
 
+        if (dictados.length === 0) {
+          console.log('No hay dictados para este curso');
+          setExamenes([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // 3. Obtener exámenes para cada dictado
+        const examenesPromises = dictados.map(async (dictado) => {
+          try {
+            const examenesRes = await fetch(`/api/examenes?dictadoId=${dictado.id}`);
+            const examenesData = await examenesRes.json();
+            const examenesDictado = examenesData.data || [];
+            
+            // Agregar información del dictado a cada examen
+            return examenesDictado.map((examen) => ({
+              ...examen,
+              materia: dictado.materia || examen.dictado?.materia,
+              docente: dictado.docente || examen.dictado?.docente,
+            }));
+          } catch (error) {
+            console.error(`Error al obtener exámenes del dictado ${dictado.id}:`, error);
+            return [];
+          }
+        });
+
+        const examenesArrays = await Promise.all(examenesPromises);
+        const todosExamenes = examenesArrays.flat();
+
+        console.log('Total de exámenes encontrados:', todosExamenes.length);
         setExamenes(todosExamenes);
       } catch (error) {
-        setExamenes([]);
         console.error('Error al cargar los exámenes:', error);
+        setExamenes([]);
       } finally {
         setIsLoading(false);
       }

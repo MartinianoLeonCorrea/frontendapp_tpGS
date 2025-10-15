@@ -10,48 +10,84 @@ function MateriaPage() {
   const [materia, setMateria] = useState(null);
   const [dictado, setDictado] = useState(null);
   const [examenes, setExamenes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (subjectId && dni) {
-      // 1. Obtener el alumno y su curso
-      fetch(`/api/personas/${dni}`)
-        .then((res) => res.json())
-        .then((alumnoData) => {
-          const cursoId = alumnoData.data?.cursoId;
-          if (!cursoId) return;
-
-          // 2. Buscar el dictado de la materia para el curso del alumno
-          fetch(
-            `/api/dictados/by-curso-materia?cursoId=${cursoId}&materiaId=${subjectId}`
-          )
-            .then((res) => res.json())
-            .then((dictadoData) => {
-              const dictado = dictadoData.data?.[0];
-              setDictado(dictado);
-
-              // 3. Obtener la materia
-              fetch(`/api/materias/${subjectId}`)
-                .then((res) => res.json())
-                .then((materiaData) => {
-                  setMateria(materiaData.data);
-                });
-
-              // 4. Obtener los exámenes asociados al dictado
-              if (dictado) {
-                fetch(`/api/examenes?dictadoId=${dictado.id}`)
-                  .then((res) => res.json())
-                  .then((examenData) => {
-                    setExamenes(examenData.data || []);
-                    console.log('Examenes recibidos: ', examenData.data);
-                  });
-              }
-            });
-        });
+    if (!subjectId || !dni) {
+      setIsLoading(false);
+      return;
     }
+
+    const fetchData = async () => {
+      try {
+        // 1. Obtener el alumno y su curso
+        const alumnoRes = await fetch(`/api/personas/${dni}`);
+        const alumnoData = await alumnoRes.json();
+        const cursoId = alumnoData.data?.cursoId;
+        
+        if (!cursoId) {
+          console.error('No se encontró cursoId para el alumno');
+          setIsLoading(false);
+          return;
+        }
+
+        // 2. Buscar el dictado de la materia para el curso del alumno
+        const dictadoRes = await fetch(
+          `/api/dictados/by-curso-materia?cursoId=${cursoId}&materiaId=${subjectId}`
+        );
+        const dictadoData = await dictadoRes.json();
+        const dictadoEncontrado = dictadoData.data?.[0];
+
+        if (!dictadoEncontrado) {
+          console.error('No se encontró dictado para esta materia y curso');
+          setIsLoading(false);
+          return;
+        }
+
+        setDictado(dictadoEncontrado);
+
+        // 3. Obtener la materia
+        const materiaRes = await fetch(`/api/materias/${subjectId}`);
+        const materiaData = await materiaRes.json();
+        setMateria(materiaData.data);
+
+        // 4. Los exámenes ya vienen incluidos en el dictado
+        console.log('Dictado completo:', dictadoEncontrado);
+        console.log('Exámenes del dictado:', dictadoEncontrado.examenes);
+        
+        // Si los exámenes vienen en el dictado, usarlos directamente
+        if (dictadoEncontrado.examenes && Array.isArray(dictadoEncontrado.examenes)) {
+          setExamenes(dictadoEncontrado.examenes);
+        } else {
+          // Si no vienen, hacer petición adicional
+          console.log('Buscando exámenes para dictadoId:', dictadoEncontrado.id);
+          const examenesRes = await fetch(`/api/examenes?dictadoId=${dictadoEncontrado.id}`);
+          const examenesData = await examenesRes.json();
+          
+          console.log('Respuesta de exámenes:', examenesData);
+          setExamenes(examenesData.data || []);
+        }
+      } catch (error) {
+        console.error('Error al cargar datos:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [subjectId, dni]);
 
-  if (!subjectId || !dni) return <div>No se seleccionó materia o alumno.</div>;
-  if (!materia || !dictado) return <div>Cargando materia...</div>;
+  if (!subjectId || !dni) {
+    return <div>No se seleccionó materia o alumno.</div>;
+  }
+
+  if (isLoading) {
+    return <div>Cargando materia...</div>;
+  }
+
+  if (!materia || !dictado) {
+    return <div>No se encontró información de la materia.</div>;
+  }
 
   function formatFecha(fechaISO) {
     if (!fechaISO) return '';
@@ -66,7 +102,6 @@ function MateriaPage() {
     <div className="materia-page">
       <div className="materia-content">
         {/* Información básica */}
-
         <div className="card profesor-info">
           <span className="profesor-label">Profesor: </span>
           <span className="profesor-name">
@@ -82,8 +117,8 @@ function MateriaPage() {
             {materia.descripcion || 'Sin descripción'}
           </div>
         </div>
+
         {/* Exámenes */}
-        {/*TODO: agregar la funcion filtrar el listado de examenes */}
         <div className="card examenes-section">
           <h3 className="examenes-title">Exámenes:</h3>
           <ul className="examenes-list">
