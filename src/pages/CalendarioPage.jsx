@@ -68,9 +68,13 @@ function CalendarioPage() {
       }
 
       try {
+        // Obtener información del usuario
         const userRes = await fetch(`/api/personas/${dni}`);
         const userData = await userRes.json();
-        const userType = userData.data?.tipo; // Suponiendo que el tipo de usuario viene en "tipo"
+        const userType = userData.data?.tipo;
+        const cursoId = userData.data?.cursoId;
+
+        console.log('Usuario:', { tipo: userType, dni, cursoId });
 
         if (!userType) {
           console.log('No se pudo determinar el tipo de usuario.');
@@ -78,60 +82,94 @@ function CalendarioPage() {
         }
 
         if (userType === 'alumno') {
-          const alumnoRes = await fetch(`/api/personas/${dni}`);
-          const alumnoData = await alumnoRes.json();
-          const cursoId = alumnoData.data?.cursoId;
+          // Verificar que el alumno tenga un curso asignado
           if (!cursoId) {
             console.log('El alumno no está asociado a ningún curso.');
+            setEvents([]);
             return;
           }
 
+          console.log('Obteniendo dictados para el curso:', cursoId);
+
+          // Obtener SOLO los dictados del curso del alumno
           const dictadosRes = await fetch(`/api/dictados?cursoId=${cursoId}`);
           const dictadosData = await dictadosRes.json();
           const dictados = Array.isArray(dictadosData) ? dictadosData : [];
 
-          const todosExamenes = dictados.flatMap((dictado) =>
+          console.log('Dictados recibidos:', dictados.length);
+
+          // Filtrar dictados por cursoId (doble verificación)
+          const dictadosDelCurso = dictados.filter(
+            (dictado) => dictado.cursoId === cursoId
+          );
+
+          console.log('Dictados filtrados del curso del alumno:', dictadosDelCurso.length);
+
+          // Extraer todos los exámenes de los dictados del curso
+          const todosExamenes = dictadosDelCurso.flatMap((dictado) =>
             (dictado.examenes || []).map((examen) => ({
               ...examen,
               materia: dictado.materia,
               docente: dictado.docente,
+              cursoId: dictado.cursoId, // Mantener referencia al curso
             }))
           );
 
-          const events = todosExamenes.map((examen) => ({
+          console.log('Exámenes extraídos:', todosExamenes.length);
+
+          // Mapear exámenes a eventos del calendario
+          const eventos = todosExamenes.map((examen) => ({
             title: `${examen.materia?.nombre || 'Materia'} - Examen`,
             start: new Date(examen.fecha_examen),
             end: new Date(examen.fecha_examen),
             examenId: examen.id,
             temas: examen.temas,
             docente: examen.docente,
+            materia: examen.materia,
+            cursoId: examen.cursoId,
           }));
 
-          setEvents(events);
+          console.log('Eventos del calendario creados:', eventos);
+          setEvents(eventos);
+
         } else if (userType === 'docente') {
+          console.log('Obteniendo dictados para el docente:', dni);
+
+          // Obtener dictados del docente
           const dictadosRes = await fetch(`/api/dictados/persona/${dni}`);
           const dictadosData = await dictadosRes.json();
           const dictados = Array.isArray(dictadosData) ? dictadosData : [];
 
+          console.log('Dictados del docente recibidos:', dictados.length);
+
+          // Extraer todos los exámenes de los dictados del docente
           const todosExamenes = dictados.flatMap((dictado) =>
             (dictado.examenes || []).map((examen) => ({
               ...examen,
               materia: dictado.materia,
+              curso: dictado.curso,
             }))
           );
 
-          const events = todosExamenes.map((examen) => ({
+          console.log('Exámenes del docente extraídos:', todosExamenes.length);
+
+          // Mapear exámenes a eventos del calendario
+          const eventos = todosExamenes.map((examen) => ({
             title: `${examen.materia?.nombre || 'Materia'} - Examen`,
             start: new Date(examen.fecha_examen),
             end: new Date(examen.fecha_examen),
             examenId: examen.id,
             temas: examen.temas,
+            materia: examen.materia,
+            curso: examen.curso,
           }));
 
-          setEvents(events);
+          console.log('Eventos del calendario del docente creados:', eventos);
+          setEvents(eventos);
         }
       } catch (error) {
         console.error('Error al obtener los eventos:', error);
+        setEvents([]);
       }
     }
 
@@ -139,23 +177,25 @@ function CalendarioPage() {
   }, [dni]);
 
   return (
-    <Calendar
-      localizer={localizer}
-      events={events}
-      components={{
-        event: CustomEvent,
-      }}
-      startAccessor="start"
-      endAccessor="end"
-      date={date}
-      onNavigate={onNavigate}
-      view={view}
-      onView={onView}
-      views={['month', 'week', 'day', 'agenda']} // Vistas disponibles
-      defaultView={Views.MONTH}
-      showMultiDayTimes // Muestra la hora en eventos de varios días
-      style={{ height: '100%', width: '100%' }}
-    />
+    <div className="calendario">
+      <Calendar
+        localizer={localizer}
+        events={events}
+        components={{
+          event: CustomEvent,
+        }}
+        startAccessor="start"
+        endAccessor="end"
+        date={date}
+        onNavigate={onNavigate}
+        view={view}
+        onView={onView}
+        views={['month', 'week', 'day', 'agenda']}
+        defaultView={Views.MONTH}
+        showMultiDayTimes
+        style={{ height: '100%', width: '100%' }}
+      />
+    </div>
   );
 }
 

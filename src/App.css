@@ -2239,3 +2239,151 @@ h3 {
     margin-top: 0.7rem;
   }
 }
+/* ==============================================
+   ESTILOS PARA PRÓXIMOS EXÁMENES EN DASHBOARD
+   ============================================== */
+
+/* Contenedor principal de los exámenes */
+.proximos-examenes-container {
+  margin-top: 0.5rem;
+}
+
+.sidebar-section-title {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* Lista con scroll de exámenes */
+.examenes-scroll-list {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+/* Estilos del scrollbar para navegadores webkit */
+.examenes-scroll-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.examenes-scroll-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.examenes-scroll-list::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 10px;
+}
+
+.examenes-scroll-list::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+/* Tarjeta individual de cada examen */
+.examen-preview-card {
+  background-color: #ffffff;
+  border-left: 4px solid #10b981;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.examen-preview-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-left-color: #059669;
+  background-color: #f9fafb;
+}
+
+.examen-preview-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Nombre de la materia */
+.examen-preview-materia {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Información del examen (temas) */
+.examen-preview-info {
+  color: #374151;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.examen-preview-info strong {
+  font-weight: 600;
+}
+
+/* Fecha del examen */
+.examen-preview-fecha {
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Nombre del docente */
+.examen-preview-docente {
+  color: #6b7280;
+  font-size: 0.8rem;
+  font-style: italic;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Ajuste para alineación de la sección de novedades */
+.news-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.section-header {
+  flex-shrink: 0;
+}
+
+/* ==============================================
+   RESPONSIVE - TABLET Y DESKTOP
+   ============================================== */
+
+@media (min-width: 768px) {
+  .examenes-scroll-list {
+    max-height: 500px;
+  }
+
+  .examen-preview-card {
+    padding: 1.25rem;
+  }
+
+  .examen-preview-materia {
+    font-size: 1rem;
+  }
+
+  .examen-preview-info {
+    font-size: 0.9rem;
+  }
+  
+  /* Asegurar que el sidebar derecho esté alineado correctamente */
+  .right-sidebar {
+    align-self: flex-start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .examenes-scroll-list {
+    max-height: 600px;
+  }
+}

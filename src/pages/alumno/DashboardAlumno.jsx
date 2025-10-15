@@ -6,7 +6,7 @@ import { useUser } from '../../context/UserContext';
 
 export default function DashboardAlumno() {
   const [materias, setMaterias] = useState([]);
-  const [proximoExamen, setProximoExamen] = useState(null);
+  const [proximosExamenes, setProximosExamenes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { dni } = useUser();
   const navigate = useNavigate();
@@ -14,13 +14,12 @@ export default function DashboardAlumno() {
   useEffect(() => {
     if (!dni) return;
 
-    // Definimos una función asincrónica para centralizar toda la lógica de carga
     const fetchDashboardData = async () => {
       console.log('fetchDashboardData ejecutado');
       setIsLoading(true);
 
       try {
-        // 1. Obtener curso del alumno para encontrar los dictados
+        // 1. Obtener curso del alumno
         const alumnoRes = await fetch(`/api/personas/${dni}`);
         const alumnoData = await alumnoRes.json();
         const cursoId = alumnoData.data?.cursoId;
@@ -30,53 +29,75 @@ export default function DashboardAlumno() {
             'No se encontró cursoId, no se buscarán datos de materias y exámenes.'
           );
           setMaterias([]);
-          setProximoExamen(null);
+          setProximosExamenes([]);
           setIsLoading(false);
           return;
         }
 
-        // 2. Obtener dictados del curso, que incluyen materias, docentes y exámenes
+        console.log('CursoId del alumno:', cursoId);
+
+        // 2. Obtener SOLO los dictados del curso del alumno
         const dictadosRes = await fetch(`/api/dictados?cursoId=${cursoId}`);
         const dictadosData = await dictadosRes.json();
-        console.log('Dictados recibidos:', dictadosData);
+        console.log('Dictados recibidos para el curso:', dictadosData);
 
         const todosDictados = Array.isArray(dictadosData) ? dictadosData : [];
-        console.log(
-          'Tipo de todosDictados:',
-          Array.isArray(todosDictados),
-          todosDictados
-        );
 
         if (!todosDictados.length) {
           console.log('No hay dictados disponibles para el curso.');
           setMaterias([]);
-          setProximoExamen(null);
+          setProximosExamenes([]);
           setIsLoading(false);
           return;
         }
 
-        // 3. Extraer materias de los dictados
-        const todasLasMaterias = todosDictados.map((dictado) => dictado.materia);
+        // 3. Filtrar dictados que pertenecen al curso del alumno (doble verificación)
+        const dictadosDelCurso = todosDictados.filter(
+          (dictado) => dictado.cursoId === cursoId
+        );
+
+        console.log('Dictados filtrados del curso del alumno:', dictadosDelCurso);
+
+        // 4. Extraer materias de los dictados del curso
+        const todasLasMaterias = dictadosDelCurso.map((dictado) => dictado.materia);
         const materiasUnicas = todasLasMaterias.filter((materia, index, array) => 
           materia && array.findIndex(m => m.id === materia.id) === index
         );
         setMaterias(materiasUnicas);
         console.log('Materias extraídas:', materiasUnicas);
 
-        // 4. Extraer todos los exámenes de los dictados
-        const todosExamenes = todosDictados.flatMap(
-          (dictado) => dictado.examenes || []
-        );
-        console.log('Todos los exámenes extraídos:', todosExamenes);
-
-        // 5. Filtrar el examen más próximo
+        // 5. Procesar exámenes próximos SOLO de los dictados del curso del alumno
         const hoy = new Date();
-        const proximos = todosExamenes
-          .filter((ex) => new Date(ex.fecha_examen) >= hoy)
-          .sort((a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen));
+        const examenesPorMateria = [];
 
-        console.log('Exámenes próximos:', proximos);
-        setProximoExamen(proximos[0] || null);
+        dictadosDelCurso.forEach((dictado) => {
+          // Verificar que el dictado tenga exámenes
+          if (!dictado.examenes || !Array.isArray(dictado.examenes)) return;
+
+          // Filtrar exámenes futuros del dictado
+          const examenesFuturos = dictado.examenes
+            .filter((ex) => new Date(ex.fecha_examen) >= hoy)
+            .sort((a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen));
+
+          // Si hay exámenes futuros, tomar el más próximo
+          if (examenesFuturos.length > 0) {
+            const proximoExamen = examenesFuturos[0];
+            examenesPorMateria.push({
+              ...proximoExamen,
+              materia: dictado.materia,
+              docente: dictado.docente,
+              cursoId: dictado.cursoId, // Guardar para verificación
+            });
+          }
+        });
+
+        // Ordenar todos los exámenes por fecha
+        examenesPorMateria.sort(
+          (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+        );
+
+        console.log('Exámenes próximos filtrados por curso:', examenesPorMateria);
+        setProximosExamenes(examenesPorMateria);
       } catch (error) {
         console.error('Error al cargar datos del dashboard:', error);
       } finally {
@@ -141,20 +162,29 @@ export default function DashboardAlumno() {
                   <hr className="title-divider" />
                 </div>
 
-                {/* Agregamos la tarjeta del próximo examen dentro de Novedades */}
-                <div className="exam-card">
-                  <h4 className="sidebar-section-title">Próximo Examen</h4>
-                  {proximoExamen ? (
-                    <div className="exam-info">
-                      <p className="info-placeholder">
-                        <strong>
-                          {proximoExamen.temas ||
-                            proximoExamen.nombre ||
-                            'Sin nombre'}
-                        </strong>
-                        <br />
-                        {formatFecha(proximoExamen.fecha_examen)}
-                      </p>
+                {/* Lista de próximos exámenes */}
+                <div className="proximos-examenes-container">
+                  <h4 className="sidebar-section-title">Próximos Exámenes</h4>
+                  {proximosExamenes.length > 0 ? (
+                    <div className="examenes-scroll-list">
+                      {proximosExamenes.map((examen) => (
+                        <div key={examen.id} className="examen-preview-card">
+                          <div className="examen-preview-materia">
+                            {examen.materia?.nombre || 'Materia sin nombre'}
+                          </div>
+                          <div className="examen-preview-info">
+                            <strong>{examen.temas}</strong>
+                          </div>
+                          <div className="examen-preview-fecha">
+                            {formatFecha(examen.fecha_examen)}
+                          </div>
+                          {examen.docente && (
+                            <div className="examen-preview-docente">
+                              Prof. {examen.docente.nombre} {examen.docente.apellido}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <p className="info-placeholder">

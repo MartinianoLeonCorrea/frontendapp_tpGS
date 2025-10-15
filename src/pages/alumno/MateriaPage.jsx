@@ -130,6 +130,7 @@ function MateriaPage() {
                     (a, b) =>
                       new Date(a.fecha_examen) - new Date(b.fecha_examen)
                   );
+                
                 if (proximos.length === 0) {
                   return (
                     <li className="examen-item">
@@ -137,12 +138,12 @@ function MateriaPage() {
                     </li>
                   );
                 }
-                const examen = proximos[0];
-                return (
+                
+                return proximos.map((examen) => (
                   <li key={examen.id} className="examen-item">
                     {examen.temas} - {formatFecha(examen.fecha_examen)}
                   </li>
-                );
+                ));
               })()
             ) : (
               <li className="examen-item">No hay exámenes programados.</li>
