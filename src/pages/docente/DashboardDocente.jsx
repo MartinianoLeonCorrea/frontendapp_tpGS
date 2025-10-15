@@ -5,13 +5,14 @@ import { useUser } from '../../context/UserContext';
 
 function DashboardDocente() {
   const [dictados, setDictados] = useState([]);
+  const [proximosExamenes, setProximosExamenes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { dni } = useUser();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!dni) return; // No ejecutar si el dni no está definido
+    if (!dni) return;
 
     const fetchDictados = async () => {
       setIsLoading(true);
@@ -22,7 +23,6 @@ function DashboardDocente() {
         const dictadosData = await dictadosRes.json();
         console.log('Dictados recibidos:', dictadosData);
 
-        // Hacer que siempre sea un array para evitar errores
         const todosDictados = Array.isArray(dictadosData) ? dictadosData : [];
         console.log(
           'Tipo de todosDictados:',
@@ -31,8 +31,43 @@ function DashboardDocente() {
         );
 
         setDictados(todosDictados);
+
+        // Procesar exámenes próximos por dictado
+        const hoy = new Date();
+        const examenesPorDictado = [];
+
+        todosDictados.forEach((dictado) => {
+          // Verificar que el dictado tenga exámenes
+          if (!dictado.examenes || !Array.isArray(dictado.examenes)) return;
+
+          // Filtrar exámenes futuros del dictado
+          const examenesFuturos = dictado.examenes
+            .filter((ex) => new Date(ex.fecha_examen) >= hoy)
+            .sort((a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen));
+
+          // Si hay exámenes futuros, tomar el más próximo
+          if (examenesFuturos.length > 0) {
+            const proximoExamen = examenesFuturos[0];
+            examenesPorDictado.push({
+              ...proximoExamen,
+              materia: dictado.materia,
+              curso: dictado.curso,
+              dictadoId: dictado.id,
+            });
+          }
+        });
+
+        // Ordenar todos los exámenes por fecha
+        examenesPorDictado.sort(
+          (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+        );
+
+        console.log('Exámenes próximos por dictado:', examenesPorDictado);
+        setProximosExamenes(examenesPorDictado);
+
       } catch (error) {
         setDictados([]);
+        setProximosExamenes([]);
         console.error('Error al cargar dictados del dashboard docente:', error);
       } finally {
         setIsLoading(false);
@@ -45,6 +80,15 @@ function DashboardDocente() {
   const handleDictadoClick = (dictadoId) => {
     navigate(`/docente/dictado`, { state: { dictadoId } });
   };
+
+  function formatFecha(fechaISO) {
+    if (!fechaISO) return '';
+    const fecha = new Date(fechaISO);
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+  }
 
   return (
     <main className="dashboard-content">
@@ -76,6 +120,7 @@ function DashboardDocente() {
             </div>
           </div>
         </section>
+
         {/* Sidebar Derecho */}
         <aside className="right-sidebar">
           {/* Sección de Novedades */}
@@ -84,11 +129,38 @@ function DashboardDocente() {
               <h3 className="sidebar-main-title">Novedades</h3>
               <hr className="title-divider" />
             </div>
-            {/* Puedes agregar aquí novedades específicas del docente */}
-            <div className="news-list">
-              <div className="info-placeholder">
-                Ejemplo de novedad para docentes.
-              </div>
+
+            {/* Lista de próximos exámenes */}
+            <div className="proximos-examenes-container">
+              <h4 className="sidebar-section-title">Próximos Exámenes</h4>
+              {isLoading ? (
+                <p className="info-placeholder">Cargando exámenes...</p>
+              ) : proximosExamenes.length > 0 ? (
+                <div className="examenes-scroll-list">
+                  {proximosExamenes.map((examen) => (
+                    <div key={examen.id} className="examen-preview-card">
+                      <div className="examen-preview-materia">
+                        {examen.materia?.nombre || 'Materia sin nombre'}
+                      </div>
+                      <div className="examen-preview-info">
+                        <strong>{examen.temas}</strong>
+                      </div>
+                      <div className="examen-preview-fecha">
+                        {formatFecha(examen.fecha_examen)}
+                      </div>
+                      {examen.curso && (
+                        <div className="examen-preview-docente">
+                          Curso: {examen.curso.nro_letra}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="info-placeholder">
+                  No hay exámenes programados
+                </p>
+              )}
             </div>
           </section>
         </aside>
