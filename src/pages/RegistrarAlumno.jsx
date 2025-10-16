@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import Form from '../components/Form.jsx';
-import Notification from '../components/Notification.jsx';
 import { alumnoSchema } from '../schemas/personaSchema.js';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const camposBase = [
   { name: 'nombre', label: 'Nombre', type: 'text' },
@@ -14,7 +15,6 @@ const camposBase = [
 
 function RegistrarAlumno() {
   const [campos, setCampos] = useState(camposBase);
-  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     const fetchCursos = async () => {
@@ -25,17 +25,14 @@ function RegistrarAlumno() {
           value: curso.id,
           label: `${curso.nro_letra} - ${curso.turno}`,
         }));
-
         setCampos([
           ...camposBase,
           { name: 'cursoId', label: 'Curso', type: 'select', options: cursosOptions },
         ]);
       } catch (err) {
-        console.error('Error al cargar cursos:', err);
-        setNotification({ message: 'Error al cargar los cursos', type: 'error' });
+        toast.error('Error al cargar los cursos');
       }
     };
-
     fetchCursos();
   }, []);
 
@@ -46,22 +43,13 @@ function RegistrarAlumno() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...alumno, tipo: 'alumno' }),
       });
-
       const result = await res.json();
-
-      if (res.ok) {
-        setNotification({ message: 'Alumno registrado correctamente ✅', type: 'success' });
-      } else {
-        setNotification({
-          message: result.message || 'Error al registrar alumno ❌',
-          type: 'error',
-        });
-      }
+      if (!res.ok) throw new Error(result.message || 'Error al registrar alumno ❌');
+      toast.success('Alumno registrado correctamente ✅');
+      return result;
     } catch (err) {
-      setNotification({
-        message: 'Error de conexión: ' + err.message,
-        type: 'error',
-      });
+      toast.error(err.message || 'Ocurrió un error ❌');
+      throw err;
     }
   };
 
@@ -72,11 +60,9 @@ function RegistrarAlumno() {
         titulo="Nuevo Alumno"
         onSubmit={handleRegistro}
         textoBoton="Registrar"
-        schema={alumnoSchema} // Schema específico de alumno
+        schema={alumnoSchema}
       />
-      {notification && (
-        <Notification message={notification.message} type={notification.type} />
-      )}
+      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

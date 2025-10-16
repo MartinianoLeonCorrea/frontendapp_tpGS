@@ -3,18 +3,17 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import '../App.css';
 
 function Form({ campos, titulo, onSubmit, textoBoton = 'Registrar', schema }) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema), // ya no context
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(schema),
   });
 
-  const submitHandler = (data) => {
-    onSubmit(data);
-    reset();
+  const submitHandler = async (data) => {
+    try {
+      await onSubmit(data); // onSubmit ahora lanza error si falla
+      reset();
+    } catch (err) {
+      // error ya manejado con toast en onSubmit
+    }
   };
 
   return (
