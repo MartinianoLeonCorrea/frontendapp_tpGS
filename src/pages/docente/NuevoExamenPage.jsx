@@ -63,7 +63,7 @@ function NuevoExamenPage() {
       // Esperar un momento para que se vea el toast antes de navegar
       setTimeout(() => {
         navigate('/docente/dictado', { state: { dictadoId } });
-      }, 1500);
+      }, 3000);
     } catch (error) {
       console.error('Error al crear el examen:', error);
       toast.error(`❌ ${error.message || 'Error al crear el examen'}`);

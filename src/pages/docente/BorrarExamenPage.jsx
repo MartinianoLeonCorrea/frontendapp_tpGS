@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function BorrarExamenPage() {
   const { state } = useLocation();
@@ -10,62 +12,79 @@ function BorrarExamenPage() {
   const [examen, setExamen] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
 
   useEffect(() => {
     if (!examenId) {
-      alert('No se especificó el examen a eliminar');
+      toast.error('No se especificó el examen a eliminar');
       navigate('/docente/dictado', { state: { dictadoId } });
       return;
     }
 
-    // Cargar datos del examen
-    const fetchExamen = async () => {
-      try {
-        const response = await fetch(`/api/examenes/${examenId}`);
-        if (response.ok) {
-          const result = await response.json();
-          setExamen(result.data);
-        } else {
-          alert('Error al cargar el examen');
-          navigate('/docente/dictado', { state: { dictadoId } });
-        }
-      } catch (error) {
-        console.error('Error al cargar el examen:', error);
-        alert('Error de conexión al cargar el examen');
-        navigate('/docente/dictado', { state: { dictadoId } });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchExamen();
   }, [examenId, dictadoId, navigate]);
 
+  const fetchExamen = async () => {
+    try {
+      const response = await fetch(`/api/examenes/${examenId}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar el examen');
+      }
+
+      const result = await response.json();
+      setExamen(result.data);
+      
+    } catch (error) {
+      console.error('Error al cargar el examen:', error);
+      toast.error('Error al cargar los datos del examen');
+      navigate('/docente/dictado', { state: { dictadoId } });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEliminar = async () => {
-    if (!window.confirm('¿Está seguro que desea eliminar este examen? Esta acción no se puede deshacer.')) {
+    // Validar que el usuario escribió "ELIMINAR"
+    if (confirmText.toUpperCase() !== 'ELIMINAR') {
+      toast.error('Debe escribir "ELIMINAR" para confirmar');
       return;
     }
 
     setDeleting(true);
+    const toastId = toast.loading('Eliminando examen...');
 
     try {
       const response = await fetch(`/api/examenes/${examenId}`, {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        alert('Examen eliminado exitosamente');
-        navigate('/docente/dictado', { state: { dictadoId } });
-      } else {
-        const result = await response.json();
-        alert(
-          `Error al eliminar el examen: ${result.message || 'Error desconocido'}`
-        );
-        setDeleting(false);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al eliminar el examen');
       }
+
+      toast.update(toastId, {
+        render: '✅ Examen eliminado exitosamente',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      // Esperar un momento antes de navegar
+      setTimeout(() => {
+        navigate('/docente/dictado', { state: { dictadoId } });
+      }, 3000);
+
     } catch (error) {
       console.error('Error al eliminar el examen:', error);
-      alert(`Error de conexión: ${error.message}`);
+      toast.update(toastId, {
+        render: `❌ ${error.message || 'Error al eliminar el examen'}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000,
+      });
       setDeleting(false);
     }
   };
@@ -93,6 +112,7 @@ function BorrarExamenPage() {
   if (!examen) {
     return (
       <div className="borrar-examen-page">
+        <ToastContainer position="top-right" autoClose={3000} />
         <h2>Examen no encontrado</h2>
         <button onClick={handleCancelar}>Volver</button>
       </div>
@@ -101,10 +121,14 @@ function BorrarExamenPage() {
 
   return (
     <div className="borrar-examen-page">
+      <ToastContainer position="top-right" autoClose={3000} />
+      
       <h2>Eliminar Examen</h2>
       
       <div className="warning-message">
-        <p>⚠️ <strong>Advertencia:</strong> Está a punto de eliminar el siguiente examen:</p>
+        <p>
+          ⚠️ <strong>Advertencia:</strong> Está a punto de eliminar el siguiente examen:
+        </p>
       </div>
 
       <div className="examen-details">
@@ -142,14 +166,33 @@ function BorrarExamenPage() {
         )}
       </div>
 
-      <div className="confirmation-message">
-        <p>Esta acción eliminará permanentemente este examen y no se puede deshacer.</p>
+      <div className="confirmation-message danger">
+        <p>
+          ⚠️ Esta acción eliminará <strong>permanentemente</strong> este examen y{' '}
+          <strong>todas las notas asociadas</strong>. No se puede deshacer.
+        </p>
+      </div>
+
+      <div className="confirmation-input">
+        <label htmlFor="confirm-text">
+          Para confirmar, escriba <strong>"ELIMINAR"</strong> en el campo:
+        </label>
+        <input
+          id="confirm-text"
+          type="text"
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          placeholder="Escriba ELIMINAR"
+          disabled={deleting}
+          autoComplete="off"
+          className="confirm-input"
+        />
       </div>
 
       <div className="form-actions">
         <button
           onClick={handleEliminar}
-          disabled={deleting}
+          disabled={deleting || confirmText.toUpperCase() !== 'ELIMINAR'}
           className="btn-eliminar-confirm"
         >
           {deleting ? 'Eliminando...' : 'Confirmar Eliminación'}
