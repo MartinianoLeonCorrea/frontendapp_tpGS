@@ -1,107 +1,136 @@
-// src/pages/docente/notas/SubirNotasPage.jsx
 import { useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { evaluacionSchema } from '../../schemas/evaluacionSchema';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../../App.css';
 
 function SubirNotasPage() {
   const { state } = useLocation();
-  console.log('State received from navigation:', state);
   const examenId = state?.examenId?.id || state?.examenId;
-  console.log('Examen ID extracted from state:', examenId);
   const dictadoId = state?.dictadoId;
-  console.log('Dictado ID extracted from state:', dictadoId);
+  
   const [examen, setExamen] = useState(null);
   const [alumnos, setAlumnos] = useState([]);
   const [notas, setNotas] = useState({});
-  const [errors, setErrors] = useState({}); // Corregido: Definición de errors
-  const [submissionSuccess, setSubmissionSuccess] = useState(false);
-  const [editMode, setEditMode] = useState(false); // Cambiado a un estado global para el modo edición
-  const [backupNotas, setBackupNotas] = useState({}); // Para almacenar las notas originales
+  const [errors, setErrors] = useState({});
+  const [editMode, setEditMode] = useState(false);
+  const [backupNotas, setBackupNotas] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchExamen = async () => {
-      try {
-        const response = await fetch(`/api/examenes/${examenId}`);
-        const data = await response.json();
-        setExamen(data.data);
-        console.log('Fetched examen data:', data.data);
-        if (data.data.alumnos) {
-          const sortedAlumnos = [...data.data.alumnos].sort((a, b) =>
-            a.apellido.localeCompare(b.apellido)
-          );
-          setAlumnos(sortedAlumnos);
-          console.log('Sorted alumnos:', sortedAlumnos);
-        } else {
-          console.log('No alumnos found in fetched examen data.');
-        }
-      } catch (error) {
-        console.error('Error fetching examen:', error);
-      }
-    };
-
-    const fetchDictado = async () => {
-      try {
-        const response = await fetch(`/api/dictados/${dictadoId}`);
-        const result = await response.json();
-        console.log('Fetched dictado data:', result);
-        if (result) {
-          setAlumnos(
-            result.curso?.alumnos?.sort((a, b) =>
-              a.apellido.localeCompare(b.apellido)
-            ) || []
-          );
-          setExamen((prevExamen) => ({
-            ...prevExamen,
-            materia: result.materia?.nombre,
-          }));
-        } else {
-          console.log('No dictado data found.');
-        }
-      } catch (error) {
-        console.error('Error fetching dictado:', error);
-      }
-    };
-
-    const fetchEvaluaciones = async () => {
-      try {
-        const response = await fetch(`/api/evaluaciones/examen/${examenId}`);
-        const data = await response.json();
-        console.log('Fetched evaluaciones data:', data.data);
-
-        if (data.data) {
-          const existingNotas = {};
-          data.data.forEach((evaluacion) => {
-            existingNotas[evaluacion.alumnoId] = {
-              nota: evaluacion.nota !== null ? evaluacion.nota : '',
-              ausente:
-                evaluacion.observaciones === 'Ausente' ||
-                evaluacion.observaciones?.includes('Ausente'),
-            };
-          });
-          setNotas(existingNotas);
-          console.log('Existing notas:', existingNotas);
-        }
-      } catch (error) {
-        console.error('Error fetching evaluaciones:', error);
-      }
-    };
-
-    if (examenId) {
-      fetchExamen();
-      fetchEvaluaciones(); // Fetch evaluaciones existentes
-    } else {
-      console.log('No examen ID available in state.');
+    if (!examenId) {
+      toast.error('No se seleccionó un examen');
+      return;
     }
-
-    if (dictadoId) {
-      fetchDictado();
-    } else {
-      console.log('No dictado ID available in state.');
-    }
+    fetchData();
   }, [examenId, dictadoId]);
 
-  const handleNotaChange = (dni, value) => {
-    const numericValue = parseFloat(value);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([
+        fetchExamen(),
+        fetchDictado(),
+        fetchEvaluaciones(),
+      ]);
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      toast.error('Error al cargar los datos del examen');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchExamen = async () => {
+    try {
+      const response = await fetch(`/api/examenes/${examenId}`);
+      if (!response.ok) throw new Error('Error al cargar el examen');
+      
+      const data = await response.json();
+      setExamen(data.data);
+      
+      if (data.data.alumnos) {
+        const sortedAlumnos = [...data.data.alumnos].sort((a, b) =>
+          a.apellido.localeCompare(b.apellido)
+        );
+        setAlumnos(sortedAlumnos);
+      }
+    } catch (error) {
+      console.error('Error fetching examen:', error);
+      throw error;
+    }
+  };
+
+  const fetchDictado = async () => {
+    if (!dictadoId) return;
+    
+    try {
+      const response = await fetch(`/api/dictados/${dictadoId}`);
+      if (!response.ok) throw new Error('Error al cargar el dictado');
+      
+      const result = await response.json();
+      
+      if (result) {
+        setAlumnos(
+          result.curso?.alumnos?.sort((a, b) =>
+            a.apellido.localeCompare(b.apellido)
+          ) || []
+        );
+        setExamen((prevExamen) => ({
+          ...prevExamen,
+          materia: result.materia?.nombre,
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching dictado:', error);
+      throw error;
+    }
+  };
+
+  const fetchEvaluaciones = async () => {
+    try {
+      const response = await fetch(`/api/evaluaciones/examen/${examenId}`);
+      if (!response.ok) throw new Error('Error al cargar las evaluaciones');
+      
+      const data = await response.json();
+
+      if (data.data) {
+        const existingNotas = {};
+        data.data.forEach((evaluacion) => {
+          existingNotas[evaluacion.alumnoId] = {
+            nota: evaluacion.nota !== null ? evaluacion.nota : '',
+            ausente:
+              evaluacion.observaciones === 'Ausente' ||
+              evaluacion.observaciones?.includes('Ausente'),
+          };
+        });
+        setNotas(existingNotas);
+      }
+    } catch (error) {
+      console.error('Error fetching evaluaciones:', error);
+      throw error;
+    }
+  };
+
+  const validateNota = async (alumnoId, nota) => {
+    try {
+      await evaluacionSchema.validate(
+        {
+          nota: nota === '' ? null : nota,
+          observaciones: null,
+          alumnoId,
+          examenId,
+        },
+        { abortEarly: false }
+      );
+      return null;
+    } catch (err) {
+      return err.errors[0];
+    }
+  };
+
+  const handleNotaChange = async (dni, value) => {
     if (value === '') {
       setNotas((prev) => ({
         ...prev,
@@ -111,11 +140,24 @@ function SubirNotasPage() {
         },
       }));
       setErrors((prev) => ({ ...prev, [dni]: '' }));
-    } else if (isNaN(numericValue) || numericValue < 0 || numericValue > 10) {
+      return;
+    }
+
+    const numericValue = parseFloat(value);
+    
+    if (isNaN(numericValue)) {
       setErrors((prev) => ({
         ...prev,
-        [dni]: 'La nota debe ser un número entre 0 y 10.',
+        [dni]: 'La nota debe ser un número válido',
       }));
+      return;
+    }
+
+    // Validar con el schema
+    const error = await validateNota(dni, numericValue);
+    
+    if (error) {
+      setErrors((prev) => ({ ...prev, [dni]: error }));
     } else {
       setNotas((prev) => ({
         ...prev,
@@ -129,69 +171,106 @@ function SubirNotasPage() {
   };
 
   const handleStartEdit = () => {
-    setBackupNotas(notas); // Guardar una copia de las notas actuales
-    setEditMode(true); // Activar el modo edición
-  };
-
-  const handleConfirmChanges = async () => {
-    try {
-      const evaluaciones = Object.entries(notas).map(([dni, data]) => {
-        const notaValue = data?.nota !== '' ? Number(data?.nota) : null;
-        const isAusente = data?.ausente || false;
-
-        return {
-          alumnoId: dni,
-          examenId,
-          nota: notaValue,
-          observaciones: isAusente ? 'Ausente' : null, // Solo "Ausente" si está marcado como ausente
-        };
-      });
-
-      console.log('Datos preparados para enviar al backend:', evaluaciones); // Log para verificar los datos
-
-      const response = await fetch('/api/evaluaciones/batch-create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ evaluaciones }), // Enviar el objeto con la propiedad evaluaciones
-      });
-
-      if (response.ok) {
-        console.log('Notas registradas correctamente.');
-        setSubmissionSuccess(true);
-        setEditMode(false); // Salir del modo edición
-      } else {
-        const errorData = await response.json();
-        console.error('Error al registrar las notas:', errorData);
-        alert(`Hubo un error al confirmar los cambios: ${errorData.message}`);
-      }
-    } catch (error) {
-      console.error('Error al confirmar los cambios:', error);
-      alert('Hubo un error al confirmar los cambios.');
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setNotas(backupNotas); // Restaurar las notas originales
-    setEditMode(false); // Salir del modo edición
+    setBackupNotas({ ...notas });
+    setEditMode(true);
+    toast.info('Modo de edición activado');
   };
 
   const handleAusenteChange = (dni, isAusente) => {
     setNotas((prev) => ({
       ...prev,
       [dni]: {
-        nota: prev[dni]?.nota || '', // Mantener la nota existente
-        ausente: isAusente, // Cambiar solo el estado de ausencia
+        nota: prev[dni]?.nota || '',
+        ausente: isAusente,
       },
     }));
   };
 
-  if (!examenId) return <p>No se seleccionó un examen.</p>;
-  if (!examen) return <p>Cargando examen...</p>;
+  const handleConfirmChanges = async () => {
+    // Validar que no haya errores
+    const hasErrors = Object.values(errors).some((error) => error !== '');
+    if (hasErrors) {
+      toast.error('Por favor corrige los errores antes de continuar');
+      return;
+    }
+
+    try {
+      const evaluaciones = Object.entries(notas).map(([dni, data]) => {
+        const notaValue = data?.nota !== '' ? Number(data?.nota) : null;
+        const isAusente = data?.ausente || false;
+
+        return {
+          alumnoId: Number(dni),
+          examenId: Number(examenId),
+          nota: notaValue,
+          observaciones: isAusente ? 'Ausente' : null,
+        };
+      });
+
+      // Validar cada evaluación antes de enviar
+      const validationPromises = evaluaciones.map((evaluacion) =>
+        evaluacionSchema.validate(evaluacion)
+      );
+
+      await Promise.all(validationPromises);
+
+      const response = await fetch('/api/evaluaciones/batch-create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ evaluaciones }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al registrar las notas');
+      }
+
+      toast.success('✅ Notas publicadas correctamente');
+      setEditMode(false);
+      setBackupNotas({});
+    } catch (error) {
+      console.error('Error al confirmar los cambios:', error);
+      toast.error(`❌ ${error.message || 'Error al confirmar los cambios'}`);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setNotas({ ...backupNotas });
+    setEditMode(false);
+    setErrors({});
+    toast.info('Cambios cancelados');
+  };
+
+  if (loading) {
+    return (
+      <div className="subir-notas-page">
+        <p>Cargando datos del examen...</p>
+      </div>
+    );
+  }
+
+  if (!examenId) {
+    return (
+      <div className="subir-notas-page">
+        <p>No se seleccionó un examen.</p>
+      </div>
+    );
+  }
+
+  if (!examen) {
+    return (
+      <div className="subir-notas-page">
+        <p>No se pudo cargar el examen.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="subir-notas-page">
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="evaluacion-examen-card">
         <h2 className="examen-title">
           Examen de {examen?.materia || 'Materia no especificada'}
@@ -216,8 +295,6 @@ function SubirNotasPage() {
           </div>
         </div>
       </div>
-
-      {errors.general && <div className="error-message">{errors.general}</div>}
 
       <div className="alumnos-section">
         <h2 className="section-title">Lista de Alumnos</h2>
@@ -253,24 +330,32 @@ function SubirNotasPage() {
                       </div>
                       <div className="cell nota-display">
                         {editMode ? (
-                          <input
-                            type="number"
-                            className={`nota-input ${
-                              errors[alumno.dni] ? 'error' : ''
-                            }`}
-                            value={
-                              alumnoData.nota !== undefined
-                                ? alumnoData.nota
-                                : ''
-                            }
-                            onChange={(e) =>
-                              handleNotaChange(alumno.dni, e.target.value)
-                            }
-                            placeholder="0-10"
-                            min="0"
-                            max="10"
-                            step="0.1"
-                          />
+                          <>
+                            <input
+                              type="number"
+                              className={`nota-input ${
+                                errors[alumno.dni] ? 'error' : ''
+                              }`}
+                              value={
+                                alumnoData.nota !== undefined
+                                  ? alumnoData.nota
+                                  : ''
+                              }
+                              onChange={(e) =>
+                                handleNotaChange(alumno.dni, e.target.value)
+                              }
+                              placeholder="0-10"
+                              min="0"
+                              max="10"
+                              step="0.1"
+                              disabled={alumnoData.ausente}
+                            />
+                            {errors[alumno.dni] && (
+                              <span className="form-error">
+                                {errors[alumno.dni]}
+                              </span>
+                            )}
+                          </>
                         ) : (
                           <span className="nota-value">
                             {alumnoData.nota !== ''
@@ -287,7 +372,7 @@ function SubirNotasPage() {
                             onChange={(e) =>
                               handleAusenteChange(alumno.dni, e.target.checked)
                             }
-                            disabled={!editMode} // Deshabilitar si no está en modo edición
+                            disabled={!editMode}
                           />
                           <span className="ausente-label">Ausente</span>
                         </label>
@@ -315,17 +400,11 @@ function SubirNotasPage() {
               💾 Publicar Cambios
             </button>
             <button className="btn-cancelar" onClick={handleCancelEdit}>
-              Cancelar
+              ❌ Cancelar
             </button>
           </>
         )}
       </div>
-
-      {submissionSuccess && (
-        <div className="success-message">
-          ✅ Las notas se han subido correctamente.
-        </div>
-      )}
     </div>
   );
 }
