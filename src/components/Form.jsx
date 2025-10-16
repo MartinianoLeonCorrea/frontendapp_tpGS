@@ -1,13 +1,16 @@
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import '../App.css';
 
-function Form({ campos, titulo, onSubmit, textoBoton = 'Registrar' }) {
+function Form({ campos, titulo, onSubmit, textoBoton = 'Registrar', schema }) {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: yupResolver(schema), // ya no context
+  });
 
   const submitHandler = (data) => {
     onSubmit(data);
@@ -26,50 +29,30 @@ function Form({ campos, titulo, onSubmit, textoBoton = 'Registrar' }) {
             {campo.type === 'select' ? (
               <select
                 id={campo.name}
-                {...register(campo.name, { required: campo.required })}
+                {...register(campo.name)}
                 className={`form-input${errors[campo.name] ? ' error' : ''}`}
                 defaultValue=""
               >
-                <option value="" disabled>
-                  Seleccione una opción
-                </option>
-                {campo.options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
+                <option value="" disabled>Seleccione una opción</option>
+                {campo.options?.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
             ) : (
               <input
                 id={campo.name}
                 type={campo.type}
-                autoComplete={
-                  campo.name === 'email'
-                    ? 'email'
-                    : campo.name === 'nombre'
-                    ? 'name'
-                    : campo.name === 'apellido'
-                    ? 'family-name'
-                    : campo.name === 'telefono'
-                    ? 'tel'
-                    : campo.name === 'direccion'
-                    ? 'street-address'
-                    : campo.name === 'dni'
-                    ? 'off'
-                    : 'off'
-                }
-                {...register(campo.name, { required: campo.required })}
+                autoComplete="off"
+                {...register(campo.name)}
                 className={`form-input${errors[campo.name] ? ' error' : ''}`}
               />
             )}
             {errors[campo.name] && (
-              <span className="form-error">Este campo es obligatorio</span>
+              <span className="form-error">{errors[campo.name].message}</span>
             )}
           </div>
         ))}
-        <button type="submit" className="form-button">
-          {textoBoton}
-        </button>
+        <button type="submit" className="form-button">{textoBoton}</button>
       </form>
     </div>
   );
