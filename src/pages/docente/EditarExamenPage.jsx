@@ -11,6 +11,7 @@ function EditarExamenPage() {
     fecha_examen: '',
     temas: '',
     copias: 1,
+    dictadoId: dictadoId,
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ function EditarExamenPage() {
             fecha_examen: fechaFormateada,
             temas: examen.temas,
             copias: examen.copias,
+            dictadoId: examen.dictadoId, // Asegurarse de incluir dictadoId
           });
         } else {
           alert('Error al cargar el examen');
@@ -110,7 +112,9 @@ function EditarExamenPage() {
       } else {
         const result = await response.json();
         alert(
-          `Error al actualizar el examen: ${result.message || 'Error desconocido'}`
+          `Error al actualizar el examen: ${
+            result.message || 'Error desconocido'
+          }`
         );
       }
     } catch (error) {
@@ -175,7 +179,11 @@ function EditarExamenPage() {
 
         <div className="form-actions">
           <button type="submit">Guardar Cambios</button>
-          <button type="button" onClick={handleCancelar} className="btn-cancelar">
+          <button
+            type="button"
+            onClick={handleCancelar}
+            className="btn-cancelar"
+          >
             Cancelar
           </button>
         </div>
