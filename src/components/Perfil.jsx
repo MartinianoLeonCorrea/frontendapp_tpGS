@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import '../App.css';
+import { toast, ToastContainer } from 'react-toastify';
 
 export default function Perfil() {
   const { userData, isAlumno, isDocente } = useUser(); // Obtener datos del contexto
@@ -82,6 +83,7 @@ export default function Perfil() {
   const handleEditClick = () => {
     console.log('Botón editar presionado. Estado actual isEditing:', isEditing);
     setIsEditing(true);
+    toast.info('Modo de edición activado');
     console.log('Estado cambiado a isEditing:', true);
   };
 
@@ -154,11 +156,11 @@ export default function Perfil() {
       setIsEditing(false);
 
       // Mostrar mensaje de éxito
-      alert('¡Datos guardados correctamente!');
+      toast.success('¡Datos guardados correctamente!');
     } catch (error) {
       console.error('Error al guardar los datos:', error);
       setError(`Error al guardar los datos: ${error.message}`);
-      alert(`Error al guardar los datos: ${error.message}`);
+      toast.error(`Error al guardar los datos: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -186,6 +188,7 @@ export default function Perfil() {
 
   return (
     <main className="perfil-container">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="perfil-card">
         <div className="perfil-header">
           <div className="perfil-avatar">
