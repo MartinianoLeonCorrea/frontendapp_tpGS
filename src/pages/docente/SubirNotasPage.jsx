@@ -9,7 +9,7 @@ function SubirNotasPage() {
   const { state } = useLocation();
   const examenId = state?.examenId?.id || state?.examenId;
   const dictadoId = state?.dictadoId;
-  
+
   const [examen, setExamen] = useState(null);
   const [alumnos, setAlumnos] = useState([]);
   const [notas, setNotas] = useState({});
@@ -19,99 +19,95 @@ function SubirNotasPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchExamen = async () => {
+      try {
+        const response = await fetch(`/api/examenes/${examenId}`);
+        if (!response.ok) throw new Error('Error al cargar el examen');
+
+        const data = await response.json();
+        setExamen(data.data);
+
+        if (data.data.alumnos) {
+          const sortedAlumnos = [...data.data.alumnos].sort((a, b) =>
+            a.apellido.localeCompare(b.apellido)
+          );
+          setAlumnos(sortedAlumnos);
+        }
+      } catch (error) {
+        console.error('Error fetching examen:', error);
+        throw error;
+      }
+    };
+
+    const fetchDictado = async () => {
+      if (!dictadoId) return;
+
+      try {
+        const response = await fetch(`/api/dictados/${dictadoId}`);
+        if (!response.ok) throw new Error('Error al cargar el dictado');
+
+        const result = await response.json();
+
+        if (result) {
+          setAlumnos(
+            result.curso?.alumnos?.sort((a, b) =>
+              a.apellido.localeCompare(b.apellido)
+            ) || []
+          );
+          setExamen((prevExamen) => ({
+            ...prevExamen,
+            materia: result.materia?.nombre,
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching dictado:', error);
+        throw error;
+      }
+    };
+
+    const fetchEvaluaciones = async () => {
+      try {
+        const response = await fetch(`/api/evaluaciones/examen/${examenId}`);
+        if (!response.ok) throw new Error('Error al cargar las evaluaciones');
+
+        const data = await response.json();
+
+        if (data.data) {
+          const existingNotas = {};
+          data.data.forEach((evaluacion) => {
+            existingNotas[evaluacion.alumnoId] = {
+              nota: evaluacion.nota !== null ? evaluacion.nota : '',
+              ausente:
+                evaluacion.observaciones === 'Ausente' ||
+                evaluacion.observaciones?.includes('Ausente'),
+            };
+          });
+          setNotas(existingNotas);
+        }
+      } catch (error) {
+        console.error('Error fetching evaluaciones:', error);
+        throw error;
+      }
+    };
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchExamen(), fetchDictado(), fetchEvaluaciones()]);
+      } catch (error) {
+        console.error('Error al cargar datos:', error);
+        toast.error('Error al cargar los datos del examen');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (!examenId) {
       toast.error('No se seleccionó un examen');
       return;
     }
     fetchData();
   }, [examenId, dictadoId]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      await Promise.all([
-        fetchExamen(),
-        fetchDictado(),
-        fetchEvaluaciones(),
-      ]);
-    } catch (error) {
-      console.error('Error al cargar datos:', error);
-      toast.error('Error al cargar los datos del examen');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchExamen = async () => {
-    try {
-      const response = await fetch(`/api/examenes/${examenId}`);
-      if (!response.ok) throw new Error('Error al cargar el examen');
-      
-      const data = await response.json();
-      setExamen(data.data);
-      
-      if (data.data.alumnos) {
-        const sortedAlumnos = [...data.data.alumnos].sort((a, b) =>
-          a.apellido.localeCompare(b.apellido)
-        );
-        setAlumnos(sortedAlumnos);
-      }
-    } catch (error) {
-      console.error('Error fetching examen:', error);
-      throw error;
-    }
-  };
-
-  const fetchDictado = async () => {
-    if (!dictadoId) return;
-    
-    try {
-      const response = await fetch(`/api/dictados/${dictadoId}`);
-      if (!response.ok) throw new Error('Error al cargar el dictado');
-      
-      const result = await response.json();
-      
-      if (result) {
-        setAlumnos(
-          result.curso?.alumnos?.sort((a, b) =>
-            a.apellido.localeCompare(b.apellido)
-          ) || []
-        );
-        setExamen((prevExamen) => ({
-          ...prevExamen,
-          materia: result.materia?.nombre,
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching dictado:', error);
-      throw error;
-    }
-  };
-
-  const fetchEvaluaciones = async () => {
-    try {
-      const response = await fetch(`/api/evaluaciones/examen/${examenId}`);
-      if (!response.ok) throw new Error('Error al cargar las evaluaciones');
-      
-      const data = await response.json();
-
-      if (data.data) {
-        const existingNotas = {};
-        data.data.forEach((evaluacion) => {
-          existingNotas[evaluacion.alumnoId] = {
-            nota: evaluacion.nota !== null ? evaluacion.nota : '',
-            ausente:
-              evaluacion.observaciones === 'Ausente' ||
-              evaluacion.observaciones?.includes('Ausente'),
-          };
-        });
-        setNotas(existingNotas);
-      }
-    } catch (error) {
-      console.error('Error fetching evaluaciones:', error);
-      throw error;
-    }
-  };
 
   const validateNota = async (alumnoId, nota) => {
     try {
@@ -144,7 +140,7 @@ function SubirNotasPage() {
     }
 
     const numericValue = parseFloat(value);
-    
+
     if (isNaN(numericValue)) {
       setErrors((prev) => ({
         ...prev,
@@ -155,7 +151,7 @@ function SubirNotasPage() {
 
     // Validar con el schema
     const error = await validateNota(dni, numericValue);
-    
+
     if (error) {
       setErrors((prev) => ({ ...prev, [dni]: error }));
     } else {
@@ -227,7 +223,7 @@ function SubirNotasPage() {
         throw new Error(errorData.message || 'Error al registrar las notas');
       }
 
-      toast.success('✅ Notas publicadas correctamente');
+      toast.success(' Notas publicadas correctamente');
       setEditMode(false);
       setBackupNotas({});
     } catch (error) {

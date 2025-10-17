@@ -31,6 +31,37 @@ function EditarExamenPage() {
   });
 
   useEffect(() => {
+    const fetchExamen = async () => {
+      try {
+        const response = await fetch(`/api/examenes/${examenId}`);
+
+        if (!response.ok) {
+          throw new Error('Error al cargar el examen');
+        }
+
+        const result = await response.json();
+        const examen = result.data;
+
+        // Formatear la fecha para el input date
+        const fechaExamen = new Date(examen.fecha_examen);
+        const fechaFormateada = fechaExamen.toISOString().split('T')[0];
+
+        // Usar reset para cargar los datos en el formulario
+        reset({
+          fecha_examen: fechaFormateada,
+          temas: examen.temas,
+          copias: examen.copias,
+          dictadoId: examen.dictadoId,
+        });
+      } catch (error) {
+        console.error('Error al cargar el examen:', error);
+        toast.error('Error al cargar los datos del examen');
+        navigate('/docente/dictado', { state: { dictadoId } });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (!examenId) {
       toast.error('No se especificó el examen a editar');
       navigate('/docente/dictado', { state: { dictadoId } });
@@ -38,39 +69,7 @@ function EditarExamenPage() {
     }
 
     fetchExamen();
-  }, [examenId, dictadoId, navigate]);
-
-  const fetchExamen = async () => {
-    try {
-      const response = await fetch(`/api/examenes/${examenId}`);
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar el examen');
-      }
-
-      const result = await response.json();
-      const examen = result.data;
-
-      // Formatear la fecha para el input date
-      const fechaExamen = new Date(examen.fecha_examen);
-      const fechaFormateada = fechaExamen.toISOString().split('T')[0];
-
-      // Usar reset para cargar los datos en el formulario
-      reset({
-        fecha_examen: fechaFormateada,
-        temas: examen.temas,
-        copias: examen.copias,
-        dictadoId: examen.dictadoId,
-      });
-
-    } catch (error) {
-      console.error('Error al cargar el examen:', error);
-      toast.error('Error al cargar los datos del examen');
-      navigate('/docente/dictado', { state: { dictadoId } });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [examenId, dictadoId, navigate, reset]);
 
   const onSubmit = async (data) => {
     try {
@@ -99,7 +98,7 @@ function EditarExamenPage() {
       }
 
       toast.update(toastId, {
-        render: '✅ Examen actualizado exitosamente',
+        render: 'Examen actualizado exitosamente',
         type: 'success',
         isLoading: false,
         autoClose: 3000,
@@ -112,7 +111,6 @@ function EditarExamenPage() {
       setTimeout(() => {
         navigate('/docente/dictado', { state: { dictadoId } });
       }, 3000);
-
     } catch (error) {
       console.error('Error al actualizar el examen:', error);
       toast.error(`❌ ${error.message || 'Error al actualizar el examen'}`);
@@ -134,9 +132,9 @@ function EditarExamenPage() {
   return (
     <div className="editar-examen-page">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <h2>Editar Examen</h2>
-      
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <label htmlFor="fecha_examen">Fecha del Examen:</label>
@@ -185,12 +183,16 @@ function EditarExamenPage() {
         <input type="hidden" {...register('dictadoId')} />
 
         <div className="form-actions">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary"
             disabled={isSubmitting || guardadoExitoso}
           >
-            {guardadoExitoso ? 'Guardado ✓' : isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+            {guardadoExitoso
+              ? 'Guardado ✓'
+              : isSubmitting
+              ? 'Guardando...'
+              : 'Guardar Cambios'}
           </button>
           <button
             type="button"

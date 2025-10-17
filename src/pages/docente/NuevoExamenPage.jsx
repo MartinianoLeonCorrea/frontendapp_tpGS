@@ -63,7 +63,7 @@ function NuevoExamenPage() {
       }
 
       toast.update(toastId, {
-        render: '✅ Examen creado exitosamente',
+        render: 'Examen creado exitosamente',
         type: 'success',
         isLoading: false,
         autoClose: 3000,
@@ -71,14 +71,14 @@ function NuevoExamenPage() {
 
       // Bloquear el formulario después de crear
       setCreadoExitoso(true);
-      
+
       // Esperar un momento para que se vea el toast antes de navegar
       setTimeout(() => {
         navigate('/docente/dictado', { state: { dictadoId } });
       }, 3000);
     } catch (error) {
       console.error('Error al crear el examen:', error);
-      toast.error(`❌ ${error.message || 'Error al crear el examen'}`);
+      toast.error(` ${error.message || 'Error al crear el examen'}`);
     }
   };
 
@@ -89,9 +89,9 @@ function NuevoExamenPage() {
   return (
     <div className="nuevo-examen-page">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <h2>Crear Nuevo Examen</h2>
-      
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <label htmlFor="fecha_examen">Fecha del Examen:</label>
@@ -143,12 +143,16 @@ function NuevoExamenPage() {
         <input type="hidden" {...register('dictadoId')} />
 
         <div className="button-group">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary"
             disabled={isSubmitting || creadoExitoso}
           >
-            {creadoExitoso ? 'Creado ✓' : isSubmitting ? 'Creando...' : 'Crear Examen'}
+            {creadoExitoso
+              ? 'Creado ✓'
+              : isSubmitting
+              ? 'Creando...'
+              : 'Crear Examen'}
           </button>
           <button
             type="button"

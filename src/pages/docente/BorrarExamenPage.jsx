@@ -16,6 +16,25 @@ function BorrarExamenPage() {
   const [eliminadoExitoso, setEliminadoExitoso] = useState(false);
 
   useEffect(() => {
+    const fetchExamen = async () => {
+      try {
+        const response = await fetch(`/api/examenes/${examenId}`);
+
+        if (!response.ok) {
+          throw new Error('Error al cargar el examen');
+        }
+
+        const result = await response.json();
+        setExamen(result.data);
+      } catch (error) {
+        console.error('Error al cargar el examen:', error);
+        toast.error('Error al cargar los datos del examen');
+        navigate('/docente/dictado', { state: { dictadoId } });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (!examenId) {
       toast.error('No se especificó el examen a eliminar');
       navigate('/docente/dictado', { state: { dictadoId } });
@@ -24,26 +43,6 @@ function BorrarExamenPage() {
 
     fetchExamen();
   }, [examenId, dictadoId, navigate]);
-
-  const fetchExamen = async () => {
-    try {
-      const response = await fetch(`/api/examenes/${examenId}`);
-      
-      if (!response.ok) {
-        throw new Error('Error al cargar el examen');
-      }
-
-      const result = await response.json();
-      setExamen(result.data);
-      
-    } catch (error) {
-      console.error('Error al cargar el examen:', error);
-      toast.error('Error al cargar los datos del examen');
-      navigate('/docente/dictado', { state: { dictadoId } });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleEliminar = async () => {
     // Validar que el usuario escribió "ELIMINAR"
@@ -67,7 +66,7 @@ function BorrarExamenPage() {
       }
 
       toast.update(toastId, {
-        render: '✅ Examen eliminado exitosamente',
+        render: 'Examen eliminado exitosamente',
         type: 'success',
         isLoading: false,
         autoClose: 3000,
@@ -80,7 +79,6 @@ function BorrarExamenPage() {
       setTimeout(() => {
         navigate('/docente/dictado', { state: { dictadoId } });
       }, 3000);
-
     } catch (error) {
       console.error('Error al eliminar el examen:', error);
       toast.update(toastId, {
@@ -126,12 +124,13 @@ function BorrarExamenPage() {
   return (
     <div className="borrar-examen-page">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <h2>Eliminar Examen</h2>
-      
+
       <div className="warning-message">
         <p>
-          ⚠️ <strong>Advertencia:</strong> Está a punto de eliminar el siguiente examen:
+          ⚠️ <strong>Advertencia:</strong> Está a punto de eliminar el siguiente
+          examen:
         </p>
       </div>
 
@@ -140,24 +139,24 @@ function BorrarExamenPage() {
           <strong>Fecha del examen:</strong>
           <span>{formatFecha(examen.fecha_examen)}</span>
         </div>
-        
+
         <div className="detail-item">
           <strong>Temas:</strong>
           <span>{examen.temas}</span>
         </div>
-        
+
         <div className="detail-item">
           <strong>Cantidad de copias:</strong>
           <span>{examen.copias}</span>
         </div>
-        
+
         {examen.dictado && (
           <>
             <div className="detail-item">
               <strong>Materia:</strong>
               <span>{examen.dictado.materia?.nombre || 'N/A'}</span>
             </div>
-            
+
             <div className="detail-item">
               <strong>Docente:</strong>
               <span>
@@ -172,8 +171,8 @@ function BorrarExamenPage() {
 
       <div className="confirmation-message danger">
         <p>
-          ⚠️ Esta acción eliminará <strong>permanentemente</strong> este examen y{' '}
-          <strong>todas las notas asociadas</strong>. No se puede deshacer.
+          ⚠️ Esta acción eliminará <strong>permanentemente</strong> este examen
+          y <strong>todas las notas asociadas</strong>. No se puede deshacer.
         </p>
       </div>
 
@@ -196,10 +195,18 @@ function BorrarExamenPage() {
       <div className="form-actions">
         <button
           onClick={handleEliminar}
-          disabled={deleting || eliminadoExitoso || confirmText.toUpperCase() !== 'ELIMINAR'}
+          disabled={
+            deleting ||
+            eliminadoExitoso ||
+            confirmText.toUpperCase() !== 'ELIMINAR'
+          }
           className="btn-eliminar-confirm"
         >
-          {eliminadoExitoso ? 'Eliminado ✓' : deleting ? 'Eliminando...' : 'Confirmar Eliminación'}
+          {eliminadoExitoso
+            ? 'Eliminado ✓'
+            : deleting
+            ? 'Eliminando...'
+            : 'Confirmar Eliminación'}
         </button>
         <button
           onClick={handleCancelar}

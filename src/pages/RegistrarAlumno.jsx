@@ -27,10 +27,15 @@ function RegistrarAlumno() {
         }));
         setCampos([
           ...camposBase,
-          { name: 'cursoId', label: 'Curso', type: 'select', options: cursosOptions },
+          {
+            name: 'cursoId',
+            label: 'Curso',
+            type: 'select',
+            options: cursosOptions,
+          },
         ]);
       } catch (err) {
-        toast.error('Error al cargar los cursos');
+        toast.error('Error al cargar los cursos:', err);
       }
     };
     fetchCursos();
@@ -44,11 +49,12 @@ function RegistrarAlumno() {
         body: JSON.stringify({ ...alumno, tipo: 'alumno' }),
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message || 'Error al registrar alumno ❌');
-      toast.success('Alumno registrado correctamente ✅');
+      if (!res.ok)
+        throw new Error(result.message || 'Error al registrar alumno ❌');
+      toast.success('Alumno registrado correctamente ');
       return result;
     } catch (err) {
-      toast.error(err.message || 'Ocurrió un error ❌');
+      toast.error(err.message || 'Ocurrió un error ');
       throw err;
     }
   };
