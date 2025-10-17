@@ -43,7 +43,9 @@ function DashboardDocente() {
           // Filtrar exámenes futuros del dictado
           const examenesFuturos = dictado.examenes
             .filter((ex) => new Date(ex.fecha_examen) >= hoy)
-            .sort((a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen));
+            .sort(
+              (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+            );
 
           // Si hay exámenes futuros, tomar el más próximo
           if (examenesFuturos.length > 0) {
@@ -64,7 +66,6 @@ function DashboardDocente() {
 
         console.log('Exámenes próximos por dictado:', examenesPorDictado);
         setProximosExamenes(examenesPorDictado);
-
       } catch (error) {
         setDictados([]);
         setProximosExamenes([]);
@@ -142,9 +143,7 @@ function DashboardDocente() {
                       <div className="examen-preview-materia">
                         {examen.materia?.nombre || 'Materia sin nombre'}
                       </div>
-                      <div className="examen-preview-info">
-                        <strong>{examen.temas}</strong>
-                      </div>
+                      <div className="examen-preview-info">{examen.temas}</div>
                       <div className="examen-preview-fecha">
                         {formatFecha(examen.fecha_examen)}
                       </div>
@@ -157,9 +156,7 @@ function DashboardDocente() {
                   ))}
                 </div>
               ) : (
-                <p className="info-placeholder">
-                  No hay exámenes programados
-                </p>
+                <p className="info-placeholder">No hay exámenes programados</p>
               )}
             </div>
           </section>

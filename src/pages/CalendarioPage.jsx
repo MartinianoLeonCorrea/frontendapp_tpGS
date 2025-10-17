@@ -70,7 +70,7 @@ function CalendarioPage() {
     const fetchEventos = async () => {
       if (!dni) {
         console.log('DNI no disponible, no se pueden cargar eventos.');
-        toast.info('Esperando datos del usuario...');
+        toast.info('No hay exámenes programados');
         setLoading(false);
         return;
       }
@@ -160,7 +160,7 @@ function CalendarioPage() {
           }));
 
           toast.update(toastId, {
-            render: `${eventos.length} exámenes cargados`,
+            render: `Exámenes cargados con éxito`,
             type: 'success',
             isLoading: false,
             autoClose: 2000,
@@ -205,7 +205,7 @@ function CalendarioPage() {
           }));
 
           toast.update(toastId, {
-            render: ` ${eventos.length} exámenes cargados`,
+            render: ` Exámenes cargados con éxito`,
             type: 'success',
             isLoading: false,
             autoClose: 2000,
@@ -217,7 +217,7 @@ function CalendarioPage() {
       } catch (error) {
         console.error('Error al obtener los eventos:', error);
         toast.update(toastId, {
-          render: `❌ ${error.message || 'Error al cargar los exámenes'}`,
+          render: ` ${error.message || 'Error al cargar los exámenes'}`,
           type: 'error',
           isLoading: false,
           autoClose: 3000,
@@ -243,12 +243,6 @@ function CalendarioPage() {
   return (
     <div className="calendario">
       <ToastContainer position="top-right" autoClose={3000} />
-
-      {events.length === 0 && !loading && (
-        <div className="calendario-empty-message">
-          <p>📅 No hay exámenes programados</p>
-        </div>
-      )}
 
       <Calendar
         localizer={localizer}

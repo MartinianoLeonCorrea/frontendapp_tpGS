@@ -56,12 +56,18 @@ export default function DashboardAlumno() {
           (dictado) => dictado.cursoId === cursoId
         );
 
-        console.log('Dictados filtrados del curso del alumno:', dictadosDelCurso);
+        console.log(
+          'Dictados filtrados del curso del alumno:',
+          dictadosDelCurso
+        );
 
         // 4. Extraer materias de los dictados del curso
-        const todasLasMaterias = dictadosDelCurso.map((dictado) => dictado.materia);
-        const materiasUnicas = todasLasMaterias.filter((materia, index, array) => 
-          materia && array.findIndex(m => m.id === materia.id) === index
+        const todasLasMaterias = dictadosDelCurso.map(
+          (dictado) => dictado.materia
+        );
+        const materiasUnicas = todasLasMaterias.filter(
+          (materia, index, array) =>
+            materia && array.findIndex((m) => m.id === materia.id) === index
         );
         setMaterias(materiasUnicas);
         console.log('Materias extraídas:', materiasUnicas);
@@ -77,7 +83,9 @@ export default function DashboardAlumno() {
           // Filtrar exámenes futuros del dictado
           const examenesFuturos = dictado.examenes
             .filter((ex) => new Date(ex.fecha_examen) >= hoy)
-            .sort((a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen));
+            .sort(
+              (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+            );
 
           // Si hay exámenes futuros, tomar el más próximo
           if (examenesFuturos.length > 0) {
@@ -96,7 +104,10 @@ export default function DashboardAlumno() {
           (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
         );
 
-        console.log('Exámenes próximos filtrados por curso:', examenesPorMateria);
+        console.log(
+          'Exámenes próximos filtrados por curso:',
+          examenesPorMateria
+        );
         setProximosExamenes(examenesPorMateria);
       } catch (error) {
         console.error('Error al cargar datos del dashboard:', error);
@@ -173,14 +184,15 @@ export default function DashboardAlumno() {
                             {examen.materia?.nombre || 'Materia sin nombre'}
                           </div>
                           <div className="examen-preview-info">
-                            <strong>{examen.temas}</strong>
+                            {examen.temas}
                           </div>
                           <div className="examen-preview-fecha">
                             {formatFecha(examen.fecha_examen)}
                           </div>
                           {examen.docente && (
                             <div className="examen-preview-docente">
-                              Prof. {examen.docente.nombre} {examen.docente.apellido}
+                              Prof. {examen.docente.nombre}{' '}
+                              {examen.docente.apellido}
                             </div>
                           )}
                         </div>

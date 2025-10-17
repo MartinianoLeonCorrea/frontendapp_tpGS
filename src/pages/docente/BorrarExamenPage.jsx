@@ -82,7 +82,7 @@ function BorrarExamenPage() {
     } catch (error) {
       console.error('Error al eliminar el examen:', error);
       toast.update(toastId, {
-        render: `❌ ${error.message || 'Error al eliminar el examen'}`,
+        render: `${error.message || 'Error al eliminar el examen'}`,
         type: 'error',
         isLoading: false,
         autoClose: 3000,

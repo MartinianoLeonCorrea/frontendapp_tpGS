@@ -113,7 +113,7 @@ function EditarExamenPage() {
       }, 3000);
     } catch (error) {
       console.error('Error al actualizar el examen:', error);
-      toast.error(`❌ ${error.message || 'Error al actualizar el examen'}`);
+      toast.error(`${error.message || 'Error al actualizar el examen'}`);
     }
   };
 

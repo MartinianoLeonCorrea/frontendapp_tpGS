@@ -141,7 +141,7 @@ function DictadoPage() {
                       className="btn-subir-notas"
                       onClick={() => handleSubirNotas(examen)}
                     >
-                      📝 Subir Notas
+                      📤 Subir Notas
                     </button>
                   </div>
                 </div>

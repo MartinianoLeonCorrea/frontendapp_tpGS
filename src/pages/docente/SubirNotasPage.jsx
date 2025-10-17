@@ -228,7 +228,7 @@ function SubirNotasPage() {
       setBackupNotas({});
     } catch (error) {
       console.error('Error al confirmar los cambios:', error);
-      toast.error(`❌ ${error.message || 'Error al confirmar los cambios'}`);
+      toast.error(` ${error.message || 'Error al confirmar los cambios'}`);
     }
   };
 
@@ -344,7 +344,6 @@ function SubirNotasPage() {
                               min="0"
                               max="10"
                               step="0.1"
-                              disabled={alumnoData.ausente}
                             />
                             {errors[alumno.dni] && (
                               <span className="form-error">
@@ -396,7 +395,7 @@ function SubirNotasPage() {
               💾 Publicar Cambios
             </button>
             <button className="btn-cancelar" onClick={handleCancelEdit}>
-              ❌ Cancelar
+              Cancelar
             </button>
           </>
         )}

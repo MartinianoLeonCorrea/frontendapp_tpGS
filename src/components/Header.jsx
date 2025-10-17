@@ -14,8 +14,8 @@ function Header() {
   // Mapeo de rutas a títulos y subtítulos
   const pageInfo = {
     '/': {
-      title: 'Gestión Tu Secundaria',
-      subtitle: '',
+      title: 'Skola',
+      subtitle: 'Conecta tu futuro',
     },
     '/alumno/dashboard': {
       title: 'Escuela Secundaria San Martín',
