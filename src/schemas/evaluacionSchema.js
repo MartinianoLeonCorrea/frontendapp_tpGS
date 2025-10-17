@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 export const evaluacionSchema = Yup.object().shape({
   nota: Yup.number()
     .typeError('La nota debe ser un número.')
-    .min(1, 'La nota debe ser al menos 1.')
+    .min(0, 'La nota debe ser un número positivo.')
     .max(10, 'La nota no puede superar 10.')
     .nullable()
     .optional(),
