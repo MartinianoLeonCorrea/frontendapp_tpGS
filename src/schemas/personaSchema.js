@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 
-export const alumnoSchema = Yup.object().shape({
+// Campos comunes para ambos tipos de usuarios
+const personaBaseSchema = {
   dni: Yup.number()
     .typeError('El DNI debe ser numérico.')
     .integer('El DNI debe ser numérico.')
@@ -11,13 +12,19 @@ export const alumnoSchema = Yup.object().shape({
   nombre: Yup.string()
     .min(2, 'El nombre debe tener al menos 2 caracteres.')
     .max(50, 'El nombre no puede superar los 50 caracteres.')
-    .matches(/^[a-zA-ZÀ-ÿ\s]*$/, 'El nombre solo puede contener letras y espacios')
+    .matches(
+      /^[a-zA-ZÀ-ÿ\s]*$/,
+      'El nombre solo puede contener letras y espacios'
+    )
     .required('El nombre no puede estar vacío.'),
 
   apellido: Yup.string()
     .min(2, 'El apellido debe tener al menos 2 caracteres.')
     .max(50, 'El apellido no puede superar los 50 caracteres.')
-    .matches(/^[a-zA-ZÀ-ÿ\s]*$/, 'El apellido solo puede contener letras y espacios')
+    .matches(
+      /^[a-zA-ZÀ-ÿ\s]*$/,
+      'El apellido solo puede contener letras y espacios'
+    )
     .required('El apellido no puede estar vacío.'),
 
   telefono: Yup.string()
@@ -37,14 +44,37 @@ export const alumnoSchema = Yup.object().shape({
     .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'El email debe ser válido.')
     .max(254, 'El email no puede superar los 254 caracteres.')
     .required('El email no puede estar vacío.'),
+};
 
+// Esquema específico para alumnos
+export const alumnoSchema = Yup.object().shape({
+  ...personaBaseSchema,
   tipo: Yup.string()
     .oneOf(['alumno', 'docente', 'administrativo'], 'El tipo no es válido.')
     .required('El tipo es obligatorio.')
     .default('alumno'),
-
   cursoId: Yup.number()
     .typeError('El cursoId debe ser numérico.')
     .integer('El cursoId debe ser numérico.')
     .required('El cursoId es obligatorio para alumnos.'),
+});
+
+// Esquema específico para docentes
+export const docenteSchema = Yup.object().shape({
+  ...personaBaseSchema,
+  tipo: Yup.string()
+    .oneOf(['docente'], 'El tipo debe ser docente.')
+    .default('docente'),
+  especialidad: Yup.string()
+    .max(100, 'La especialidad no puede superar los 100 caracteres.')
+    .nullable(),
+});
+
+// Esquema para edición de perfil (sin validación de cursoId o tipo)
+export const perfilEditSchema = Yup.object().shape({
+  nombre: personaBaseSchema.nombre,
+  apellido: personaBaseSchema.apellido,
+  email: personaBaseSchema.email,
+  telefono: personaBaseSchema.telefono,
+  direccion: personaBaseSchema.direccion,
 });

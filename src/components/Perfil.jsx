@@ -4,7 +4,11 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import '../App.css';
 import { toast, ToastContainer } from 'react-toastify';
-import { alumnoSchema } from '../schemas/personaSchema';
+import {
+  perfilEditSchema,
+  alumnoSchema,
+  docenteSchema,
+} from '../schemas/personaSchema';
 
 export default function Perfil() {
   const { userData, isAlumno, isDocente } = useUser(); // Obtener datos del contexto
@@ -81,8 +85,17 @@ export default function Perfil() {
     loadUserData();
   }, [userData, userType]);
 
+  // Inicializar especialidad para docentes cuando los datos se cargan
+  useEffect(() => {
+    if (userType === 'docente' && userDataState && isEditing === false) {
+      setFormData((prevState) => ({
+        ...prevState,
+        especialidad: userDataState.especialidad || '',
+      }));
+    }
+  }, [userType, userDataState, isEditing]);
+
   const handleEditClick = () => {
-    console.log('Botón editar presionado. Estado actual isEditing:', isEditing);
     setIsEditing(true);
     toast.info('Modo de edición activado');
     console.log('Estado cambiado a isEditing:', true);
@@ -105,15 +118,22 @@ export default function Perfil() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Formulario enviado con datos:', formData);
-
     setIsSaving(true);
     setError(null);
-    setFieldErrors({}); // Reset field errors before submission
+    setFieldErrors({});
 
     try {
-      // Validar datos con el schema de Joi
-      await alumnoSchema.validate(formData, { abortEarly: false });
+      // Selecciona el esquema según el tipo de usuario
+      let schema;
+      if (userType === 'docente') {
+        schema = docenteSchema;
+      } else if (userType === 'alumno') {
+        schema = alumnoSchema;
+      } else {
+        schema = perfilEditSchema;
+      }
+
+      await schema.validate(formData, { abortEarly: false });
 
       // Preparar datos para enviar (excluir campos que no deben actualizarse)
       const dataToUpdate = {
@@ -124,9 +144,9 @@ export default function Perfil() {
         direccion: formData.direccion,
       };
 
-      // Si es docente, incluir especialidad si existe
-      if (userType === 'docente' && formData.especialidad !== undefined) {
-        dataToUpdate.especialidad = formData.especialidad;
+      // Si es docente, incluir especialidad
+      if (userType === 'docente') {
+        dataToUpdate.especialidad = formData.especialidad || '';
       }
 
       console.log('Enviando datos al servidor:', dataToUpdate);
@@ -162,13 +182,17 @@ export default function Perfil() {
       // Mostrar mensaje de éxito
       toast.success('¡Datos guardados correctamente!');
     } catch (error) {
+      console.log('Error en handleSubmit:', error);
+
       if (error.inner) {
         // Manejar errores de validación de Joi
+        console.log('Error de validación de Joi:', error.inner);
         const validationErrors = {};
         error.inner.forEach((err) => {
           validationErrors[err.path] = err.message;
         });
         setFieldErrors(validationErrors);
+        toast.error('Por favor corrija los errores en el formulario');
       } else {
         console.error('Error al guardar los datos:', error);
         setError(`Error al guardar los datos: ${error.message}`);
