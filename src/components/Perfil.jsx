@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import '../App.css';
 import { toast, ToastContainer } from 'react-toastify';
+import { alumnoSchema } from '../schemas/personaSchema';
 
 export default function Perfil() {
   const { userData, isAlumno, isDocente } = useUser(); // Obtener datos del contexto
@@ -111,6 +112,9 @@ export default function Perfil() {
     setFieldErrors({}); // Reset field errors before submission
 
     try {
+      // Validar datos con el schema de Joi
+      await alumnoSchema.validate(formData, { abortEarly: false });
+
       // Preparar datos para enviar (excluir campos que no deben actualizarse)
       const dataToUpdate = {
         nombre: formData.nombre,
@@ -158,9 +162,18 @@ export default function Perfil() {
       // Mostrar mensaje de éxito
       toast.success('¡Datos guardados correctamente!');
     } catch (error) {
-      console.error('Error al guardar los datos:', error);
-      setError(`Error al guardar los datos: ${error.message}`);
-      toast.error(`Error al guardar los datos: ${error.message}`);
+      if (error.inner) {
+        // Manejar errores de validación de Joi
+        const validationErrors = {};
+        error.inner.forEach((err) => {
+          validationErrors[err.path] = err.message;
+        });
+        setFieldErrors(validationErrors);
+      } else {
+        console.error('Error al guardar los datos:', error);
+        setError(`Error al guardar los datos: ${error.message}`);
+        toast.error(`Error al guardar los datos: ${error.message}`);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -199,34 +212,38 @@ export default function Perfil() {
             <h2>
               {isEditing ? (
                 <div className="nombre-editing">
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre || ''}
-                    onChange={handleInputChange}
-                    className={`input-nombre ${
-                      fieldErrors.nombre ? 'input-error' : ''
-                    }`}
-                    placeholder="Nombre"
-                    required
-                  />
-                  {fieldErrors.nombre && (
-                    <span className="error-text">{fieldErrors.nombre}</span>
-                  )}
-                  <input
-                    type="text"
-                    name="apellido"
-                    value={formData.apellido || ''}
-                    onChange={handleInputChange}
-                    className={`input-apellido ${
-                      fieldErrors.apellido ? 'input-error' : ''
-                    }`}
-                    placeholder="Apellido"
-                    required
-                  />
-                  {fieldErrors.apellido && (
-                    <span className="error-text">{fieldErrors.apellido}</span>
-                  )}
+                  <div className="input-container">
+                    <input
+                      type="text"
+                      name="nombre"
+                      value={formData.nombre || ''}
+                      onChange={handleInputChange}
+                      className={`input-nombre ${
+                        fieldErrors.nombre ? 'input-error' : ''
+                      }`}
+                      placeholder="Nombre"
+                      required
+                    />
+                    {fieldErrors.nombre && (
+                      <span className="error-text">{fieldErrors.nombre}</span>
+                    )}
+                  </div>
+                  <div className="input-container">
+                    <input
+                      type="text"
+                      name="apellido"
+                      value={formData.apellido || ''}
+                      onChange={handleInputChange}
+                      className={`input-apellido ${
+                        fieldErrors.apellido ? 'input-error' : ''
+                      }`}
+                      placeholder="Apellido"
+                      required
+                    />
+                    {fieldErrors.apellido && (
+                      <span className="error-text">{fieldErrors.apellido}</span>
+                    )}
+                  </div>
                 </div>
               ) : (
                 `${userDataState?.nombre || ''} ${
@@ -278,63 +295,69 @@ export default function Perfil() {
             <div className="dato-item">
               <strong>Correo electrónico:</strong>
               {isEditing ? (
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email || ''}
-                  onChange={handleInputChange}
-                  className={`input-dato ${
-                    fieldErrors.email ? 'input-error' : ''
-                  }`}
-                  required
-                />
+                <div className="input-container">
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email || ''}
+                    onChange={handleInputChange}
+                    className={`input-dato ${
+                      fieldErrors.email ? 'input-error' : ''
+                    }`}
+                    required
+                  />
+                  {fieldErrors.email && (
+                    <span className="error-text">{fieldErrors.email}</span>
+                  )}
+                </div>
               ) : (
                 <span>{userDataState?.email || ''}</span>
-              )}
-              {fieldErrors.email && (
-                <span className="error-text">{fieldErrors.email}</span>
               )}
             </div>
 
             <div className="dato-item">
               <strong>Teléfono de contacto:</strong>
               {isEditing ? (
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono || ''}
-                  onChange={handleInputChange}
-                  className={`input-dato ${
-                    fieldErrors.telefono ? 'input-error' : ''
-                  }`}
-                  required
-                />
+                <div className="input-container">
+                  <input
+                    type="tel"
+                    name="telefono"
+                    value={formData.telefono || ''}
+                    onChange={handleInputChange}
+                    className={`input-dato ${
+                      fieldErrors.telefono ? 'input-error' : ''
+                    }`}
+                    required
+                  />
+                  {fieldErrors.telefono && (
+                    <span className="error-text">{fieldErrors.telefono}</span>
+                  )}
+                </div>
               ) : (
                 <span>{userDataState?.telefono || ''}</span>
-              )}
-              {fieldErrors.telefono && (
-                <span className="error-text">{fieldErrors.telefono}</span>
               )}
             </div>
 
             <div className="dato-item">
               <strong>Dirección:</strong>
               {isEditing ? (
-                <input
-                  type="text"
-                  name="direccion"
-                  value={formData.direccion || ''}
-                  onChange={handleInputChange}
-                  className={`input-dato ${
-                    fieldErrors.direccion ? 'input-error' : ''
-                  }`}
-                  required
-                />
+                <div className="input-container">
+                  <input
+                    type="text"
+                    name="direccion"
+                    value={formData.direccion || ''}
+                    onChange={handleInputChange}
+                    className={`input-dato ${
+                      fieldErrors.direccion ? 'input-error' : ''
+                    }`}
+                    required
+                  />
+                  {fieldErrors.direccion && (
+                    <span className="error-text">{fieldErrors.direccion}</span>
+                  )}
+                </div>
               ) : (
                 <span>{userDataState?.direccion || ''}</span>
-              )}
-              {fieldErrors.direccion && (
-                <span className="error-text">{fieldErrors.direccion}</span>
               )}
             </div>
 
@@ -343,23 +366,27 @@ export default function Perfil() {
               <div className="dato-item">
                 <strong>Especialidad:</strong>
                 {isEditing ? (
-                  <input
-                    type="text"
-                    name="especialidad"
-                    value={formData.especialidad || ''}
-                    onChange={handleInputChange}
-                    className={`input-dato ${
-                      fieldErrors.especialidad ? 'input-error' : ''
-                    }`}
-                    placeholder="Especialidad del docente"
-                  />
+                  <div className="input-container">
+                    <input
+                      type="text"
+                      name="especialidad"
+                      value={formData.especialidad || ''}
+                      onChange={handleInputChange}
+                      className={`input-dato ${
+                        fieldErrors.especialidad ? 'input-error' : ''
+                      }`}
+                      placeholder="Especialidad del docente"
+                    />
+                    {fieldErrors.especialidad && (
+                      <span className="error-text">
+                        {fieldErrors.especialidad}
+                      </span>
+                    )}
+                  </div>
                 ) : (
                   <span>
                     {userDataState?.especialidad || 'No especificada'}
                   </span>
-                )}
-                {fieldErrors.especialidad && (
-                  <span className="error-text">{fieldErrors.especialidad}</span>
                 )}
               </div>
             )}

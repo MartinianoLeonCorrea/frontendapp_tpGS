@@ -4,7 +4,18 @@ import * as Yup from 'yup';
 export const examenSchema = Yup.object().shape({
   fecha_examen: Yup.date()
     .typeError('La fecha del examen debe ser válida.')
-    .required('La fecha del examen es obligatoria.'),
+    .required('La fecha del examen es obligatoria.')
+    .test(
+      'is-future-date',
+      'La fecha del examen debe ser posterior a hoy.',
+      (value) => {
+        if (!value) return false;
+        const fechaExamen = new Date(value);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        return fechaExamen > hoy;
+      }
+    ),
 
   temas: Yup.string()
     .min(5, 'Los temas deben tener al menos 5 caracteres.')
