@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,6 +11,8 @@ function NuevoExamenPage() {
   const navigate = useNavigate();
   const dictadoId = state?.dictadoId;
   const cantidadAlumnos = state?.cantidadAlumnos || 0;
+
+  const [creadoExitoso, setCreadoExitoso] = useState(false);
 
   const {
     register,
@@ -46,6 +48,8 @@ function NuevoExamenPage() {
         return;
       }
 
+      const toastId = toast.loading('Creando examen...');
+
       const response = await fetch('/api/examenes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -58,7 +62,15 @@ function NuevoExamenPage() {
         throw new Error(result.message || 'Error al crear el examen');
       }
 
-      toast.success('✅ Examen creado exitosamente');
+      toast.update(toastId, {
+        render: '✅ Examen creado exitosamente',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      // Bloquear el formulario después de crear
+      setCreadoExitoso(true);
       
       // Esperar un momento para que se vea el toast antes de navegar
       setTimeout(() => {
@@ -68,6 +80,10 @@ function NuevoExamenPage() {
       console.error('Error al crear el examen:', error);
       toast.error(`❌ ${error.message || 'Error al crear el examen'}`);
     }
+  };
+
+  const handleCancelar = () => {
+    navigate('/docente/dictado', { state: { dictadoId } });
   };
 
   return (
@@ -84,6 +100,7 @@ function NuevoExamenPage() {
             id="fecha_examen"
             {...register('fecha_examen')}
             className={errors.fecha_examen ? 'error' : ''}
+            disabled={isSubmitting || creadoExitoso}
           />
           {errors.fecha_examen && (
             <span className="form-error">{errors.fecha_examen.message}</span>
@@ -98,6 +115,7 @@ function NuevoExamenPage() {
             className={errors.temas ? 'error' : ''}
             rows="5"
             placeholder="Ingrese los temas del examen..."
+            disabled={isSubmitting || creadoExitoso}
           />
           {errors.temas && (
             <span className="form-error">{errors.temas.message}</span>
@@ -112,6 +130,7 @@ function NuevoExamenPage() {
             {...register('copias')}
             className={errors.copias ? 'error' : ''}
             min="1"
+            disabled={isSubmitting || creadoExitoso}
           />
           {errors.copias && (
             <span className="form-error">{errors.copias.message}</span>
@@ -127,15 +146,15 @@ function NuevoExamenPage() {
           <button 
             type="submit" 
             className="btn-primary"
-            disabled={isSubmitting}
+            disabled={isSubmitting || creadoExitoso}
           >
-            {isSubmitting ? 'Creando...' : 'Crear Examen'}
+            {creadoExitoso ? 'Creado ✓' : isSubmitting ? 'Creando...' : 'Crear Examen'}
           </button>
           <button
             type="button"
             className="btn-secondary"
-            onClick={() => navigate(-1)}
-            disabled={isSubmitting}
+            onClick={handleCancelar}
+            disabled={isSubmitting || creadoExitoso}
           >
             Cancelar
           </button>

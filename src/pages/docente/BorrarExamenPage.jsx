@@ -13,6 +13,7 @@ function BorrarExamenPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [confirmText, setConfirmText] = useState('');
+  const [eliminadoExitoso, setEliminadoExitoso] = useState(false);
 
   useEffect(() => {
     if (!examenId) {
@@ -71,6 +72,9 @@ function BorrarExamenPage() {
         isLoading: false,
         autoClose: 3000,
       });
+
+      // Bloquear toda la interfaz después de eliminar
+      setEliminadoExitoso(true);
 
       // Esperar un momento antes de navegar
       setTimeout(() => {
@@ -183,7 +187,7 @@ function BorrarExamenPage() {
           value={confirmText}
           onChange={(e) => setConfirmText(e.target.value)}
           placeholder="Escriba ELIMINAR"
-          disabled={deleting}
+          disabled={deleting || eliminadoExitoso}
           autoComplete="off"
           className="confirm-input"
         />
@@ -192,14 +196,14 @@ function BorrarExamenPage() {
       <div className="form-actions">
         <button
           onClick={handleEliminar}
-          disabled={deleting || confirmText.toUpperCase() !== 'ELIMINAR'}
+          disabled={deleting || eliminadoExitoso || confirmText.toUpperCase() !== 'ELIMINAR'}
           className="btn-eliminar-confirm"
         >
-          {deleting ? 'Eliminando...' : 'Confirmar Eliminación'}
+          {eliminadoExitoso ? 'Eliminado ✓' : deleting ? 'Eliminando...' : 'Confirmar Eliminación'}
         </button>
         <button
           onClick={handleCancelar}
-          disabled={deleting}
+          disabled={deleting || eliminadoExitoso}
           className="btn-cancelar"
         >
           Cancelar
