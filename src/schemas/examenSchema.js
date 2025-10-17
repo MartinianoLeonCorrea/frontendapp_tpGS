@@ -9,6 +9,10 @@ export const examenSchema = Yup.object().shape({
   temas: Yup.string()
     .min(5, 'Los temas deben tener al menos 5 caracteres.')
     .max(800, 'Los temas no pueden superar los 800 caracteres.')
+    .matches(
+      /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ.,;:()\s]+$/,
+      'Los temas contienen caracteres no permitidos.'
+    )
     .required('Los temas no pueden estar vacíos.'),
 
   copias: Yup.number()
