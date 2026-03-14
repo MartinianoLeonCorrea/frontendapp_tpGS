@@ -22,7 +22,7 @@ export default function DashboardAlumno() {
         // 1. Obtener curso del alumno
         const alumnoRes = await fetch(`/api/personas/${dni}`);
         const alumnoData = await alumnoRes.json();
-        const cursoId = alumnoData.data?.cursoId;
+        const cursoId = alumnoData.data?.curso?.id;
 
         if (!cursoId) {
           console.log(
@@ -41,7 +41,7 @@ export default function DashboardAlumno() {
         const dictadosData = await dictadosRes.json();
         console.log('Dictados recibidos para el curso:', dictadosData);
 
-        const todosDictados = Array.isArray(dictadosData) ? dictadosData : [];
+        const todosDictados = Array.isArray(dictadosData.data) ? dictadosData.data : [];
 
         if (!todosDictados.length) {
           console.log('No hay dictados disponibles para el curso.');
@@ -53,7 +53,7 @@ export default function DashboardAlumno() {
 
         // 3. Filtrar dictados que pertenecen al curso del alumno (doble verificación)
         const dictadosDelCurso = todosDictados.filter(
-          (dictado) => dictado.cursoId === cursoId
+          (dictado) => (dictado.curso?.id ?? dictado.cursoId) === cursoId
         );
 
         console.log(
