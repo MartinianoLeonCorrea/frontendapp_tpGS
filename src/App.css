@@ -396,6 +396,184 @@ button:hover {
 .news-list .info-placeholder:last-child {
   margin-bottom: 0;
 }
+/* ==============================================
+   LOGIN 
+   ============================================== */
+
+
+
+/* --- Variables de la app --- */
+:root {
+  --color-primary: #2eaa8a;
+  --color-primary-hover: #259978;
+  --color-sidebar: #2d3a4a;
+  --color-bg: #e8e8e8;
+  --color-card: #ffffff;
+  --color-text: #2d3a4a;
+  --color-text-light: #6b7a8d;
+  --color-border: #d0d5dd;
+  --color-error: #d9534f;
+  --color-role-active-bg: var(--color-primary);
+  --color-role-inactive-bg: #f0f0f0;
+  --radius: 10px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Main centrado --- */
+.login-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+/* --- Card del formulario --- */
+.login-card {
+
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0 auto;
+
+}
+
+.login-card__title {
+  
+  
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.login-card__desc {
+  
+  font-size: 14px;
+  color: var(--color-text-light);
+}
+
+/* --- Selector Alumno / Docente --- */
+.login-role-selector {
+  display: flex;
+  gap: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--color-primary);
+}
+
+.login-role-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  background-color: var(--color-role-inactive-bg);
+  color: var(--color-primary);
+}
+
+.login-role-btn--active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.login-role-btn:hover:not(.login-role-btn--active) {
+  background-color: #d8f3ec;
+}
+
+/* --- Divisor bajo el selector --- */
+.login-divider {
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+
+}
+
+/* --- Formulario --- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-form__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.login-form__input {
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: #fafafa;
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+
+.login-form__input:focus {
+  border-color: var(--color-primary);
+  background-color: white;
+}
+
+.login-form__input::placeholder {
+  color: #b0b8c1;
+}
+
+/* --- Error --- */
+.login-form__error {
+  margin: 0;
+  padding: 10px 14px;
+  background-color: #fdecea;
+  border-left: 4px solid var(--color-error);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-error);
+}
+
+/* --- Botón submit (igual al "Registrar Alumno" de la app) --- */
+.login-form__submit {
+  padding: 12px;
+  background-color: #4a90d9;   /* Azul igual al botón "Registrar Alumno" */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: 4px;
+}
+
+.login-form__submit:hover:not(:disabled) {
+  background-color: #3a7fc1;
+}
+
+.login-form__submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --- Responsive --- */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 20px;
+  }
+}
 
 /* ==============================================
    CALENDARIO - MÓVIL

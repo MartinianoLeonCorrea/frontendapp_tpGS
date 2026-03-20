@@ -25,6 +25,7 @@ import NuevoExamenPage from './pages/docente/NuevoExamenPage';
 import EditarExamenPage from './pages/docente/EditarExamenPage';
 import BorrarExamenPage from './pages/docente/BorrarExamenPage';
 import SubirNotasPage from './pages/docente/SubirNotasPage';
+import LoginPage from './pages/LoginPage';  
 import React, { useState, useEffect } from 'react';
 
 const Layout = () => {
@@ -270,6 +271,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="login" element={<LoginPage />} />
             <Route path="alumno/dashboard" element={<DashboardAlumno />} />
             <Route path="alumno/materias" element={<MateriasAlumno />} />
             <Route path="docente/dashboard" element={<DashboardDocente />} />
