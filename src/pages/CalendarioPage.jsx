@@ -88,7 +88,7 @@ function CalendarioPage() {
 
         const userData = await userRes.json();
         const userType = userData.data?.tipo;
-        const cursoId = userData.data?.cursoId;
+        const cursoId = userData.data?.curso?.id ?? userData.data?.cursoId;
 
         console.log('Usuario:', { tipo: userType, dni, cursoId });
 
@@ -121,14 +121,17 @@ function CalendarioPage() {
           }
 
           const dictadosData = await dictadosRes.json();
-          const dictados = Array.isArray(dictadosData) ? dictadosData : [];
+          const dictados = Array.isArray(dictadosData.data)
+            ? dictadosData.data
+            : [];
 
           console.log('Dictados recibidos:', dictados.length);
 
           // Filtrar dictados por cursoId (doble verificación)
-          const dictadosDelCurso = dictados.filter(
-            (dictado) => dictado.cursoId === cursoId
-          );
+          const dictadosDelCurso = dictados.filter((dictado) => {
+            const dictadoCursoId = dictado.curso?.id ?? dictado.cursoId;
+            return Number(dictadoCursoId) === Number(cursoId);
+          });
 
           console.log(
             'Dictados filtrados del curso del alumno:',
@@ -141,7 +144,7 @@ function CalendarioPage() {
               ...examen,
               materia: dictado.materia,
               docente: dictado.docente,
-              cursoId: dictado.cursoId,
+              cursoId: dictado.curso?.id ?? dictado.cursoId,
             }))
           );
 
@@ -150,8 +153,8 @@ function CalendarioPage() {
           // Mapear exámenes a eventos del calendario
           eventos = todosExamenes.map((examen) => ({
             title: `${examen.materia?.nombre || 'Materia'} - Examen`,
-            start: new Date(examen.fecha_examen),
-            end: new Date(examen.fecha_examen),
+            start: new Date(examen.fechaExamen ?? examen.fecha_examen),
+            end: new Date(examen.fechaExamen ?? examen.fecha_examen),
             examenId: examen.id,
             temas: examen.temas,
             docente: examen.docente,
@@ -176,7 +179,9 @@ function CalendarioPage() {
           }
 
           const dictadosData = await dictadosRes.json();
-          const dictados = Array.isArray(dictadosData) ? dictadosData : [];
+          const dictados = Array.isArray(dictadosData.data)
+            ? dictadosData.data
+            : [];
 
           console.log('Dictados del docente recibidos:', dictados.length);
 
@@ -195,8 +200,8 @@ function CalendarioPage() {
           // Mapear exámenes a eventos del calendario
           eventos = todosExamenes.map((examen) => ({
             title: `${examen.materia?.nombre || 'Materia'} - Examen`,
-            start: new Date(examen.fecha_examen),
-            end: new Date(examen.fecha_examen),
+            start: new Date(examen.fechaExamen ?? examen.fecha_examen),
+            end: new Date(examen.fechaExamen ?? examen.fecha_examen),
             examenId: examen.id,
             temas: examen.temas,
             materia: examen.materia,

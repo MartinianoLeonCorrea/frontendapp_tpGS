@@ -19,7 +19,7 @@ function ExamenesPage() {
         // 1. Obtener curso del alumno
         const alumnoRes = await fetch(`/api/personas/${dni}`);
         const alumnoData = await alumnoRes.json();
-        const cursoId = alumnoData.data?.cursoId;
+        const cursoId = alumnoData.data?.curso?.id;
         
         if (!cursoId) {
           console.error('No se encontró cursoId para el alumno');
@@ -31,15 +31,15 @@ function ExamenesPage() {
         console.log('CursoId del alumno:', cursoId);
 
         // 2. Obtener dictados del curso usando la ruta correcta
-        const dictadosRes = await fetch(`/api/dictados/curso/${cursoId}`);
+        const dictadosRes = await fetch(`/api/dictados?curso=${cursoId}`);
         const dictadosData = await dictadosRes.json();
         
         console.log('Respuesta de dictados:', dictadosData);
         
         // La respuesta puede venir directamente como array o dentro de .data
-        const dictados = Array.isArray(dictadosData) 
-          ? dictadosData 
-          : (dictadosData.data || []);
+        const dictados = Array.isArray(dictadosData.data) 
+          ? dictadosData.data 
+          : [];
 
         console.log('Dictados encontrados:', dictados);
 

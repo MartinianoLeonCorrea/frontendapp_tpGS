@@ -20,11 +20,15 @@ export const UserProvider = ({ children }) => {
       if (response.ok) {
         const result = await response.json();
         setDni(userDni);
-        setUserData(result.data);
+
+        const cursoId = result.data?.curso?.id || null;
+        const userDataWithCursoId = { ...result.data, cursoId };
+        
+        setUserData(userDataWithCursoId);
 
         // Guardar en localStorage para persistencia (opcional)
         localStorage.setItem('userDni', userDni.toString());
-        localStorage.setItem('userData', JSON.stringify(result.data));
+        localStorage.setItem('userData', JSON.stringify(userDataWithCursoId));
       } else {
         console.error('Usuario no encontrado');
         logout();
