@@ -12,6 +12,8 @@ function MateriaPage() {
   const [examenes, setExamenes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const getFechaExamen = (examen) => examen?.fecha_examen || examen?.fechaExamen;
+
   useEffect(() => {
     if (!subjectId || !dni) {
       setIsLoading(false);
@@ -23,7 +25,7 @@ function MateriaPage() {
         // 1. Obtener el alumno y su curso
         const alumnoRes = await fetch(`/api/personas/${dni}`);
         const alumnoData = await alumnoRes.json();
-        const cursoId = alumnoData.data?.cursoId;
+        const cursoId = alumnoData.data?.curso?.id;
         
         if (!cursoId) {
           console.error('No se encontró cursoId para el alumno');
@@ -125,10 +127,13 @@ function MateriaPage() {
             {Array.isArray(examenes) && examenes.length > 0 ? (
               (() => {
                 const proximos = examenes
-                  .filter((ex) => new Date(ex.fecha_examen) >= new Date())
+                  .filter((ex) => {
+                    const fecha = new Date(getFechaExamen(ex));
+                    return !Number.isNaN(fecha.getTime()) && fecha >= new Date();
+                  })
                   .sort(
                     (a, b) =>
-                      new Date(a.fecha_examen) - new Date(b.fecha_examen)
+                      new Date(getFechaExamen(a)) - new Date(getFechaExamen(b))
                   );
                 
                 if (proximos.length === 0) {
@@ -141,7 +146,7 @@ function MateriaPage() {
                 
                 return proximos.map((examen) => (
                   <li key={examen.id} className="examen-item">
-                    {examen.temas} - {formatFecha(examen.fecha_examen)}
+                    {examen.temas} - {formatFecha(getFechaExamen(examen))}
                   </li>
                 ));
               })()

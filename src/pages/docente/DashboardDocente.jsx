@@ -11,6 +11,8 @@ function DashboardDocente() {
 
   const navigate = useNavigate();
 
+  const getFechaExamen = (examen) => examen?.fecha_examen || examen?.fechaExamen;
+
   useEffect(() => {
     if (!dni) return;
 
@@ -21,14 +23,9 @@ function DashboardDocente() {
         // Obtener dictados asociados al docente
         const dictadosRes = await fetch(`/api/dictados/persona/${dni}`);
         const dictadosData = await dictadosRes.json();
-        console.log('Dictados recibidos:', dictadosData);
+        const todosDictados = Array.isArray(dictadosData.data) ? dictadosData.data : [];
 
-        const todosDictados = Array.isArray(dictadosData) ? dictadosData : [];
-        console.log(
-          'Tipo de todosDictados:',
-          Array.isArray(todosDictados),
-          todosDictados
-        );
+        console.log('Dictados recibidos:', todosDictados);
 
         setDictados(todosDictados);
 
@@ -42,9 +39,13 @@ function DashboardDocente() {
 
           // Filtrar exámenes futuros del dictado
           const examenesFuturos = dictado.examenes
-            .filter((ex) => new Date(ex.fecha_examen) >= hoy)
+            .filter((ex) => {
+              const fecha = new Date(getFechaExamen(ex));
+              return !Number.isNaN(fecha.getTime()) && fecha >= hoy;
+            })
             .sort(
-              (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+              (a, b) =>
+                new Date(getFechaExamen(a)) - new Date(getFechaExamen(b))
             );
 
           // Si hay exámenes futuros, tomar el más próximo
@@ -61,7 +62,7 @@ function DashboardDocente() {
 
         // Ordenar todos los exámenes por fecha
         examenesPorDictado.sort(
-          (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+          (a, b) => new Date(getFechaExamen(a)) - new Date(getFechaExamen(b))
         );
 
         console.log('Exámenes próximos por dictado:', examenesPorDictado);
@@ -113,7 +114,7 @@ function DashboardDocente() {
                         ? `${dictado.docente.nombre} ${dictado.docente.apellido}`
                         : 'Sin docente'
                     }
-                    cursoNroLetra={dictado.curso?.nro_letra || 'Sin curso'}
+                    cursoNroLetra={dictado.curso?.nroLetra || 'Sin curso'}
                     onClick={() => handleDictadoClick(dictado.id)}
                   />
                 ))
@@ -145,11 +146,11 @@ function DashboardDocente() {
                       </div>
                       <div className="examen-preview-info">{examen.temas}</div>
                       <div className="examen-preview-fecha">
-                        {formatFecha(examen.fecha_examen)}
+                        {formatFecha(getFechaExamen(examen))}
                       </div>
                       {examen.curso && (
                         <div className="examen-preview-docente">
-                          Curso: {examen.curso.nro_letra}
+                          Curso: {examen.curso.nroLetra}
                         </div>
                       )}
                     </div>

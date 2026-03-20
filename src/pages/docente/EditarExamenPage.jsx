@@ -15,6 +15,8 @@ function EditarExamenPage() {
   const [loading, setLoading] = useState(true);
   const [guardadoExitoso, setGuardadoExitoso] = useState(false);
 
+  const getFechaExamen = (examen) => examen?.fecha_examen || examen?.fechaExamen;
+
   const {
     register,
     handleSubmit,
@@ -43,7 +45,13 @@ function EditarExamenPage() {
         const examen = result.data;
 
         // Formatear la fecha para el input date
-        const fechaExamen = new Date(examen.fecha_examen);
+        const rawFechaExamen = getFechaExamen(examen);
+        const fechaExamen = new Date(rawFechaExamen);
+
+        if (Number.isNaN(fechaExamen.getTime())) {
+          throw new Error('Fecha de examen invalida');
+        }
+
         const fechaFormateada = fechaExamen.toISOString().split('T')[0];
 
         // Usar reset para cargar los datos en el formulario
@@ -51,7 +59,7 @@ function EditarExamenPage() {
           fecha_examen: fechaFormateada,
           temas: examen.temas,
           copias: examen.copias,
-          dictadoId: examen.dictadoId,
+          dictadoId: examen.dictadoId ?? examen.dictado?.id ?? dictadoId,
         });
       } catch (error) {
         console.error('Error al cargar el examen:', error);

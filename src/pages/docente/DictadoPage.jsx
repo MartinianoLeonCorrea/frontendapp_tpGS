@@ -11,10 +11,15 @@ function DictadoPage() {
   const [examenes, setExamenes] = useState([]);
   const [loadingExamenes, setLoadingExamenes] = useState(true);
 
+  const getFechaExamen = (examen) => examen?.fecha_examen || examen?.fechaExamen;
+
   const fetchExamenes = useCallback(async () => {
     setLoadingExamenes(true);
     try {
       const response = await fetch(`/api/examenes?dictadoId=${dictadoId}`);
+      if (!response.ok) {
+        throw new Error('No se pudieron cargar los examenes');
+      }
       const result = await response.json();
       setExamenes(result.data || []);
     } catch (error) {
@@ -29,8 +34,11 @@ function DictadoPage() {
     if (dictadoId) {
       // Cargar datos del dictado
       fetch(`/api/dictados/${dictadoId}`)
-        .then((res) => res.json())
-        .then((data) => setDictado(data))
+        .then((res) => {
+          if (!res.ok) throw new Error('No se pudo cargar el dictado');
+          return res.json();
+        })
+        .then((data) => setDictado(data.data ?? null))
         .catch((err) => console.error('Error en fetch dictado:', err));
 
       // Cargar exámenes del dictado
@@ -74,6 +82,8 @@ function DictadoPage() {
   };
 
   const formatFecha = (fecha) => {
+    const parsedDate = new Date(fecha);
+    if (Number.isNaN(parsedDate.getTime())) return 'Fecha invalida';
     return new Date(fecha).toLocaleDateString('es-AR', {
       year: 'numeric',
       month: 'long',
@@ -89,7 +99,7 @@ function DictadoPage() {
         <span className="dictado-info">
           <h3 className="subtitle">Curso</h3>
           <p>
-            <strong>Año y división:</strong> {curso?.nro_letra}{' '}
+            <strong>Año y división:</strong> {curso?.nroLetra}{' '}
             <strong>Turno:</strong> {curso?.turno}
           </p>
         </span>
@@ -121,7 +131,7 @@ function DictadoPage() {
                   </button>
                   <div className="examen-info">
                     <h4 className="examen-fecha">
-                      📅 {formatFecha(examen.fecha_examen)}
+                      📅 {formatFecha(getFechaExamen(examen))}
                     </h4>
                     <p className="examen-temas">
                       <strong>Temas:</strong> {examen.temas}

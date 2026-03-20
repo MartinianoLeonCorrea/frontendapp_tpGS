@@ -11,6 +11,8 @@ export default function DashboardAlumno() {
   const { dni } = useUser();
   const navigate = useNavigate();
 
+  const getFechaExamen = (examen) => examen?.fecha_examen || examen?.fechaExamen;
+
   useEffect(() => {
     if (!dni) return;
 
@@ -82,9 +84,12 @@ export default function DashboardAlumno() {
 
           // Filtrar exámenes futuros del dictado
           const examenesFuturos = dictado.examenes
-            .filter((ex) => new Date(ex.fecha_examen) >= hoy)
+            .filter((ex) => {
+              const fecha = new Date(getFechaExamen(ex));
+              return !Number.isNaN(fecha.getTime()) && fecha >= hoy;
+            })
             .sort(
-              (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+              (a, b) => new Date(getFechaExamen(a)) - new Date(getFechaExamen(b))
             );
 
           // Si hay exámenes futuros, tomar el más próximo
@@ -101,7 +106,7 @@ export default function DashboardAlumno() {
 
         // Ordenar todos los exámenes por fecha
         examenesPorMateria.sort(
-          (a, b) => new Date(a.fecha_examen) - new Date(b.fecha_examen)
+          (a, b) => new Date(getFechaExamen(a)) - new Date(getFechaExamen(b))
         );
 
         console.log(
@@ -187,7 +192,7 @@ export default function DashboardAlumno() {
                             {examen.temas}
                           </div>
                           <div className="examen-preview-fecha">
-                            {formatFecha(examen.fecha_examen)}
+                            {formatFecha(getFechaExamen(examen))}
                           </div>
                           {examen.docente && (
                             <div className="examen-preview-docente">
