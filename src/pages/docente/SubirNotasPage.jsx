@@ -5,6 +5,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../App.css';
 
+// Utilidad para obtener la fecha del examen robusta
+function getFechaExamen(examen) {
+  return examen?.fecha_examen || examen?.fechaExamen || null;
+}
+
 function SubirNotasPage() {
   const { state } = useLocation();
   const examenId = state?.examenId?.id || state?.examenId;
@@ -16,50 +21,58 @@ function SubirNotasPage() {
   const [errors, setErrors] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [backupNotas, setBackupNotas] = useState({});
+  const [evaluacionesExistentes, setEvaluacionesExistentes] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let serverError = false;
     const fetchExamen = async () => {
       try {
         const response = await fetch(`/api/examenes/${examenId}`);
         if (!response.ok) throw new Error('Error al cargar el examen');
-
         const data = await response.json();
-        setExamen(data.data);
-
-        if (data.data.alumnos) {
-          const sortedAlumnos = [...data.data.alumnos].sort((a, b) =>
-            a.apellido.localeCompare(b.apellido)
-          );
-          setAlumnos(sortedAlumnos);
-        }
+        const examenData = data.data ?? null;
+        setExamen(examenData);
+        return examenData;
       } catch (error) {
+        if (error.message.includes('Failed to fetch')) {
+          serverError = true;
+        }
         console.error('Error fetching examen:', error);
         throw error;
       }
     };
 
-    const fetchDictado = async () => {
-      if (!dictadoId) return;
-
+    const fetchDictado = async (resolvedDictadoId) => {
+      if (!resolvedDictadoId) {
+        setAlumnos([]);
+        return;
+      }
       try {
-        const response = await fetch(`/api/dictados/${dictadoId}`);
+        const response = await fetch(`/api/dictados/${resolvedDictadoId}`);
         if (!response.ok) throw new Error('Error al cargar el dictado');
-
         const result = await response.json();
-
-        if (result) {
-          setAlumnos(
-            result.curso?.alumnos?.sort((a, b) =>
+        const dictado = result.data ?? null;
+      
+        const alumnosCurso = dictado?.curso?.alumnos
+          ? [...dictado.curso.alumnos].sort((a, b) =>
               a.apellido.localeCompare(b.apellido)
-            ) || []
-          );
-          setExamen((prevExamen) => ({
-            ...prevExamen,
-            materia: result.materia?.nombre,
-          }));
-        }
+            )
+          : [];
+        setAlumnos(alumnosCurso);
+
+        // Materia desde dictado.materia
+        setExamen((prevExamen) => ({
+          ...prevExamen,
+          materia:
+            dictado?.materia?.nombre ||
+            prevExamen?.materia ||
+            'Materia no especificada',
+        }));
       } catch (error) {
+        if (error.message.includes('Failed to fetch')) {
+          serverError = true;
+        }
         console.error('Error fetching dictado:', error);
         throw error;
       }
@@ -69,22 +82,36 @@ function SubirNotasPage() {
       try {
         const response = await fetch(`/api/evaluaciones/examen/${examenId}`);
         if (!response.ok) throw new Error('Error al cargar las evaluaciones');
-
         const data = await response.json();
-
         if (data.data) {
           const existingNotas = {};
+          const existingEvaluaciones = {};
           data.data.forEach((evaluacion) => {
-            existingNotas[evaluacion.alumnoId] = {
+            const dniAlumno = Number(
+              evaluacion.alumnoId ?? evaluacion.alumno?.dni
+            );
+            if (!Number.isInteger(dniAlumno) || dniAlumno <= 0) {
+              return;
+            }
+
+            existingNotas[dniAlumno] = {
               nota: evaluacion.nota !== null ? evaluacion.nota : '',
               ausente:
-                evaluacion.observaciones === 'Ausente' ||
-                evaluacion.observaciones?.includes('Ausente'),
+                evaluacion.observacion === 'Ausente' ||
+                evaluacion.observacion?.includes('Ausente'),
             };
+
+            if (Number.isInteger(Number(evaluacion.id))) {
+              existingEvaluaciones[dniAlumno] = Number(evaluacion.id);
+            }
           });
           setNotas(existingNotas);
+          setEvaluacionesExistentes(existingEvaluaciones);
         }
       } catch (error) {
+        if (error.message.includes('Failed to fetch')) {
+          serverError = true;
+        }
         console.error('Error fetching evaluaciones:', error);
         throw error;
       }
@@ -93,8 +120,16 @@ function SubirNotasPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchExamen(), fetchDictado(), fetchEvaluaciones()]);
+        const [examenData] = await Promise.all([fetchExamen(), fetchEvaluaciones()]);
+        const resolvedDictadoId =
+          dictadoId || examenData?.dictado?.id || examenData?.dictadoId;
+        await fetchDictado(resolvedDictadoId);
       } catch (error) {
+        if (serverError) {
+          setLoading(false);
+          setExamen('SERVER_ERROR');
+          return;
+        }
         console.error('Error al cargar datos:', error);
         toast.error('Error al cargar los datos del examen');
       } finally {
@@ -114,7 +149,7 @@ function SubirNotasPage() {
       await evaluacionSchema.validate(
         {
           nota: nota === '' ? null : nota,
-          observaciones: null,
+          observacion: null,
           alumnoId,
           examenId,
         },
@@ -127,15 +162,20 @@ function SubirNotasPage() {
   };
 
   const handleNotaChange = async (dni, value) => {
+    const dniNumber = Number(dni);
+    if (!Number.isInteger(dniNumber) || dniNumber <= 0) {
+      return;
+    }
+
     if (value === '') {
       setNotas((prev) => ({
         ...prev,
-        [dni]: {
-          ...prev[dni],
+        [dniNumber]: {
+          ...prev[dniNumber],
           nota: '',
         },
       }));
-      setErrors((prev) => ({ ...prev, [dni]: '' }));
+      setErrors((prev) => ({ ...prev, [dniNumber]: '' }));
       return;
     }
 
@@ -144,25 +184,25 @@ function SubirNotasPage() {
     if (isNaN(numericValue)) {
       setErrors((prev) => ({
         ...prev,
-        [dni]: 'La nota debe ser un número válido',
+        [dniNumber]: 'La nota debe ser un número válido',
       }));
       return;
     }
 
     // Validar con el schema
-    const error = await validateNota(dni, numericValue);
+    const error = await validateNota(dniNumber, numericValue);
 
     if (error) {
-      setErrors((prev) => ({ ...prev, [dni]: error }));
+      setErrors((prev) => ({ ...prev, [dniNumber]: error }));
     } else {
       setNotas((prev) => ({
         ...prev,
-        [dni]: {
-          ...prev[dni],
+        [dniNumber]: {
+          ...prev[dniNumber],
           nota: numericValue,
         },
       }));
-      setErrors((prev) => ({ ...prev, [dni]: '' }));
+      setErrors((prev) => ({ ...prev, [dniNumber]: '' }));
     }
   };
 
@@ -173,10 +213,15 @@ function SubirNotasPage() {
   };
 
   const handleAusenteChange = (dni, isAusente) => {
+    const dniNumber = Number(dni);
+    if (!Number.isInteger(dniNumber) || dniNumber <= 0) {
+      return;
+    }
+
     setNotas((prev) => ({
       ...prev,
-      [dni]: {
-        nota: prev[dni]?.nota || '',
+      [dniNumber]: {
+        nota: prev[dniNumber]?.nota ?? '',
         ausente: isAusente,
       },
     }));
@@ -191,41 +236,105 @@ function SubirNotasPage() {
     }
 
     try {
-      const evaluaciones = Object.entries(notas).map(([dni, data]) => {
-        const notaValue = data?.nota !== '' ? Number(data?.nota) : null;
-        const isAusente = data?.ausente || false;
+      const evaluacionesParaCrear = [];
+      const evaluacionesParaActualizar = [];
 
-        return {
-          alumnoId: Number(dni),
-          examenId: Number(examenId),
-          nota: notaValue,
-          observaciones: isAusente ? 'Ausente' : null,
-        };
-      });
+      alumnos
+        .map((alumno) => {
+          const dni = Number(alumno.dni);
+          if (!Number.isInteger(dni) || dni <= 0) return null;
+
+          const data = notas[dni] ?? { nota: '', ausente: false };
+          const notaValue = data?.nota !== '' ? Number(data?.nota) : null;
+          const isAusente = data?.ausente || false;
+          const observacion = isAusente ? 'Ausente' : null;
+          const evaluacionId = evaluacionesExistentes[dni];
+
+          const payloadBase = {
+            alumnoId: dni,
+            examenId: Number(examenId),
+            nota: Number.isNaN(notaValue) ? null : notaValue,
+            observacion,
+          };
+
+          if (evaluacionId) {
+            evaluacionesParaActualizar.push({
+              id: Number(evaluacionId),
+              ...payloadBase,
+            });
+            return payloadBase;
+          }
+
+          if (payloadBase.nota !== null || payloadBase.observacion !== null) {
+            evaluacionesParaCrear.push(payloadBase);
+          }
+
+          return payloadBase;
+        })
+        .filter(Boolean);
 
       // Validar cada evaluación antes de enviar
-      const validationPromises = evaluaciones.map((evaluacion) =>
+      const validationPromises = [...evaluacionesParaCrear, ...evaluacionesParaActualizar].map((evaluacion) =>
         evaluacionSchema.validate(evaluacion)
       );
 
       await Promise.all(validationPromises);
 
-      const response = await fetch('/api/evaluaciones/batch-create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ evaluaciones }),
-      });
+      if (evaluacionesParaActualizar.length > 0) {
+        const updateResponse = await fetch('/api/evaluaciones/batch-update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ evaluaciones: evaluacionesParaActualizar }),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al registrar las notas');
+        if (!updateResponse.ok) {
+          const errorData = await updateResponse.json();
+          throw new Error(errorData.message || 'Error al actualizar las notas');
+        }
+      }
+
+      if (evaluacionesParaCrear.length > 0) {
+        const createResponse = await fetch('/api/evaluaciones/batch-create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ evaluaciones: evaluacionesParaCrear }),
+        });
+
+        if (!createResponse.ok) {
+          const errorData = await createResponse.json();
+          throw new Error(errorData.message || 'Error al registrar las notas');
+        }
       }
 
       toast.success(' Notas publicadas correctamente');
       setEditMode(false);
       setBackupNotas({});
+
+      // Recargar mapeo de evaluaciones para mantener ids actualizados y evitar duplicados en próximas ediciones
+      const reloadResponse = await fetch(`/api/evaluaciones/examen/${examenId}`);
+      if (reloadResponse.ok) {
+        const reloadData = await reloadResponse.json();
+        if (reloadData?.data) {
+          const existingEvaluaciones = {};
+          reloadData.data.forEach((evaluacion) => {
+            const dniAlumno = Number(
+              evaluacion.alumnoId ?? evaluacion.alumno?.dni
+            );
+            if (
+              Number.isInteger(dniAlumno) &&
+              dniAlumno > 0 &&
+              Number.isInteger(Number(evaluacion.id))
+            ) {
+              existingEvaluaciones[dniAlumno] = Number(evaluacion.id);
+            }
+          });
+          setEvaluacionesExistentes(existingEvaluaciones);
+        }
+      }
     } catch (error) {
       console.error('Error al confirmar los cambios:', error);
       toast.error(` ${error.message || 'Error al confirmar los cambios'}`);
@@ -255,6 +364,16 @@ function SubirNotasPage() {
     );
   }
 
+  if (examen === 'SERVER_ERROR') {
+    return (
+      <div className="subir-notas-page">
+        <p style={{ color: 'red', fontWeight: 'bold' }}>
+          ❌ No se pudo conectar con el servidor. Por favor, verifica la conexión o intenta más tarde.
+        </p>
+      </div>
+    );
+  }
+
   if (!examen) {
     return (
       <div className="subir-notas-page">
@@ -269,18 +388,24 @@ function SubirNotasPage() {
 
       <div className="evaluacion-examen-card">
         <h2 className="examen-title">
-          Examen de {examen?.materia || 'Materia no especificada'}
+          Examen de {examen?.materia || 'materia no especificada'}
         </h2>
         <div className="examen-details">
           <div className="detail-item">
             <span className="detail-icon">📅</span>
             <p>
               <strong>Fecha:</strong>{' '}
-              {new Date(examen.fecha_examen).toLocaleDateString('es-AR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {(() => {
+                const rawFecha = getFechaExamen(examen);
+                if (!rawFecha) return 'Fecha no especificada';
+                const fechaObj = new Date(rawFecha);
+                if (Number.isNaN(fechaObj.getTime())) return 'Fecha inválida';
+                return fechaObj.toLocaleDateString('es-AR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                });
+              })()}
             </p>
           </div>
           <div className="detail-item">
@@ -308,9 +433,9 @@ function SubirNotasPage() {
               </div>
               <ul className="alumnos-list" role="list">
                 {alumnos.map((alumno) => {
-                  const alumnoData = notas[alumno.dni] || {
-                    nota: '',
-                    ausente: false,
+                  const alumnoData = {
+                    nota: notas[alumno.dni]?.nota ?? '',
+                    ausente: notas[alumno.dni]?.ausente ?? false,
                   };
                   return (
                     <li
@@ -332,11 +457,7 @@ function SubirNotasPage() {
                               className={`nota-input ${
                                 errors[alumno.dni] ? 'error' : ''
                               }`}
-                              value={
-                                alumnoData.nota !== undefined
-                                  ? alumnoData.nota
-                                  : ''
-                              }
+                              value={alumnoData.nota ?? ''}
                               onChange={(e) =>
                                 handleNotaChange(alumno.dni, e.target.value)
                               }

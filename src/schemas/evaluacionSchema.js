@@ -9,7 +9,7 @@ export const evaluacionSchema = Yup.object().shape({
     .nullable()
     .optional(),
 
-  observaciones: Yup.string()
+  observacion: Yup.string()
     .min(0, 'Las observaciones deben tener al menos 0 caracteres.')
     .max(500, 'Las observaciones no pueden superar los 500 caracteres.')
     .nullable()
