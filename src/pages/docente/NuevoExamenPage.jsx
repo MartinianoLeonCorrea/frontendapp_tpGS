@@ -50,16 +50,26 @@ function NuevoExamenPage() {
 
       const toastId = toast.loading('Creando examen...');
 
+      const payload = {
+        fechaExamen: data.fecha_examen,
+        temas: data.temas,
+        copias: Number(data.copias),
+        dictadoId: Number(data.dictadoId),
+      };
+
       const response = await fetch('/api/examenes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Error al crear el examen');
+        const details = Array.isArray(result.errors)
+          ? result.errors.map((e) => e.message || e).join(' | ')
+          : null;
+        throw new Error(details || result.message || 'Error al crear el examen');
       }
 
       toast.update(toastId, {

@@ -15,6 +15,8 @@ function BorrarExamenPage() {
   const [confirmText, setConfirmText] = useState('');
   const [eliminadoExitoso, setEliminadoExitoso] = useState(false);
 
+  const getFechaExamen = (item) => item?.fecha_examen || item?.fechaExamen;
+
   useEffect(() => {
     const fetchExamen = async () => {
       try {
@@ -96,7 +98,9 @@ function BorrarExamenPage() {
   };
 
   const formatFecha = (fecha) => {
-    return new Date(fecha).toLocaleDateString('es-AR', {
+    const parsedDate = new Date(fecha);
+    if (Number.isNaN(parsedDate.getTime())) return 'Fecha invalida';
+    return parsedDate.toLocaleDateString('es-AR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -137,7 +141,7 @@ function BorrarExamenPage() {
       <div className="examen-details">
         <div className="detail-item">
           <strong>Fecha del examen:</strong>
-          <span>{formatFecha(examen.fecha_examen)}</span>
+          <span>{formatFecha(getFechaExamen(examen))}</span>
         </div>
 
         <div className="detail-item">
