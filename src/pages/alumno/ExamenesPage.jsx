@@ -85,9 +85,12 @@ function ExamenesPage() {
     fetchExamenes();
   }, [dni]);
 
+  const getFechaExamen = (examen) => examen?.fechaExamen;
+
   function formatFecha(fechaISO) {
     if (!fechaISO) return '';
     const fecha = new Date(fechaISO);
+    if (Number.isNaN(fecha.getTime())) return 'Fecha invalida';
     const dia = String(fecha.getDate()).padStart(2, '0');
     const mes = String(fecha.getMonth() + 1).padStart(2, '0');
     const anio = fecha.getFullYear();
@@ -99,7 +102,12 @@ function ExamenesPage() {
   hoy.setHours(0, 0, 0, 0);
 
   let examenesFiltrados = examenes.filter((examen) => {
-    const fechaExamen = new Date(examen.fecha_examen);
+    const fechaRaw = getFechaExamen(examen);
+    if (!fechaRaw) return false;
+
+    const fechaExamen = new Date(fechaRaw);
+    if (Number.isNaN(fechaExamen.getTime())) return false;
+
     fechaExamen.setHours(0, 0, 0, 0);
     if (filtro === 'proximos') return fechaExamen >= hoy;
     if (filtro === 'pasados') return fechaExamen < hoy;
@@ -107,8 +115,13 @@ function ExamenesPage() {
   });
 
   examenesFiltrados = [...examenesFiltrados].sort((a, b) => {
-    const fechaA = new Date(a.fecha_examen);
-    const fechaB = new Date(b.fecha_examen);
+    const fechaA = new Date(getFechaExamen(a));
+    const fechaB = new Date(getFechaExamen(b));
+
+    if (Number.isNaN(fechaA.getTime()) && Number.isNaN(fechaB.getTime())) return 0;
+    if (Number.isNaN(fechaA.getTime())) return 1;
+    if (Number.isNaN(fechaB.getTime())) return -1;
+
     return orden === 'asc' ? fechaA - fechaB : fechaB - fechaA;
   });
 
@@ -145,7 +158,7 @@ function ExamenesPage() {
         {isLoading ? (
           <p>Cargando exámenes...</p>
         ) : examenesFiltrados.length === 0 ? (
-          <p>No hay exámenes asignados.</p>
+          <p>No hay exámenes asignados bajo este filtro.</p>
         ) : (
           <ul className="examenes-list">
             {examenesFiltrados.map((examen) => (
@@ -155,7 +168,7 @@ function ExamenesPage() {
                     <strong>{examen.materia?.nombre || 'Materia'}</strong>
                   </span>
                   <span className="examen-fecha">
-                    {formatFecha(examen.fecha_examen)}
+                    {formatFecha(getFechaExamen(examen))}
                   </span>
                 </div>
                 <div className="examen-docente">
