@@ -176,7 +176,7 @@ function Home() {
             {selectedUser.email && <p>Email: {selectedUser.email}</p>}
             {selectedUser.curso && (
               <p>
-                Curso: {selectedUser.curso.nro_letra} -{' '}
+                Curso: {selectedUser.curso.nroLetra} -{' '}
                 {selectedUser.curso.turno}
               </p>
             )}

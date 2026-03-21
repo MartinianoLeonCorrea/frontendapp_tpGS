@@ -4,11 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import '../App.css';
 import { toast, ToastContainer } from 'react-toastify';
-import {
-  perfilEditSchema,
-  alumnoSchema,
-  docenteSchema,
-} from '../schemas/personaSchema';
+import { perfilEditSchema } from '../schemas/personaSchema';
 
 export default function Perfil() {
   const { userData, isAlumno, isDocente } = useUser(); // Obtener datos del contexto
@@ -30,7 +26,7 @@ export default function Perfil() {
         icon: '🎓',
         title: 'Alumno',
         formatAdditionalInfo: (info) =>
-          `[${info?.nro_letra || ''} - ${info?.turno || ''}]`,
+          `[${info?.nroLetra || ''} - ${info?.turno || ''}]`,
       },
       docente: {
         icon: '👨‍🏫',
@@ -58,10 +54,16 @@ export default function Perfil() {
 
         // Cargar datos básicos del usuario
         const response = await fetch(apiEndpoint);
-        const data = await response.json();
+
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error('No se pudo leer la respuesta del servidor');
+        }
 
         if (!response.ok) {
-          throw new Error(data.message || 'Error al cargar datos');
+          throw new Error(data?.message || 'Error al cargar datos');
         }
 
         console.log('Datos cargados:', data);
@@ -75,7 +77,8 @@ export default function Perfil() {
         }
         setAdditionalInfo(additionalData);
       } catch (err) {
-        setError(`No se pudieron cargar los datos del ${userType}.`);
+        const errorMessage = err?.message || `No se pudieron cargar los datos del ${userType}.`;
+        setError(errorMessage);
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -123,15 +126,9 @@ export default function Perfil() {
     setFieldErrors({});
 
     try {
-      // Selecciona el esquema según el tipo de usuario
-      let schema;
-      if (userType === 'docente') {
-        schema = docenteSchema;
-      } else if (userType === 'alumno') {
-        schema = alumnoSchema;
-      } else {
-        schema = perfilEditSchema;
-      }
+      // En edición de perfil solo se validan campos editables,
+      // no curso/tipo porque no se modifican desde esta pantalla.
+      const schema = perfilEditSchema;
 
       await schema.validate(formData, { abortEarly: false });
 

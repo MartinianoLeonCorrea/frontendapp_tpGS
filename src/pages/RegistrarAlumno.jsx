@@ -23,7 +23,7 @@ function RegistrarAlumno() {
         const data = await res.json();
         const cursosOptions = (data.data || []).map((curso) => ({
           value: curso.id,
-          label: `${curso.nro_letra} - ${curso.turno}`,
+          label: `${curso.nroLetra} - ${curso.turno}`,
         }));
         setCampos([
           ...camposBase,
