@@ -25,7 +25,7 @@ import NuevoExamenPage from './pages/docente/NuevoExamenPage';
 import EditarExamenPage from './pages/docente/EditarExamenPage';
 import BorrarExamenPage from './pages/docente/BorrarExamenPage';
 import SubirNotasPage from './pages/docente/SubirNotasPage';
-import LoginPage from './pages/LoginPage';  
+import LoginPage from './pages/LoginPage';
 import React, { useState, useEffect } from 'react';
 
 const Layout = () => {
@@ -198,9 +198,8 @@ function Home() {
               alumnos.map((alumno) => (
                 <div
                   key={alumno.dni}
-                  className={`user-card ${
-                    selectedUser?.dni === alumno.dni ? 'selected' : ''
-                  }`}
+                  className={`user-card ${selectedUser?.dni === alumno.dni ? 'selected' : ''
+                    }`}
                   onClick={() => handleUserSelect(alumno)}
                 >
                   <p>
@@ -223,9 +222,8 @@ function Home() {
               docentes.map((docente) => (
                 <div
                   key={docente.dni}
-                  className={`user-card ${
-                    selectedUser?.dni === docente.dni ? 'selected' : ''
-                  }`}
+                  className={`user-card ${selectedUser?.dni === docente.dni ? 'selected' : ''
+                    }`}
                   onClick={() => handleUserSelect(docente)}
                 >
                   <p>
@@ -277,6 +275,8 @@ function App() {
             <Route path="docente/dashboard" element={<DashboardDocente />} />
             <Route path="registrar" element={<RegistrarAlumno />} />
             <Route path="calendario" element={<CalendarioPage />} />
+            <Route path="login" element={<LoginPage />} />
+
             <Route
               path="/alumno/perfil"
               element={<Perfil userType="alumno" />}
