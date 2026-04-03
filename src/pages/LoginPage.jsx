@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 
@@ -9,7 +9,15 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    const savedRole = localStorage.getItem("userRole");
+
+    if (savedToken && savedRole) {
+      navigate(savedRole === "alumno" ? "/alumno/dashboard" : "/docente/dashboard");
+    }
+  }, [navigate]);
 
 
   const handleSubmit = async (e) => {
@@ -25,8 +33,8 @@ export default function Login() {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: token },
-        body: JSON.stringify({ email, password, role: userType }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -36,6 +44,7 @@ export default function Login() {
         setError(data.message || "Credenciales incorrectas.");
       } else {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("userRole", userType);
         console.log("logink ok", data);
         // Guardar token/usuario en contexto o localStorage según tu implementación
         // authContext.login(data.user);

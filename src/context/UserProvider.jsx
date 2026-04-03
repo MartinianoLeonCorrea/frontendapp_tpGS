@@ -47,6 +47,8 @@ export const UserProvider = ({ children }) => {
     setUserData(null);
     localStorage.removeItem('userDni');
     localStorage.removeItem('userData');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
   };
 
   // Verificar si hay un usuario guardado al cargar la aplicación

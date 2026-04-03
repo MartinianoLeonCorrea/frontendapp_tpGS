@@ -257,6 +257,7 @@ function Home() {
         </button>
 
         <button onClick={() => navigate('/registrar')}>Registrar Alumno</button>
+        <button onClick={() => navigate('/login')}>Ir a Login</button>
       </div>
     </div>
   );
