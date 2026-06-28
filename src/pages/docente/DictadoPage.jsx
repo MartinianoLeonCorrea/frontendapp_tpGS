@@ -3,6 +3,160 @@ import { useEffect, useState, useCallback } from 'react';
 import Foro from '../../components/Foro';
 import '../../App.css';
 
+function MaterialDocente({ dictadoId }) {
+  const [materiales, setMateriales] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [mostrarForm, setMostrarForm] = useState(false);
+  const [form, setForm] = useState({ titulo: '', descripcion: '', url: '', tipo: 'pdf' });
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchMateriales = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/materiales/dictado/${dictadoId}`);
+      const data = await res.json();
+      setMateriales(data.data || []);
+    } catch (error) {
+      console.error('Error al cargar materiales:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [dictadoId]);
+
+  useEffect(() => {
+    if (dictadoId) fetchMateriales();
+  }, [dictadoId, fetchMateriales]);
+
+  const handleSubmit = async () => {
+    if (!form.titulo || !form.url) {
+      setError('El título y la URL son obligatorios');
+      return;
+    }
+    setGuardando(true);
+    setError('');
+    try {
+      const res = await fetch('/api/materiales', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, dictadoId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al guardar');
+      setForm({ titulo: '', descripcion: '', url: '', tipo: 'pdf' });
+      setMostrarForm(false);
+      fetchMateriales();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const handleEliminar = async (id) => {
+    if (!confirm('¿Eliminar este material?')) return;
+    try {
+      await fetch(`/api/materiales/${id}`, { method: 'DELETE' });
+      fetchMateriales();
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+    }
+  };
+
+  const iconoTipo = (tipo) =>
+    ({ pdf: '📄', video: '🎥', link: '🔗', otro: '📎' })[tipo] || '📎';
+
+  return (
+    <div className="examenes-section">
+      <div className="examenes-header">
+        <h3 className="subtitle">Materiales</h3>
+        <button
+          className="btn-nuevo-examen"
+          onClick={() => setMostrarForm(!mostrarForm)}
+        >
+          {mostrarForm ? 'Cancelar' : '+ Nuevo Material'}
+        </button>
+      </div>
+
+      {mostrarForm && (
+        <div className="examen-card" style={{ flexDirection: 'column', gap: '8px' }}>
+          {error && <p style={{ color: 'red', margin: 0 }}>{error}</p>}
+          <input
+            placeholder="Título *"
+            value={form.titulo}
+            onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '100%' }}
+          />
+          <input
+            placeholder="Descripción (opcional)"
+            value={form.descripcion}
+            onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '100%' }}
+          />
+          <input
+            placeholder="URL del material *"
+            value={form.url}
+            onChange={(e) => setForm({ ...form, url: e.target.value })}
+            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '100%' }}
+          />
+          <select
+            value={form.tipo}
+            onChange={(e) => setForm({ ...form, tipo: e.target.value })}
+            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '100%' }}
+          >
+            <option value="pdf">📄 PDF</option>
+            <option value="video">🎥 Video</option>
+            <option value="link">🔗 Link</option>
+            <option value="otro">📎 Otro</option>
+          </select>
+          <button
+            className="btn-nuevo-examen"
+            onClick={handleSubmit}
+            disabled={guardando}
+          >
+            {guardando ? 'Guardando...' : 'Guardar Material'}
+          </button>
+        </div>
+      )}
+
+      {isLoading ? (
+        <p>Cargando materiales...</p>
+      ) : materiales.length === 0 ? (
+        <p className="no-data">No hay materiales cargados.</p>
+      ) : (
+        <div className="examenes-list">
+          {materiales.map((material) => (
+            <div key={material.id} className="examen-card">
+              <button
+                className="btn-eliminar-cruz"
+                onClick={() => handleEliminar(material.id)}
+              >
+                ✖
+              </button>
+              <div className="examen-info">
+                <h4 className="examen-fecha">
+                  {iconoTipo(material.tipo)} {material.titulo}
+                </h4>
+                {material.descripcion && (
+                  <p className="examen-temas">{material.descripcion}</p>
+                )}
+                <a
+                  href={material.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-editar"
+                  style={{ display: 'inline-block', marginTop: '6px' }}
+                >
+                  🔗 Ver material
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DictadoPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -160,6 +314,10 @@ function DictadoPage() {
           )}
         </div>
 
+        {/* Sección de Materiales */}
+        <MaterialDocente dictadoId={dictadoId} />
+
+        {/* Alumnos del curso */}
         <div className="alumnos-section">
           <h3 className="subtitle">Alumnos del curso</h3>
           {alumnos.length === 0 ? (

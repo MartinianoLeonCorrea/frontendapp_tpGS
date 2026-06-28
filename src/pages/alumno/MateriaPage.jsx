@@ -3,6 +3,71 @@ import { useEffect, useState } from 'react';
 import Foro from '../../components/Foro';
 import '../../App.css';
 
+function MaterialSection({ dictadoId }) {
+  const [materiales, setMateriales] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMateriales = async () => {
+      try {
+        const res = await fetch(`/api/materiales/dictado/${dictadoId}`);
+        const data = await res.json();
+        setMateriales(data.data || []);
+      } catch (error) {
+        console.error('Error al cargar materiales:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (dictadoId) fetchMateriales();
+  }, [dictadoId]);
+
+  const iconoTipo = (tipo) => {
+    const iconos = { pdf: '📄', video: '🎥', link: '🔗', otro: '📎' };
+    return iconos[tipo] || '📎';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="card material-section">
+        <h3 className="material-title">Material:</h3>
+        <p>Cargando materiales...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card material-section">
+      <h3 className="material-title">Material:</h3>
+      {materiales.length === 0 ? (
+        <p>No hay materiales disponibles.</p>
+      ) : (
+        <ul className="materiales-list">
+          {materiales.map((material) => (
+            <li key={material.id} className="material-item">
+              <span className="material-icono">{iconoTipo(material.tipo)}</span>
+              <div className="material-info">
+                <a
+                  href={material.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="material-titulo"
+                >
+                  {material.titulo}
+                </a>
+                {material.descripcion && (
+                  <p className="material-descripcion">{material.descripcion}</p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function MateriaPage() {
   const { state } = useLocation();
   const subjectId = state?.subjectId;
@@ -26,7 +91,7 @@ function MateriaPage() {
         const alumnoRes = await fetch(`/api/personas/${dni}`);
         const alumnoData = await alumnoRes.json();
         const cursoId = alumnoData.data?.curso?.id;
-        
+
         if (!cursoId) {
           console.error('No se encontró cursoId para el alumno');
           setIsLoading(false);
@@ -135,7 +200,7 @@ function MateriaPage() {
                     (a, b) =>
                       new Date(getFechaExamen(a)) - new Date(getFechaExamen(b))
                   );
-                
+
                 if (proximos.length === 0) {
                   return (
                     <li className="examen-item">
@@ -143,7 +208,7 @@ function MateriaPage() {
                     </li>
                   );
                 }
-                
+
                 return proximos.map((examen) => (
                   <li key={examen.id} className="examen-item">
                     {examen.temas} - {formatFecha(getFechaExamen(examen))}
@@ -157,12 +222,7 @@ function MateriaPage() {
         </div>
 
         {/* Material */}
-        <div className="card material-section">
-          <h3 className="material-title">Material:</h3>
-          <div className="material-placeholder">
-            <p>Feature no desarrollada</p>
-          </div>
-        </div>
+        <MaterialSection dictadoId={dictado.id} />
       </div>
 
       {/* Foro - Sidebar derecho */}
